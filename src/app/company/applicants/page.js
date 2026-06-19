@@ -158,6 +158,32 @@ export default function PlacementTracking() {
         </div>
       </div>
 
+      {/* Pipeline Statistics Cards */}
+      {(() => {
+        const stats = [
+          { label: 'Total Applicants', count: applications.length, color: 'bg-slate-900', textColor: 'text-white', icon: '👥' },
+          { label: 'Applied', count: applications.filter(a => a.stage === 'Applied').length, color: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200', icon: '📩' },
+          { label: 'Shortlisted', count: applications.filter(a => a.stage === 'Shortlisted').length, color: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200', icon: '⭐' },
+          { label: 'Interview Scheduled', count: applications.filter(a => a.stage === 'Interview Scheduled').length, color: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200', icon: '📅' },
+          { label: 'Selected', count: applications.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released').length, color: 'bg-emerald-50', textColor: 'text-emerald-700', borderColor: 'border-emerald-200', icon: '✅' },
+          { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, color: 'bg-red-50', textColor: 'text-red-700', borderColor: 'border-red-200', icon: '❌' },
+        ];
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className={`${stat.color} ${stat.borderColor ? 'border ' + stat.borderColor : ''} rounded-2xl p-5 transition-transform hover:scale-105 ${stat.label === 'Total Applicants' ? 'shadow-lg' : 'shadow-sm'}`}
+              >
+                <div className="text-2xl mb-2">{stat.icon}</div>
+                <div className={`text-3xl font-black ${stat.textColor}`}>{stat.count}</div>
+                <div className={`text-xs font-semibold mt-1 ${stat.label === 'Total Applicants' ? 'text-slate-300' : 'text-slate-500'}`}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
