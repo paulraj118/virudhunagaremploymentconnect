@@ -1,0 +1,389 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+
+export default function CompanyDashboard() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [approvalStatus, setApprovalStatus] = useState(null); // null means not registered
+  const [stats, setStats] = useState({ activeJobs: 0, totalApplicants: 0, interviews: 0, hired: 0 });
+  
+  const [formData, setFormData] = useState({
+    companyName: '', hrName: '', website: '', address: '',
+    linkedIn: '', description: '', industryType: 'IT Services', companySize: '1-50', dpiitRegistered: 'No'
+  });
+
+  useEffect(() => {
+    fetchCompanyStatus();
+  }, []);
+
+  const fetchCompanyStatus = async () => {
+    try {
+      const res = await fetch('/api/company/profile');
+      const data = await res.json();
+      if (data.registered) {
+        setApprovalStatus(data.company);
+        if (data.company.approvalStatus === 'approved') {
+          fetchStats();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch('/api/company/dashboard');
+      const data = await res.json();
+      if (data.success) {
+        setStats(data.stats);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRegistrationSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/company/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setApprovalStatus(data.company);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert('Submission failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFF]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <p className="text-indigo-600 font-semibold tracking-wide">Loading Profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (approvalStatus) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFF] font-sans selection:bg-indigo-200">
+        
+        {/* Soft Light Mode Decorative Background */}
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-indigo-300/30 blur-[120px] rounded-full mix-blend-multiply"></div>
+          <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-pink-300/30 blur-[120px] rounded-full mix-blend-multiply"></div>
+          <div className="absolute top-[20%] right-[15%] w-[30%] h-[30%] bg-blue-300/20 blur-[100px] rounded-full mix-blend-multiply"></div>
+        </div>
+
+        {/* Top Navbar removed because layout handles it */}
+
+        <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+            <div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">
+                Dashboard Overview
+              </h1>
+              <p className="text-slate-500 font-medium text-lg">Real-time metrics and hiring pipeline for <span className="text-indigo-600 font-bold">{approvalStatus.companyName}</span></p>
+            </div>
+            {approvalStatus.approvalStatus === 'approved' && (
+              <button onClick={() => router.push('/company/jobs')} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all hover:scale-105 flex items-center gap-2 group cursor-pointer z-20 relative">
+                <span className="group-hover:rotate-90 transition-transform duration-300 text-xl leading-none">+</span> Create Job Listing
+              </button>
+            )}
+          </div>
+          
+          {approvalStatus.approvalStatus === 'pending' && (
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-800 p-8 rounded-3xl shadow-sm mb-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center flex-shrink-0 text-amber-600 shadow-sm border border-amber-200">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-xl mb-1">Registration Under Review</h3>
+                  <p className="text-amber-700/80 font-medium">Your company profile ({approvalStatus.companyName}) is currently being verified by our Admin team. Once approved, you will unlock full access to post jobs and view applicant profiles.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {approvalStatus.approvalStatus === 'rejected' && (
+            <div className="bg-red-50 border border-red-200 text-red-800 p-8 rounded-3xl shadow-sm mb-8 flex items-start gap-4">
+               <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0 text-red-600 shadow-sm border border-red-200">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+              <div>
+                <h3 className="font-bold text-xl mb-1">Registration Rejected</h3>
+                <p className="text-red-700/80 font-medium">Unfortunately, your company registration could not be verified. Please contact support for more details.</p>
+              </div>
+            </div>
+          )}
+
+          {approvalStatus.approvalStatus === 'approved' && (
+            <>
+              {/* Extra Cards Section (4 columns) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                
+                {/* Card 1 */}
+                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 border border-indigo-100 group-hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">Live</span>
+                  </div>
+                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.activeJobs}</p>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Jobs</h3>
+                </div>
+                
+                {/* Card 2 */}
+                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full">+0%</span>
+                  </div>
+                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.totalApplicants}</p>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Applicants</h3>
+                </div>
+
+                {/* Card 3 */}
+                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(245,158,11,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100 group-hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-600 rounded-full border border-amber-100">This Week</span>
+                  </div>
+                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.interviews}</p>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Interviews</h3>
+                </div>
+
+                {/* Card 4 */}
+                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(236,72,153,0.1)] hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-pink-600 border border-pink-100 group-hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1 bg-pink-50 text-pink-600 rounded-full border border-pink-100">Success</span>
+                  </div>
+                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.hired}</p>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Hired Candidates</h3>
+                </div>
+
+              </div>
+
+              {/* Advanced Charts Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Advanced Bar Chart - 2 Columns wide */}
+                <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-8 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                  <div className="flex justify-between items-center mb-8">
+                    <div>
+                      <h3 className="text-xl font-black text-slate-800">Application Trends</h3>
+                      <p className="text-sm font-medium text-slate-500">Applicant volume over the last 7 days</p>
+                    </div>
+                    <select className="bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block px-3 py-2 outline-none">
+                      <option>Last 7 days</option>
+                      <option>Last 30 days</option>
+                    </select>
+                  </div>
+                  
+                  {/* Custom CSS Bar Chart */}
+                  <div className="h-64 flex items-end justify-between gap-2 pt-4 relative">
+                    {/* Horizontal grid lines */}
+                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="w-full border-t border-slate-100/80 h-0 flex items-center justify-start">
+                           <span className="text-xs text-slate-400 font-medium -translate-y-3">{100 - i*25}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Bars */}
+                    <div className="w-full flex justify-around items-end h-full z-10 pl-8">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
+                        // Dummy heights for demonstration
+                        const heights = ['h-[20%]', 'h-[40%]', 'h-[30%]', 'h-[60%]', 'h-[80%]', 'h-[50%]', 'h-[90%]'];
+                        const isToday = i === 6;
+                        return (
+                          <div key={day} className="flex flex-col items-center gap-3 group w-full px-1 sm:px-2 relative">
+                            <div className={`w-full max-w-[3rem] ${heights[i]} rounded-t-lg transition-all duration-500 relative group-hover:opacity-80 ${isToday ? 'bg-gradient-to-t from-indigo-600 to-purple-500 shadow-lg shadow-indigo-500/30' : 'bg-indigo-100'}`}>
+                              {/* Tooltip on hover */}
+                              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
+                                0 Applicants
+                              </div>
+                            </div>
+                            <span className={`text-xs font-bold ${isToday ? 'text-indigo-600' : 'text-slate-400'}`}>{day}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Advanced Circular Progress Chart - 1 Column wide */}
+                <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 rounded-3xl shadow-[0_10px_40px_rgba(79,70,229,0.15)] relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                  
+                  <div>
+                    <h3 className="text-xl font-black text-white mb-1">Hiring Efficiency</h3>
+                    <p className="text-sm font-medium text-indigo-200/70">Candidate conversion rate</p>
+                  </div>
+
+                  {/* Circular CSS Chart */}
+                  <div className="flex justify-center items-center py-8 relative">
+                    <div className="relative w-40 h-40">
+                      {/* Background circle */}
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/10" />
+                        {/* Progress circle (dummy 0% for now) */}
+                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="440" strokeDashoffset="440" strokeLinecap="round" className="text-indigo-400 transition-all duration-1000" />
+                      </svg>
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                        <span className="text-4xl font-black text-white">{stats.totalApplicants > 0 ? Math.round((stats.hired / stats.totalApplicants) * 100) : 0}%</span>
+                        <span className="block text-xs font-bold text-indigo-300 uppercase mt-1">Conversion</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div className="bg-white/10 backdrop-blur border border-white/10 rounded-2xl p-4">
+                      <p className="text-indigo-200 text-xs font-bold uppercase mb-1">Interviews</p>
+                      <p className="text-white text-2xl font-black">{stats.interviews}</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur border border-white/10 rounded-2xl p-4">
+                      <p className="text-indigo-200 text-xs font-bold uppercase mb-1">Offers</p>
+                      <p className="text-white text-2xl font-black">{stats.hired}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Company Registration Form
+  return (
+    <div className="flex items-center justify-center relative w-full pb-12">
+      <div className="max-w-4xl w-full bg-white rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden relative z-10">
+        <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-10 py-10 text-white relative overflow-hidden flex flex-col items-start">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 blur-[50px] rounded-full"></div>
+          <h2 className="text-3xl font-black tracking-tight relative z-10">HR Company Setup</h2>
+          <p className="text-slate-300 mt-2 font-medium relative z-10">Complete your company profile to unlock the hiring portal</p>
+        </div>
+        
+        <form onSubmit={handleRegistrationSubmit} className="p-10 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Company Name</label>
+              <input required type="text" value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">HR Manager Name</label>
+              <input required type="text" value={formData.hrName} onChange={e => setFormData({...formData, hrName: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Company Website</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                </div>
+                <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full pl-11 pr-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium hover:border-indigo-300" placeholder="https://..." />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">LinkedIn Profile <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </div>
+                <input required type="url" value={formData.linkedIn} onChange={e => setFormData({...formData, linkedIn: e.target.value})} className="w-full pl-11 pr-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium hover:border-indigo-300" placeholder="https://linkedin.com/company/..." />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Company Address</label>
+            <textarea required rows="2" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium"></textarea>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-8">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Industry Type</label>
+              <div className="relative">
+                 <select value={formData.industryType} onChange={e => setFormData({...formData, industryType: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium appearance-none hover:border-indigo-300 cursor-pointer">
+                  <option value="IT Services">IT Services</option>
+                  <option value="Product Based">Product Based</option>
+                  <option value="Fintech">Fintech</option>
+                  <option value="EdTech">EdTech</option>
+                  <option value="Healthcare">Healthcare</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Company Size</label>
+              <div className="relative">
+                <select value={formData.companySize} onChange={e => setFormData({...formData, companySize: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium appearance-none hover:border-indigo-300 cursor-pointer">
+                  <option value="1-50">1-50 Employees</option>
+                  <option value="51-200">51-200 Employees</option>
+                  <option value="201-500">201-500 Employees</option>
+                  <option value="500+">500+ Employees</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-3">DPIIT Registered?</label>
+              <div className="flex items-center gap-4">
+                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all duration-300 font-bold ${formData.dpiitRegistered === 'Yes' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-200' : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300'}`}>
+                  <input type="radio" name="dpiit" value="Yes" className="hidden" checked={formData.dpiitRegistered === 'Yes'} onChange={e => setFormData({...formData, dpiitRegistered: e.target.value})} />
+                  Yes
+                </label>
+                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all duration-300 font-bold ${formData.dpiitRegistered === 'No' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-200' : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300'}`}>
+                  <input type="radio" name="dpiit" value="No" className="hidden" checked={formData.dpiitRegistered === 'No'} onChange={e => setFormData({...formData, dpiitRegistered: e.target.value})} />
+                  No
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all mt-4 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+            {loading ? 'Submitting...' : 'Submit Registration for Approval'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
