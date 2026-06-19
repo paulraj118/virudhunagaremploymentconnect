@@ -165,17 +165,34 @@ export default function StudentApprovals() {
 
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div className="text-sm font-semibold text-slate-500 mb-1">Total Enrollments</div>
-            <div className="text-3xl font-bold text-slate-800">{stats.totalEnrollments}</div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Enrollments</div>
+              <div className="text-3xl font-black text-blue-600 tracking-tight">{stats.totalEnrollments}</div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div className="text-sm font-semibold text-slate-500 mb-1">Active Students</div>
-            <div className="text-3xl font-bold text-emerald-600">{stats.activeStudents}</div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Active Students</div>
+              <div className="text-3xl font-black text-emerald-600 tracking-tight">{stats.activeStudents}</div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div className="text-sm font-semibold text-slate-500 mb-1">Pending Approvals</div>
-            <div className="text-3xl font-bold text-amber-600">{stats.pendingApprovals}</div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Pending Approvals</div>
+              <div className="text-3xl font-black text-amber-600 tracking-tight">{stats.pendingApprovals}</div>
+            </div>
           </div>
         </div>
       )}
