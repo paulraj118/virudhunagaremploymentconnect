@@ -7,6 +7,12 @@ export default function PlacementTracking() {
   const [loading, setLoading] = useState(true);
   const [selectedApp, setSelectedApp] = useState(null);
   
+  // Filtering state
+  const [jobRoles, setJobRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState('All Jobs');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All Status');
+  
   // Interview Modal state
   const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [interviewData, setInterviewData] = useState({ date: '', link: '' });
@@ -17,12 +23,34 @@ export default function PlacementTracking() {
   ];
 
   useEffect(() => {
-    fetchApplications();
+    fetchJobs();
   }, []);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [selectedRole]);
+
+  const fetchJobs = async () => {
+    try {
+      const res = await fetch('/api/company/jobs');
+      const data = await res.json();
+      if (data.success) {
+        const uniqueRoles = [...new Set(data.jobs.map(job => job.title))].filter(Boolean);
+        setJobRoles(uniqueRoles);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchApplications = async () => {
     try {
-      const res = await fetch('/api/company/applications');
+      setLoading(true);
+      const url = selectedRole === 'All Jobs' 
+        ? '/api/company/applications' 
+        : `/api/company/applications?role=${encodeURIComponent(selectedRole)}`;
+        
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
         setApplications(data.applications);
@@ -63,15 +91,79 @@ export default function PlacementTracking() {
 
   if (loading) return <div>Loading applicants...</div>;
 
+  // Apply frontend filters for search and status
+  const filteredApps = applications.filter(app => {
+    const matchesSearch = app.studentId?.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          app.jobId?.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'All Status' || app.stage === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-8">Pipeline Tracker</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Pipeline Tracker</h1>
+
+      {/* Filters Section */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Search Candidates</label>
+          <input 
+            type="text" 
+            placeholder="Search by name or job..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-medium"
+          />
+        </div>
+        
+        <div className="w-full md:w-64">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Filter by Job Role</label>
+          <select 
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-bold text-indigo-700 bg-indigo-50"
+          >
+            <option value="All Jobs">All Jobs</option>
+            {jobRoles.map(role => (
+              <option key={role} value={role}>{role}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="w-full md:w-48">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-medium"
+          >
+            <option value="All Status">All Status</option>
+            {STAGES.map(stage => (
+              <option key={stage} value={stage}>{stage}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <button 
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedRole('All Jobs');
+              setStatusFilter('All Status');
+            }}
+            className="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
             <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
               <tr>
+                <th className="px-6 py-4 w-24">Rank</th>
                 <th className="px-6 py-4">Candidate</th>
                 <th className="px-6 py-4">Applied Job</th>
                 <th className="px-6 py-4">Applied Date</th>
@@ -82,8 +174,13 @@ export default function PlacementTracking() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {applications.map((app) => (
+              {filteredApps.map((app) => (
                 <tr key={app._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className={`font-black text-lg ${app.rankValue <= 3 ? 'text-indigo-600' : 'text-slate-400'}`}>
+                      {app.rankString || '-'}
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="font-bold text-slate-800">{app.studentId?.userId?.name}</div>
                     <div className="text-xs text-slate-500">{app.studentId?.userId?.email}</div>
@@ -159,10 +256,10 @@ export default function PlacementTracking() {
                 </tr>
               ))}
               
-              {applications.length === 0 && (
+              {filteredApps.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="px-6 py-16 text-center text-slate-500">
-                    No applications received yet.
+                  <td colSpan="8" className="px-6 py-16 text-center text-slate-500">
+                    No applications match your filters.
                   </td>
                 </tr>
               )}
