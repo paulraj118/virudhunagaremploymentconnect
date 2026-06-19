@@ -8,6 +8,7 @@ export default function LandingPage() {
   const { user, logout } = useAuth();
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -49,7 +50,8 @@ export default function LandingPage() {
               </span>
             </div>
             
-            <div className="flex items-center space-x-4 md:space-x-6">
+            <div className="flex items-center space-x-3">
+              {/* Theme Toggle */}
               <button onClick={toggleTheme} className={`p-2.5 rounded-full transition-all duration-300 flex items-center justify-center ${isDark ? 'bg-white/10 text-yellow-400 hover:bg-white/20' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:scale-105 shadow-sm'}`}>
                 {isDark ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -58,26 +60,84 @@ export default function LandingPage() {
                 )}
               </button>
 
-              {!user ? (
-                <>
-                  <Link href="/login" className={`font-bold transition-colors duration-300 hidden sm:block ${isDark ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-indigo-600'}`}>
-                    Log In
-                  </Link>
-                  <Link href="/register" className="relative inline-flex h-11 items-center justify-center px-6 py-2 font-bold text-white transition-all duration-200 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full hover:scale-105 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50">
-                    Register Now
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href={user.role === 'student' ? '/student' : user.role === 'hr_company' ? '/company' : '/admin'} className="font-bold text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-5 py-2.5 rounded-full transition-all border border-indigo-100 shadow-sm">
-                    Dashboard
-                  </Link>
-                  <button onClick={logout} className={`font-bold px-5 py-2.5 rounded-full transition-all duration-300 border ${isDark ? 'bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-slate-300 border-white/10' : 'bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-700 border-slate-200 shadow-sm'}`}>
-                    Log Out
-                  </button>
-                </>
-              )}
+              {/* Desktop Menu */}
+              <div className="hidden md:flex items-center space-x-4">
+                {!user ? (
+                  <>
+                    <Link href="/login" className={`font-bold transition-colors duration-300 ${isDark ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-indigo-600'}`}>
+                      Log In
+                    </Link>
+                    <Link href="/register" className="relative inline-flex h-11 items-center justify-center px-6 py-2 font-bold text-white transition-all duration-200 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full hover:scale-105 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50">
+                      Register Now
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href={user.role === 'student' ? '/student' : user.role === 'hr_company' ? '/company' : '/admin'} className="font-bold text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-5 py-2.5 rounded-full transition-all border border-indigo-100 shadow-sm">
+                      Dashboard
+                    </Link>
+                    <button onClick={logout} className={`font-bold px-5 py-2.5 rounded-full transition-all duration-300 border ${isDark ? 'bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-slate-300 border-white/10' : 'bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-700 border-slate-200 shadow-sm'}`}>
+                      Log Out
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Hamburger Button (Mobile Only) */}
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                className={`p-2.5 rounded-xl transition-all duration-300 md:hidden flex items-center justify-center border ${isDark ? 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                aria-label="Toggle Menu"
+              >
+                {isMenuOpen ? (
+                  // Close Icon (X)
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                ) : (
+                  // Hamburger Icon (3 lines)
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                )}
+              </button>
             </div>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-64 border-t' : 'max-h-0 border-t-0'} ${isDark ? 'bg-[#0F1424] border-white/10' : 'bg-white border-slate-200'}`}>
+          <div className="px-4 py-4 space-y-3 flex flex-col">
+            {!user ? (
+              <>
+                <Link 
+                  href="/login" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`font-bold py-2.5 px-4 rounded-xl transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
+                >
+                  Log In
+                </Link>
+                <Link 
+                  href="/register" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="font-bold py-3 px-4 text-center text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-md"
+                >
+                  Register Now
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href={user.role === 'student' ? '/student' : user.role === 'hr_company' ? '/company' : '/admin'} 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="font-bold text-center py-2.5 px-4 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100 shadow-sm"
+                >
+                  Dashboard
+                </Link>
+                <button 
+                  onClick={() => { logout(); setIsMenuOpen(false); }} 
+                  className={`font-bold py-2.5 px-4 rounded-xl text-center border ${isDark ? 'bg-white/5 text-slate-300 border-white/10 hover:bg-red-500/20 hover:text-red-400' : 'bg-white text-slate-700 border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'}`}
+                >
+                  Log Out
+                </button>
+              </>
+            )}
           </div>
         </div>
       </nav>
