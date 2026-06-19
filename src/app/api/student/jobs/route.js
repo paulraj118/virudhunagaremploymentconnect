@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Job from '@/models/Job';
 import Student from '@/models/Student';
-import AssessmentResult from '@/models/AssessmentResult';
+
 import { getCurrentUser } from '@/lib/auth';
 import { calculateMatchScore } from '@/lib/aiMatcher';
 
@@ -20,16 +20,7 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Student profile not found' }, { status: 404 });
     }
 
-    // Assessment pass-gate: only students who passed can see jobs
-    const passedAssessment = await AssessmentResult.findOne({ studentId: student._id, passFail: 'Pass' });
-    if (!passedAssessment) {
-      return NextResponse.json({
-        success: true,
-        jobs: [],
-        gated: true,
-        message: 'You must pass the assessment test to access job opportunities.'
-      });
-    }
+
 
     const allJobs = await Job.find({ isActive: true }).populate('companyId', 'companyName');
 

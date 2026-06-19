@@ -3,7 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import JobApplication from '@/models/JobApplication';
 import Job from '@/models/Job';
 import Student from '@/models/Student';
-import AssessmentResult from '@/models/AssessmentResult';
+
 import { getCurrentUser } from '@/lib/auth';
 import { calculateMatchScore } from '@/lib/aiMatcher';
 
@@ -23,11 +23,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Student profile not found' }, { status: 404 });
     }
 
-    // Assessment pass-gate: only students who passed can apply
-    const passedAssessment = await AssessmentResult.findOne({ studentId: student._id, passFail: 'Pass' });
-    if (!passedAssessment) {
-      return NextResponse.json({ success: false, message: 'You must pass the assessment test to apply for jobs.' }, { status: 403 });
-    }
+
 
     const job = await Job.findById(jobId);
     if (!job) {
