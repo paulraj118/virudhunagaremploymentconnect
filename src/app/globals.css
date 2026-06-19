@@ -17,3 +17,37 @@ body {
   color: var(--foreground);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+/* ==========================================
+   MEDIA QUERIES FOR RESPONSIVE DESIGN
+   ========================================== */
+
+/* Small Mobile */
+@media (max-width: 320px) {
+    
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    
+}
+
+/* Large Mobile */
+@media (max-width: 768px) {
+    
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    
+}
+
+/* Laptop */
+@media (max-width: 1280px) {
+    
+}
+
+/* Desktop */
+@media (max-width: 1440px) {
+    
+}
