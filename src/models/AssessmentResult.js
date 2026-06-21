@@ -7,6 +7,11 @@ const AssessmentResultSchema = new mongoose.Schema(
       ref: 'Student',
       required: true,
     },
+    jobId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Job',
+      required: false,
+    },
     domain: {
       type: String,
       required: true,
@@ -39,6 +44,36 @@ const AssessmentResultSchema = new mongoose.Schema(
     autoSubmitted: {
       type: Boolean,
       default: false,
+    },
+    sessionId: {
+      type: String,
+    },
+    browserName: String,
+    browserVersion: String,
+    operatingSystem: String,
+    deviceType: String,
+    screenResolution: String,
+    loginTimestamp: Date,
+    submissionTimestamp: Date,
+    tabSwitchCount: {
+      type: Number,
+      default: 0,
+    },
+    fullscreenExitCount: {
+      type: Number,
+      default: 0,
+    },
+    devtoolsAttemptCount: {
+      type: Number,
+      default: 0,
+    },
+    clipboardAttemptCount: {
+      type: Number,
+      default: 0,
+    },
+    integrityScore: {
+      type: Number,
+      default: 100,
     }
   },
   { timestamps: true }

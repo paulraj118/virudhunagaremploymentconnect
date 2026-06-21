@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
+const SESSION_ROLE_KEY = 'jf_expected_role';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +22,22 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
       
       if (data.success) {
+        const expectedRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+
+        // If this tab had a previous login session, verify the role still matches
+        if (expectedRole && data.user.role !== expectedRole) {
+          // Another tab logged in as a different role — the cookie was overwritten.
+          // Clear this tab's stale expected role and redirect to login.
+          sessionStorage.removeItem(SESSION_ROLE_KEY);
+          setUser(null);
+          setLoading(false);
+          router.push('/login');
+          return;
+        }
+
         setUser(data.user);
       } else {
+        sessionStorage.removeItem(SESSION_ROLE_KEY);
         setUser(null);
       }
     } catch (error) {
@@ -40,8 +56,10 @@ export const AuthProvider = ({ children }) => {
     
     const data = await res.json();
     if (data.success) {
+      // Store this tab's expected role so we can detect cross-tab overwrites
+      sessionStorage.setItem(SESSION_ROLE_KEY, data.user.role);
       setUser(data.user);
-      return { success: true };
+      return { success: true, user: data.user };
     }
     return { success: false, message: data.message };
   };
@@ -55,14 +73,17 @@ export const AuthProvider = ({ children }) => {
     
     const data = await res.json();
     if (data.success) {
+      // Store this tab's expected role so we can detect cross-tab overwrites
+      sessionStorage.setItem(SESSION_ROLE_KEY, data.user.role);
       setUser(data.user);
-      return { success: true };
+      return { success: true, user: data.user };
     }
     return { success: false, message: data.message };
   };
 
   const logout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
+    sessionStorage.removeItem(SESSION_ROLE_KEY);
     setUser(null);
     router.push('/login');
   };

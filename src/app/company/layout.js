@@ -48,10 +48,10 @@ export default function CompanyLayout({ children }) {
   }
 
   const links = [
-    { name: 'Dashboard', path: '/company' },
-    { name: 'Company Setup', path: '/company/setup' },
-    { name: 'Job Management', path: '/company/jobs' },
-    { name: 'Pipeline Tracker', path: '/company/applicants' },
+    { name: 'Dashboard', path: '/company', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> },
+    { name: 'Company Setup', path: '/company/setup', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> },
+    { name: 'Job Management', path: '/company/jobs', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> },
+    { name: 'Candidate Tracker', path: '/company/applicants', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg> },
   ];
 
   return (
@@ -65,21 +65,21 @@ export default function CompanyLayout({ children }) {
       )}
 
       {/* Sidebar */}
-      <aside className={`w-64 bg-slate-900 text-white flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-xl`}>
-        <div className="p-6 flex items-center justify-between border-b border-slate-800">
+      <aside className={`w-64 bg-white text-slate-700 flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-lg border-r border-slate-200`}>
+        <div className="p-6 flex items-center justify-between border-b border-slate-100">
           <div>
-            <h2 className="text-xl font-bold text-indigo-400">HR Workspace</h2>
+            <h2 className="text-lg font-bold text-[#0B1E40]">HR Workspace</h2>
             <p className="text-xs text-slate-400 mt-1">{user?.email}</p>
           </div>
           {/* Close button for mobile sidebar */}
           <button 
             onClick={() => setIsSidebarOpen(false)}
-            className="p-1 text-slate-400 hover:text-white rounded-lg md:hidden"
+            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg md:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
-        <nav className="flex-1 px-4 space-y-1 mt-4">
+        <nav className="flex-1 px-3 space-y-1 mt-4">
           {links.map(link => {
             const isActive = pathname === link.path;
             return (
@@ -87,19 +87,20 @@ export default function CompanyLayout({ children }) {
                 key={link.name} 
                 href={link.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`block px-4 py-3 rounded-xl transition-colors text-sm font-medium ${
-                  isActive ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium ${
+                  isActive ? 'bg-[#0B1E40] text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
+                {link.icon}
                 {link.name}
               </Link>
             );
           })}
         </nav>
-        <div className="p-6 border-t border-slate-800 mt-auto">
-          <button onClick={logout} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-red-500/20 shadow-sm shadow-red-500/5">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            LOG OUT
+        <div className="p-4 border-t border-slate-100 mt-auto">
+          <button onClick={logout} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-lg text-sm font-semibold transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Log Out
           </button>
         </div>
       </aside>
@@ -127,7 +128,7 @@ export default function CompanyLayout({ children }) {
               Home
             </Link>
             
-            <Link href="/company/jobs" className="bg-indigo-600 text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-indigo-700 transition-colors ml-1 md:ml-2">
+            <Link href="/company/jobs" className="bg-[#0B1E40] text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-[#152d54] transition-colors ml-1 md:ml-2">
               + Post Job
             </Link>
           </div>

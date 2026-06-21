@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Student from '@/models/Student';
+import AssessmentResult from '@/models/AssessmentResult';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(request) {
@@ -36,12 +37,24 @@ export async function POST(request) {
       preferredDomain,
       industryTrack,
       resumeUrl,
-      enrollmentStatus: 'pending' // As per workflow
+      enrollmentStatus: 'approved'
     });
+
+    // Calculate ATS Score now that we have the full profile
+    try {
+      const { processAtsScore } = require('@/lib/atsScorer');
+      const { atsScore, resumeUrl: finalResumeUrl } = await processAtsScore(student);
+      
+      student.atsScore = atsScore;
+      student.resumeUrl = finalResumeUrl;
+      await student.save();
+    } catch (err) {
+      console.error('Error calculating ATS score during enrollment:', err);
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Enrollment submitted successfully. Pending Admin Approval.',
+      message: 'Enrollment submitted successfully.',
       student
     }, { status: 201 });
 
@@ -65,10 +78,13 @@ export async function GET(request) {
       return NextResponse.json({ success: true, enrolled: false });
     }
 
+    const assessments = await AssessmentResult.find({ studentId: student._id }).sort({ createdAt: -1 });
+
     return NextResponse.json({
       success: true,
       enrolled: true,
-      student
+      student,
+      assessments
     });
 
   } catch (error) {

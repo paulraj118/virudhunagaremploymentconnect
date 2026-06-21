@@ -10,7 +10,8 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
     const body = await request.json();
     const { stage, interviewDate, meetingLink, feedback } = body;
 

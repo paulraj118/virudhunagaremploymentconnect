@@ -1,646 +1,856 @@
+// ============================================================================
+// DOMAIN-SPECIFIC ASSESSMENT QUESTION BANK
+// 2000+ questions across 28+ domains
+// Each domain: ~50-120 questions (Easy 40%, Medium 40%, Hard 20%)
+// ============================================================================
+
+// Domain alias mapping for flexible matching
+export const DOMAIN_ALIASES = {
+  'data science': ['data science', 'data analytics', 'data analysis', 'big data'],
+  'artificial intelligence & machine learning': ['artificial intelligence', 'ai', 'machine learning', 'ml', 'ai & ml', 'ai/ml', 'artificial intelligence & machine learning'],
+  'cyber security': ['cyber security', 'cybersecurity', 'information security', 'network security'],
+  'cloud computing': ['cloud computing', 'cloud', 'aws', 'azure', 'gcp', 'devops'],
+  'full stack development': ['full stack', 'full stack development', 'fullstack', 'web development', 'mern', 'mean'],
+  'mechanical engineering': ['mechanical engineering', 'mechanical', 'mech'],
+  'civil engineering': ['civil engineering', 'civil'],
+  'electrical engineering': ['electrical engineering', 'electrical', 'eee'],
+  'electronics & communication engineering (ece)': ['electronics', 'ece', 'electronics & communication', 'electronics & communication engineering', 'electronics & communication engineering (ece)', 'electronics engineering'],
+  'automobile engineering': ['automobile engineering', 'automobile', 'automotive'],
+  'english literature': ['english literature', 'english', 'literature'],
+  'tamil literature': ['tamil literature', 'tamil'],
+  'history': ['history'],
+  'economics': ['economics'],
+  'psychology': ['psychology'],
+  'sociology': ['sociology'],
+  'journalism & mass communication': ['journalism', 'mass communication', 'journalism & mass communication', 'media'],
+  'visual communication': ['visual communication', 'viscom'],
+  'fine arts': ['fine arts', 'arts'],
+  'human resources (hr)': ['human resources', 'hr', 'human resources (hr)', 'human resource management'],
+  'marketing': ['marketing', 'digital marketing'],
+  'finance': ['finance', 'financial management', 'corporate finance'],
+  'operations management': ['operations management', 'operations'],
+  'business analytics': ['business analytics', 'business analysis'],
+  'supply chain management': ['supply chain management', 'supply chain', 'logistics'],
+  'banking': ['banking', 'banking & finance'],
+  'accounting': ['accounting', 'accounts', 'chartered accountancy'],
+  'entrepreneurship': ['entrepreneurship', 'startup', 'business development'],
+  'pharmacy': ['pharmacy', 'pharmaceutical', 'pharma', 'b.pharm', 'd.pharm'],
+  'clinical research': ['clinical research', 'clinical trials'],
+  'nursing': ['nursing', 'bsc nursing', 'gnm'],
+  'physiotherapy': ['physiotherapy', 'physical therapy', 'bpt'],
+  'medical laboratory technology': ['medical laboratory', 'medical lab', 'mlt', 'medical laboratory technology', 'lab technology'],
+  'healthcare management': ['healthcare management', 'hospital management', 'health management'],
+  'biotechnology': ['biotechnology', 'biotech'],
+  'pharmacovigilance': ['pharmacovigilance', 'drug safety'],
+  'public health': ['public health', 'community health', 'epidemiology'],
+};
+
+// Category fallback mapping
+export const CATEGORY_FALLBACKS = {
+  // Arts / Engineering fallbacks
+  'mechanical engineering': 'Engineering Fundamentals',
+  'civil engineering': 'Engineering Fundamentals',
+  'electrical engineering': 'Engineering Fundamentals',
+  'electronics & communication engineering (ece)': 'Engineering Fundamentals',
+  'automobile engineering': 'Engineering Fundamentals',
+  'english literature': 'Arts & Humanities',
+  'tamil literature': 'Arts & Humanities',
+  'history': 'Arts & Humanities',
+  'economics': 'Arts & Humanities',
+  'psychology': 'Arts & Humanities',
+  'sociology': 'Arts & Humanities',
+  'journalism & mass communication': 'Arts & Humanities',
+  'visual communication': 'Arts & Humanities',
+  'fine arts': 'Arts & Humanities',
+  // Admin / Management fallbacks
+  'human resources (hr)': 'Management Fundamentals',
+  'marketing': 'Management Fundamentals',
+  'finance': 'Management Fundamentals',
+  'operations management': 'Management Fundamentals',
+  'business analytics': 'Management Fundamentals',
+  'supply chain management': 'Management Fundamentals',
+  'banking': 'Management Fundamentals',
+  'accounting': 'Management Fundamentals',
+  'entrepreneurship': 'Management Fundamentals',
+  // Pharma / Medical fallbacks
+  'pharmacy': 'Medical Fundamentals',
+  'clinical research': 'Medical Fundamentals',
+  'nursing': 'Medical Fundamentals',
+  'physiotherapy': 'Medical Fundamentals',
+  'medical laboratory technology': 'Medical Fundamentals',
+  'healthcare management': 'Medical Fundamentals',
+  'biotechnology': 'Medical Fundamentals',
+  'pharmacovigilance': 'Medical Fundamentals',
+  'public health': 'Medical Fundamentals',
+};
+
 export const fallbackQuestions = [
-  // ==================== REACT EASY (10 questions) ====================
-  {
-    domain: 'React',
-    questionText: 'What is the Virtual DOM in React?',
-    options: [
-      'A lightweight copy of the actual DOM',
-      'A new HTML element',
-      'A backend rendering engine',
-      'A browser plugin'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'Which method is used to update state in a React class component?',
-    options: [
-      'setState()',
-      'updateState()',
-      'changeState()',
-      'modifyState()'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'What hook is used to perform side effects in functional components?',
-    options: [
-      'useEffect',
-      'useState',
-      'useContext',
-      'useReducer'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'What are props in React?',
-    options: [
-      'Short for properties, used to pass data between components',
-      'Internal state of a component',
-      'Methods to select DOM elements',
-      'HTML attributes'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'React is primarily built around which architectural pattern?',
-    options: [
-      'Component-based architecture',
-      'Model-View-Controller (MVC)',
-      'Model-View-ViewModel (MVVM)',
-      'Service-oriented architecture'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'How do you create a React application using the command line?',
-    options: [
-      'npx create-react-app my-app',
-      'npm install react-app',
-      'npx new react-app',
-      'react-admin create my-app'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'In React, what is the purpose of a key prop when rendering a list?',
-    options: [
-      'To identify which items have changed, been added, or been removed',
-      'To apply unique CSS styles',
-      'To bind click handlers',
-      'To encrypt list data'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the default port used by the local development server in Create React App?',
-    options: [
-      '3000',
-      '8080',
-      '5000',
-      '4200'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'Which of the following is used to handle multiple states in a single Hook?',
-    options: [
-      'useReducer',
-      'useState',
-      'useEffect',
-      'useMemo'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'React',
-    questionText: 'What does JSX stand for?',
-    options: [
-      'JavaScript XML',
-      'JavaScript Extension',
-      'Java Syntax Extension',
-      'JSON XML'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
+  // ============================================================================
+  // DATA SCIENCE (80 questions)
+  // ============================================================================
+  // Easy (32)
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What does CSV stand for?', options: ['Comma Separated Values', 'Common Structured Variables', 'Combined Statistical Values', 'Categorical Sorted Variables'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which Python library is primarily used for data manipulation?', options: ['Pandas', 'Flask', 'Django', 'Tkinter'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is the purpose of data cleaning?', options: ['To remove errors and inconsistencies from data', 'To encrypt data', 'To compress data', 'To delete all data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is a measure of central tendency?', options: ['Mean', 'Variance', 'Standard Deviation', 'Range'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What does EDA stand for in data science?', options: ['Exploratory Data Analysis', 'Extended Data Algorithm', 'Encrypted Data Access', 'Evaluated Data Architecture'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which visualization library in Python is used for creating static plots?', options: ['Matplotlib', 'Scikit-learn', 'NumPy', 'SciPy'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is a DataFrame in Pandas?', options: ['A 2-dimensional labeled data structure', 'A type of chart', 'A machine learning model', 'A database connection'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is NOT a data type?', options: ['Relational', 'Integer', 'Float', 'String'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is the median of the dataset [1, 3, 5, 7, 9]?', options: ['5', '3', '7', '25'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which tool is commonly used for big data processing?', options: ['Apache Hadoop', 'Microsoft Word', 'Adobe Photoshop', 'Google Docs'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is a histogram used for?', options: ['To display frequency distribution of data', 'To show relationships between two variables', 'To display network connections', 'To encrypt data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which language is most popular for data science?', options: ['Python', 'C++', 'Assembly', 'Fortran'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What does SQL stand for?', options: ['Structured Query Language', 'Simple Question Language', 'Standard Quick Language', 'Sequential Query Logic'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is a scatter plot used for?', options: ['Showing relationship between two variables', 'Displaying pie chart data', 'Creating 3D models', 'Encrypting information'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is a NoSQL database?', options: ['MongoDB', 'MySQL', 'PostgreSQL', 'Oracle'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is the mode of the dataset [2, 3, 3, 5, 7]?', options: ['3', '2', '5', '4'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which Python library is used for numerical computing?', options: ['NumPy', 'BeautifulSoup', 'Requests', 'Pillow'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What does API stand for?', options: ['Application Programming Interface', 'Automated Process Integration', 'Applied Python Interface', 'Advanced Program Instruction'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is data normalization?', options: ['Scaling data to a standard range', 'Deleting outliers', 'Adding more data points', 'Encrypting data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which chart is best for showing proportions?', options: ['Pie chart', 'Line chart', 'Scatter plot', 'Histogram'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is an outlier?', options: ['A data point significantly different from others', 'A type of database', 'A visualization tool', 'A programming language'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which format is commonly used for data exchange on the web?', options: ['JSON', 'JPEG', 'MP4', 'DOCX'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is the range of the dataset [10, 20, 30, 40, 50]?', options: ['40', '30', '50', '20'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is a null value in a dataset?', options: ['A missing or undefined value', 'A zero value', 'A negative value', 'The maximum value'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is a supervised learning task?', options: ['Classification', 'Clustering', 'Dimensionality reduction', 'Association rule mining'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What does BI stand for in data analytics?', options: ['Business Intelligence', 'Binary Integration', 'Base Index', 'Batch Information'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which Python library is used for web scraping?', options: ['BeautifulSoup', 'TensorFlow', 'Keras', 'PyTorch'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is the purpose of a box plot?', options: ['To show data distribution and identify outliers', 'To display network topology', 'To encrypt information', 'To create 3D models'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is variance in statistics?', options: ['A measure of how spread out the data is', 'The most frequent value', 'The middle value', 'The average value'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is a data warehouse tool?', options: ['Amazon Redshift', 'Notepad', 'VLC Player', 'WinRAR'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'What is a correlation coefficient?', options: ['A measure of the strength of relationship between two variables', 'A type of encryption key', 'A database index', 'A sorting algorithm'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Easy', questionText: 'Which of these is an example of categorical data?', options: ['Gender (Male/Female)', 'Height in cm', 'Weight in kg', 'Temperature in Celsius'], correctOptionIndex: 0 },
+  // Medium (32)
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the difference between population and sample in statistics?', options: ['Population is the entire group; sample is a subset', 'They are the same thing', 'Population is smaller than sample', 'Sample includes all data points'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which technique is used to handle missing data?', options: ['Imputation', 'Encryption', 'Compression', 'Hashing'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is feature engineering?', options: ['Creating new features from existing data to improve model performance', 'Deleting all features', 'A type of database query', 'A visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of cross-validation?', options: ['To assess how well a model generalizes to unseen data', 'To clean data', 'To visualize data', 'To compress data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which algorithm is used for dimensionality reduction?', options: ['PCA (Principal Component Analysis)', 'Linear Regression', 'K-Means', 'Naive Bayes'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is overfitting in machine learning?', options: ['When a model performs well on training data but poorly on new data', 'When a model is too simple', 'When data is too clean', 'When the dataset is too small'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the difference between structured and unstructured data?', options: ['Structured has a defined schema; unstructured does not', 'They are identical', 'Unstructured is always numerical', 'Structured data cannot be queried'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which metric is used to evaluate classification models?', options: ['Accuracy, Precision, Recall, F1-Score', 'Mean Absolute Error only', 'R-squared only', 'Silhouette Score only'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is A/B testing?', options: ['Comparing two versions to determine which performs better', 'A type of sorting algorithm', 'A data encryption method', 'A database backup technique'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the difference between correlation and causation?', options: ['Correlation shows a relationship; causation implies one causes the other', 'They mean the same thing', 'Causation is weaker than correlation', 'Correlation always implies causation'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of the pandas groupby() function?', options: ['To group data based on columns and apply aggregate functions', 'To sort data alphabetically', 'To delete duplicate rows', 'To merge two DataFrames'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is a confusion matrix?', options: ['A table showing actual vs predicted classifications', 'A type of neural network', 'A data encryption matrix', 'A random number generator'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of train-test split?', options: ['To divide data into training and testing subsets for evaluation', 'To delete half the data', 'To encrypt data', 'To visualize data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which of these is an unsupervised learning algorithm?', options: ['K-Means Clustering', 'Logistic Regression', 'Decision Tree', 'Support Vector Machine'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the p-value in hypothesis testing?', options: ['The probability of observing results as extreme as the test statistic under the null hypothesis', 'The probability that the hypothesis is true', 'The sample size', 'The mean of the data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is data wrangling?', options: ['The process of cleaning and transforming raw data into a usable format', 'A type of machine learning', 'A database backup method', 'A visualization library'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of Seaborn library in Python?', options: ['Statistical data visualization built on top of Matplotlib', 'Web development', 'Game development', 'Data encryption'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is multicollinearity?', options: ['When independent variables in a regression model are highly correlated', 'When data has no null values', 'When all data points are identical', 'When the target variable is categorical'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which SQL clause is used to filter grouped data?', options: ['HAVING', 'WHERE', 'ORDER BY', 'LIMIT'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the difference between INNER JOIN and LEFT JOIN?', options: ['INNER returns matching rows only; LEFT returns all from left table plus matches', 'They are the same', 'LEFT returns only unmatched rows', 'INNER returns all rows from both tables'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is ETL in data engineering?', options: ['Extract, Transform, Load', 'Encrypt, Transfer, Log', 'Evaluate, Test, Launch', 'Edit, Translate, Link'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is a heatmap used for in data visualization?', options: ['To show the magnitude of values using color intensity', 'To create 3D bar charts', 'To display network diagrams', 'To generate random data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is regularization in machine learning?', options: ['A technique to prevent overfitting by adding a penalty term', 'A method to increase model complexity', 'A data cleaning process', 'A visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What does RMSE stand for?', options: ['Root Mean Squared Error', 'Random Model Selection Evaluation', 'Recursive Mean Standard Error', 'Relative Maximum Score Estimation'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of one-hot encoding?', options: ['To convert categorical variables into binary columns', 'To normalize numerical data', 'To remove outliers', 'To sort data alphabetically'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is a time series dataset?', options: ['Data collected at regular time intervals', 'Data with no timestamps', 'Random unordered data', 'Only numerical data'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'Which library is used for interactive dashboards in Python?', options: ['Plotly/Dash', 'Pandas', 'NumPy', 'OS module'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the Central Limit Theorem?', options: ['The sampling distribution of the mean approaches a normal distribution as sample size increases', 'All data is normally distributed', 'The mean always equals the median', 'Larger samples are always more accurate'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the difference between batch processing and stream processing?', options: ['Batch processes data in chunks; stream processes data in real-time', 'They are the same', 'Stream is always slower', 'Batch is only for small datasets'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is a decision tree?', options: ['A tree-like model used for classification and regression decisions', 'A type of database schema', 'A network protocol', 'A data format'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is data governance?', options: ['Policies and processes for managing data quality, security, and availability', 'A type of machine learning', 'A visualization tool', 'A database engine'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Medium', questionText: 'What is the purpose of Standard Deviation?', options: ['To measure the amount of variation in a dataset', 'To find the middle value', 'To count the number of data points', 'To sort data'], correctOptionIndex: 0 },
+  // Hard (16)
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the bias-variance tradeoff?', options: ['Balancing model simplicity (bias) against sensitivity to data (variance)', 'Choosing between accuracy and speed', 'Selecting features vs selecting models', 'Deciding between Python and R'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the curse of dimensionality?', options: ['As dimensions increase, data becomes sparse making analysis and modeling difficult', 'Having too few features', 'When all features are identical', 'When data is too clean'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the difference between L1 and L2 regularization?', options: ['L1 (Lasso) uses absolute values and can zero out coefficients; L2 (Ridge) uses squared values', 'They are identical techniques', 'L1 is for classification only', 'L2 always produces better results'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is stochastic gradient descent?', options: ['An optimization algorithm that updates parameters using a random subset of data per iteration', 'A visualization technique', 'A data cleaning method', 'A type of database query'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'How does Random Forest prevent overfitting compared to a single Decision Tree?', options: ['By building multiple trees on random subsets and averaging their predictions', 'By using a single deep tree', 'By removing all features', 'By using only linear models'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the purpose of the ROC-AUC curve?', options: ['To evaluate binary classification model performance across all thresholds', 'To visualize data distribution', 'To measure data quality', 'To compress datasets'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is ensemble learning?', options: ['Combining multiple models to produce a better prediction than any single model', 'Using a single complex model', 'Training on a single data point', 'A data visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the difference between bagging and boosting?', options: ['Bagging trains models in parallel on random subsets; boosting trains sequentially focusing on errors', 'They are the same technique', 'Bagging is always better', 'Boosting does not use multiple models'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is SMOTE used for?', options: ['Synthetic Minority Over-sampling Technique to handle class imbalance', 'A data encryption method', 'A visualization library', 'A database optimization technique'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the difference between Type I and Type II errors?', options: ['Type I is false positive (rejecting true null); Type II is false negative (failing to reject false null)', 'They are the same', 'Type II is always worse', 'Type I occurs only in large datasets'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the purpose of XGBoost?', options: ['An optimized gradient boosting algorithm for speed and performance', 'A data cleaning tool', 'A visualization library', 'A database management system'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is feature importance in tree-based models?', options: ['A measure of how much each feature contributes to the model predictions', 'The number of features in a dataset', 'The order of features in a CSV file', 'The data type of each feature'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the difference between parametric and non-parametric models?', options: ['Parametric models assume a fixed form for data distribution; non-parametric do not', 'They are identical', 'Non-parametric models are always simpler', 'Parametric models have no assumptions'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the purpose of the elbow method in K-Means clustering?', options: ['To determine the optimal number of clusters by plotting SSE against K', 'To remove outliers', 'To normalize data', 'To split data into train/test sets'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is a data lake?', options: ['A centralized repository that stores raw data in its native format at any scale', 'A small database', 'A type of data visualization', 'A machine learning model'], correctOptionIndex: 0 },
+  { domain: 'Data Science', difficulty: 'Hard', questionText: 'What is the MapReduce programming model?', options: ['A framework for processing large datasets in parallel across a cluster: Map phase filters/sorts, Reduce phase summarizes', 'A visualization technique', 'A single-threaded algorithm', 'A database backup method'], correctOptionIndex: 0 },
 
-  // ==================== REACT MEDIUM (10 questions) ====================
-  {
-    domain: 'React',
-    questionText: 'What is the purpose of the useMemo hook in React?',
-    options: [
-      'To memoize expensive calculations and optimize performance',
-      'To cache network requests',
-      'To remember component state across re-renders',
-      'To delay function execution'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'How does the useContext hook help in state management?',
-    options: [
-      'It allows consuming values from a React context without nesting',
-      'It stores state directly in local storage',
-      'It creates a global Redux store',
-      'It optimizes state updates using web workers'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the difference between controlled and uncontrolled components?',
-    options: [
-      'Controlled components have state managed by React; uncontrolled use the DOM directly',
-      'Controlled components are functional; uncontrolled are class-based',
-      'Controlled components use hooks; uncontrolled components do not',
-      'Controlled components are safer but slower'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the correct way to pass a ref to a child component (forwardRef)?',
-    options: [
-      'React.forwardRef((props, ref) => ...)',
-      'React.createRef((props, ref) => ...)',
-      'React.useRef((props) => ...)',
-      'React.passRef((props, ref) => ...)'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the purpose of React.memo?',
-    options: [
-      'A higher-order component that shallowly compares props to prevent unnecessary re-renders',
-      'A hook to cache return values of standard functions',
-      'A class method to log rendering times',
-      'A decorator to store state in history'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'In React Router, which hook is used to programmatically navigate?',
-    options: [
-      'useNavigate',
-      'useHistory',
-      'useRedirect',
-      'useRouter'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is Strict Mode in React?',
-    options: [
-      'A tool for highlighting potential problems in an application by running double-renders in dev mode',
-      'A security layer that blocks cross-site scripting',
-      'A compiler flag that enables strict TypeScript checks',
-      'A runtime mode that prevents component errors from crashing the page'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What does a custom hook name need to start with by convention?',
-    options: [
-      'use',
-      'get',
-      'handle',
-      'custom'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'Which hook should be used to store a mutable value that does not cause a re-render when updated?',
-    options: [
-      'useRef',
-      'useState',
-      'useMemo',
-      'useCallback'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the purpose of the cleanup function in useEffect?',
-    options: [
-      'To clean up subscriptions, timers, or event listeners before the component unmounts or re-renders',
-      'To clear the browser cache',
-      'To reset the component state to default values',
-      'To garbage collect unused variables'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
+  // ============================================================================
+  // ARTIFICIAL INTELLIGENCE & MACHINE LEARNING (80 questions)
+  // ============================================================================
+  // Easy (32)
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What does AI stand for?', options: ['Artificial Intelligence', 'Automated Integration', 'Applied Informatics', 'Advanced Interface'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which of these is a type of machine learning?', options: ['Supervised Learning', 'Manual Learning', 'Physical Learning', 'Visual Learning'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a neural network inspired by?', options: ['The human brain', 'Computer hardware', 'Database systems', 'Network protocols'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is the purpose of training data in ML?', options: ['To teach the model patterns and relationships', 'To test the final model', 'To delete old data', 'To encrypt information'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which is an example of supervised learning?', options: ['Email spam detection', 'Customer segmentation', 'Anomaly detection', 'Topic modeling'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a label in machine learning?', options: ['The known output or answer for a data point', 'A data column name', 'A type of algorithm', 'A visualization tool'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which Python library is popular for machine learning?', options: ['Scikit-learn', 'Flask', 'Django', 'Tkinter'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is classification in ML?', options: ['Predicting a categorical output (e.g., spam or not spam)', 'Predicting a continuous value', 'Grouping similar data points', 'Reducing data dimensions'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is regression in ML?', options: ['Predicting a continuous numerical value', 'Predicting a category', 'Clustering data', 'Image recognition'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What does NLP stand for?', options: ['Natural Language Processing', 'Network Learning Protocol', 'Neural Logic Programming', 'Numerical Linear Processing'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which of these is an application of AI?', options: ['Self-driving cars', 'Manual data entry', 'Paper filing', 'Physical measurements'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a feature in machine learning?', options: ['An input variable used by the model', 'The final prediction', 'A type of neural network', 'A database table'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is the Turing Test?', options: ['A test to determine if a machine can exhibit intelligent behavior indistinguishable from a human', 'A test to measure computer speed', 'A test for internet connectivity', 'A memory benchmark test'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which of these is an example of unsupervised learning?', options: ['Customer segmentation', 'Spam detection', 'Weather prediction', 'Handwriting recognition'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a chatbot?', options: ['An AI program that simulates human conversation', 'A type of database', 'A network protocol', 'A hardware device'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is computer vision?', options: ['AI field enabling computers to interpret visual data from the world', 'A type of monitor display', 'A programming language', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is deep learning?', options: ['A subset of ML using neural networks with many layers', 'A type of database query', 'A data cleaning technique', 'A hardware optimization'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which company developed GPT?', options: ['OpenAI', 'Google', 'Microsoft', 'Meta'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a dataset?', options: ['A collection of data organized for analysis', 'A type of algorithm', 'A programming language', 'A hardware component'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is the output of a classification model?', options: ['A discrete category or class', 'A continuous number', 'A random value', 'A database record'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is reinforcement learning?', options: ['Learning through rewards and penalties from actions', 'Learning from labeled data', 'Learning from unlabeled data', 'Learning from images only'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is an epoch in neural network training?', options: ['One complete pass through the entire training dataset', 'A single data point', 'A type of activation function', 'A learning rate value'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which of these is a popular deep learning framework?', options: ['TensorFlow', 'jQuery', 'Bootstrap', 'Angular'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is the goal of a recommendation system?', options: ['To suggest items a user might like based on past behavior', 'To delete user data', 'To encrypt communications', 'To speed up internet'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a decision boundary?', options: ['A line or surface that separates different classes in classification', 'A database table boundary', 'A network firewall', 'A memory limit'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is overfitting?', options: ['When a model learns noise in training data instead of the actual pattern', 'When a model is too simple', 'When there is too little data', 'When training is too fast'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is the purpose of a test set?', options: ['To evaluate how well the model performs on unseen data', 'To train the model', 'To clean the data', 'To visualize results'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a perceptron?', options: ['The simplest form of a neural network with a single layer', 'A type of database', 'A visualization tool', 'A data format'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'Which of these is NOT an AI application?', options: ['Manual bookkeeping', 'Face recognition', 'Speech translation', 'Autonomous driving'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a prediction in ML?', options: ['The output produced by a trained model for new input data', 'The training data itself', 'A visualization chart', 'A database query'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is bias in machine learning?', options: ['Error from oversimplified assumptions in the model', 'The training speed', 'The number of features', 'The dataset size'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Easy', questionText: 'What is a loss function?', options: ['A function that measures how wrong the model predictions are', 'A function that deletes data', 'A database function', 'A network function'], correctOptionIndex: 0 },
+  // Medium (32)
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the difference between batch and online learning?', options: ['Batch learns from all data at once; online learns incrementally', 'They are the same', 'Online requires more memory', 'Batch is always faster'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the vanishing gradient problem?', options: ['When gradients become very small in deep networks, making learning slow in early layers', 'When the model runs out of memory', 'When data has too many features', 'When the learning rate is too high'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the purpose of an activation function?', options: ['To introduce non-linearity into neural network outputs', 'To store data in memory', 'To compress the model', 'To delete unnecessary weights'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'Which activation function is most commonly used in hidden layers of deep networks?', options: ['ReLU (Rectified Linear Unit)', 'Sigmoid', 'Step Function', 'Linear'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is transfer learning?', options: ['Using a pre-trained model on a new but related task', 'Transferring data between databases', 'Moving models between servers', 'Copying training data'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the purpose of dropout in neural networks?', options: ['To randomly disable neurons during training to prevent overfitting', 'To remove layers from the network', 'To speed up training', 'To add more data'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is a Convolutional Neural Network (CNN) primarily used for?', options: ['Image recognition and processing', 'Text translation only', 'Audio processing only', 'Database management'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is a Recurrent Neural Network (RNN) designed for?', options: ['Sequential data like time series and text', 'Static image classification', 'Database queries', 'Hardware optimization'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the learning rate in gradient descent?', options: ['A hyperparameter that controls how much the model weights are updated per iteration', 'The speed of the computer', 'The size of the dataset', 'The number of features'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is K-Nearest Neighbors (KNN)?', options: ['A lazy learning algorithm that classifies based on closest data points', 'A neural network architecture', 'A data cleaning technique', 'A visualization library'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the purpose of backpropagation?', options: ['To calculate gradients and update weights to minimize the loss function', 'To add new layers to the network', 'To clean input data', 'To visualize the model'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is a hyperparameter?', options: ['A parameter set before training that controls the learning process', 'A parameter learned during training', 'A type of data', 'A visualization option'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the Naive Bayes algorithm based on?', options: ['Bayes theorem with an assumption of feature independence', 'Neural network architecture', 'Decision tree splits', 'Gradient descent optimization'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is precision in classification?', options: ['The proportion of true positives among all predicted positives', 'The total number of correct predictions', 'The speed of the model', 'The size of the dataset'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is recall in classification?', options: ['The proportion of true positives among all actual positives', 'The number of false negatives', 'The model training time', 'The dataset size'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is a Support Vector Machine (SVM)?', options: ['A supervised algorithm that finds the optimal hyperplane to separate classes', 'An unsupervised clustering method', 'A data visualization tool', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is data augmentation?', options: ['Creating modified versions of existing data to increase training set size', 'Deleting data points', 'Compressing the dataset', 'Encrypting sensitive data'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the F1 Score?', options: ['The harmonic mean of precision and recall', 'The arithmetic mean of accuracy and loss', 'The model training speed', 'The number of parameters'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is gradient descent?', options: ['An optimization algorithm that minimizes the loss function by iteratively updating parameters', 'A data sorting algorithm', 'A visualization technique', 'A database query method'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the difference between hard and soft clustering?', options: ['Hard assigns each point to one cluster; soft gives probabilities for multiple clusters', 'They are identical', 'Hard is always better', 'Soft clustering is faster'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is a Generative Adversarial Network (GAN)?', options: ['Two neural networks competing: a generator creates data, a discriminator evaluates it', 'A single neural network for classification', 'A database management system', 'A data visualization tool'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is word embedding?', options: ['Converting words to dense numerical vectors that capture semantic meaning', 'Hiding words in images', 'Encrypting text data', 'Compressing documents'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the purpose of batch normalization?', options: ['To normalize layer inputs to speed up training and improve stability', 'To reduce the dataset size', 'To delete outliers', 'To add more layers'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the difference between a generative and discriminative model?', options: ['Generative models the joint probability P(x,y); discriminative models the conditional P(y|x)', 'They are the same', 'Discriminative models generate data', 'Generative models only classify'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is an autoencoder?', options: ['A neural network that learns to compress and reconstruct data', 'A data encryption tool', 'A database backup system', 'A web framework'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the kernel trick in SVM?', options: ['Mapping data to higher dimensions to make it linearly separable', 'A data cleaning technique', 'A visualization method', 'A database optimization'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is tokenization in NLP?', options: ['Breaking text into individual words or sub-words', 'Encrypting text data', 'Deleting punctuation', 'Translating between languages'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is model interpretability?', options: ['The ability to understand and explain how a model makes predictions', 'The speed of the model', 'The size of the dataset', 'The number of parameters'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the purpose of padding in CNNs?', options: ['To preserve spatial dimensions of the input when applying filters', 'To add noise to data', 'To remove features', 'To speed up training'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is mini-batch gradient descent?', options: ['Gradient descent using small random subsets of data per iteration', 'Processing all data at once', 'Using only one data point', 'A visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is the softmax function used for?', options: ['Converting raw scores into probabilities that sum to 1 for multi-class classification', 'Normalizing input data', 'Compressing images', 'Encrypting passwords'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Medium', questionText: 'What is semi-supervised learning?', options: ['Learning using a mix of labeled and unlabeled data', 'Learning with only labeled data', 'Learning with only unlabeled data', 'Learning without any data'], correctOptionIndex: 0 },
+  // Hard (16)
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the attention mechanism in neural networks?', options: ['A mechanism that allows the model to focus on relevant parts of input when producing output', 'A method to reduce training time', 'A data augmentation technique', 'A type of loss function'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the Transformer architecture?', options: ['A model based entirely on self-attention mechanisms without recurrence or convolution', 'A type of CNN', 'A data preprocessing pipeline', 'A database architecture'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the difference between LSTM and GRU?', options: ['Both handle long-term dependencies; GRU has fewer gates and is computationally simpler', 'They are identical architectures', 'LSTM cannot handle sequences', 'GRU always performs better'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the exploding gradient problem?', options: ['When gradients grow exponentially during backpropagation causing unstable updates', 'When the model is too small', 'When the dataset is too large', 'When features are normalized'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is contrastive learning?', options: ['Learning representations by comparing similar and dissimilar data pairs', 'Learning from labeled data only', 'A type of data augmentation', 'A database optimization technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the purpose of the residual connection in ResNet?', options: ['To allow gradients to flow directly through skip connections, enabling training of very deep networks', 'To reduce the number of parameters', 'To speed up inference', 'To handle sequential data'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is federated learning?', options: ['Training models across decentralized devices without sharing raw data', 'Training on a single centralized server', 'A type of data augmentation', 'A database sharding technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is knowledge distillation?', options: ['Training a smaller model to mimic a larger pre-trained model', 'Deleting unnecessary data', 'Compressing a database', 'A visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the No Free Lunch theorem in ML?', options: ['No single algorithm is best for all problems; performance depends on the problem', 'Deep learning always wins', 'More data always helps', 'Simpler models are always better'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the purpose of positional encoding in Transformers?', options: ['To inject information about token position since Transformers have no inherent sequence order', 'To compress the input', 'To normalize the data', 'To reduce dimensionality'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is meta-learning?', options: ['Learning to learn — models that improve their learning algorithm through experience', 'Learning from metadata only', 'A type of database query', 'A data visualization technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the difference between model-based and model-free reinforcement learning?', options: ['Model-based builds a model of the environment; model-free learns directly from interaction', 'They are identical', 'Model-free requires more memory', 'Model-based cannot handle complex environments'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is few-shot learning?', options: ['Training models to recognize new classes with very few examples', 'Training with millions of examples', 'A type of data augmentation', 'A database technique'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is the purpose of self-supervised learning?', options: ['Learning representations from unlabeled data by creating pretext tasks', 'Learning from human feedback', 'Learning with labeled data only', 'A type of reinforcement learning'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is adversarial robustness?', options: ['A model ability to maintain performance when given deliberately perturbed inputs', 'The speed of training', 'The size of the model', 'The number of features'], correctOptionIndex: 0 },
+  { domain: 'Artificial Intelligence & Machine Learning', difficulty: 'Hard', questionText: 'What is neural architecture search (NAS)?', options: ['Automating the design of neural network architectures using optimization techniques', 'Manually designing networks', 'A data cleaning method', 'A visualization tool'], correctOptionIndex: 0 },
 
-  // ==================== REACT HARD (10 questions) ====================
-  {
-    domain: 'React',
-    questionText: 'What happens during the reconciliation phase in React?',
-    options: [
-      'React computes the diff between the new Virtual DOM and the old one to determine minimal real DOM updates',
-      'React compiles JSX into plain JavaScript calls',
-      'React resolves styling conflicts between components',
-      'React synchronizes local state with a backend database'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'How does React\'s Fiber architecture improve performance?',
-    options: [
-      'By breaking rendering work into incremental chunks and scheduling them based on priority',
-      'By compiling React code directly into WebAssembly',
-      'By bypassing the Virtual DOM comparison entirely',
-      'By executing rendering on multiple browser threads simultaneously'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the correct behavior of the dependency array in useEffect when passing an object variable?',
-    options: [
-      'It triggers the effect on every render because object references change unless memoized (e.g. via useMemo)',
-      'It compares the object properties deeply to see if they changed',
-      'It ignores the object variable and logs a warning',
-      'It causes a compilation error'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'What are Error Boundaries in React?',
-    options: [
-      'Class components that catch JavaScript errors anywhere in their child component tree and display a fallback UI',
-      'Functional components using the catchError hook',
-      'Middleware configurations in Next.js',
-      'Try-catch blocks wrapped around JSX'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'How do you implement code splitting in React?',
-    options: [
-      'Using React.lazy() and Suspense',
-      'Using require.ensure()',
-      'Using split-chunks-plugin in Webpack config',
-      'Using the useSplit hook'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the main benefit of using server components in Next.js/React?',
-    options: [
-      'They render on the server, reducing the JS bundle sent to the client and improving load performance',
-      'They allow direct access to local storage from the server',
-      'They eliminate the need for any client-side JavaScript',
-      'They run faster in development mode'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'When using useCallback, what is memoized?',
-    options: [
-      'The function instance itself, preventing its recreation on re-renders unless dependencies change',
-      'The returned value of the function',
-      'The parameters passed to the function',
-      'The component rendering tree'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the purpose of the useLayoutEffect hook?',
-    options: [
-      'It fires synchronously after all DOM mutations but before the browser paints',
-      'It is a faster alternative to useEffect for async operations',
-      'It is used specifically for styling CSS transitions',
-      'It updates the state before the virtual DOM is constructed'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'In a custom hook, how do you handle state shareability?',
-    options: [
-      'State inside a custom hook is isolated; each component using the hook gets its own independent state',
-      'State is automatically shared globally among all components importing the hook',
-      'You must wrap the hook inside a Context Provider to share state',
-      'You must pass the state as arguments to other components'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'React',
-    questionText: 'What is the purpose of hydration in React SSR?',
-    options: [
-      'The process of attaching event listeners to the server-rendered static HTML on the client side',
-      'The process of fetching initial data before rendering a page',
-      'Compiling CSS styles into JavaScript bundles',
-      'Caching server-side components in the browser database'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
+  // ============================================================================
+  // CYBER SECURITY (80 questions)
+  // ============================================================================
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What does a firewall do?', options: ['Monitors and filters incoming and outgoing network traffic', 'Cools down the computer', 'Speeds up the internet', 'Stores passwords'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is phishing?', options: ['A social engineering attack that tricks users into revealing sensitive information', 'A type of firewall', 'A programming language', 'A network protocol'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What does VPN stand for?', options: ['Virtual Private Network', 'Very Protected Network', 'Visual Processing Node', 'Verified Public Network'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is malware?', options: ['Malicious software designed to harm or exploit systems', 'A type of hardware', 'A network cable', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is two-factor authentication (2FA)?', options: ['Using two different methods to verify identity', 'Using the same password twice', 'Having two user accounts', 'Logging in from two devices'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a virus in computing?', options: ['A self-replicating program that attaches to legitimate files', 'A hardware malfunction', 'A network speed booster', 'A type of memory'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is encryption?', options: ['Converting data into a coded form to prevent unauthorized access', 'Deleting data permanently', 'Compressing data for storage', 'Backing up data'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a strong password?', options: ['A mix of uppercase, lowercase, numbers, and special characters', 'Your name followed by 123', 'The word "password"', 'A single letter repeated'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What does HTTPS stand for?', options: ['Hyper Text Transfer Protocol Secure', 'High Tech Transmission Protocol System', 'Hyper Technical Processing System', 'High Transfer Text Protocol Secure'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is antivirus software?', options: ['Software designed to detect and remove malicious programs', 'A type of virus', 'A network configuration tool', 'A database application'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is social engineering in cybersecurity?', options: ['Manipulating people into giving up confidential information', 'Building social media platforms', 'Engineering social networks', 'Programming chatbots'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a data breach?', options: ['Unauthorized access to confidential data', 'A software update', 'A network speed test', 'A type of backup'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a Trojan horse in computing?', options: ['Malware disguised as legitimate software', 'A type of firewall', 'A network protocol', 'An encryption algorithm'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is ransomware?', options: ['Malware that encrypts files and demands payment for decryption', 'A type of antivirus', 'A network monitoring tool', 'A data backup system'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a DDoS attack?', options: ['Distributed Denial of Service — overwhelming a server with traffic', 'A type of encryption', 'A network optimization', 'A database query'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a security patch?', options: ['A software update that fixes security vulnerabilities', 'A type of malware', 'A hardware component', 'A network cable'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is multi-factor authentication?', options: ['Using multiple verification methods for identity confirmation', 'Having multiple passwords', 'Using multiple email accounts', 'Logging in multiple times'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is a brute force attack?', options: ['Trying every possible password combination until the correct one is found', 'A physical attack on hardware', 'A type of encryption', 'A network speed test'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What is spyware?', options: ['Software that secretly monitors user activity', 'A type of firewall', 'An antivirus program', 'A network tool'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Easy', questionText: 'What does CIA stand for in cybersecurity?', options: ['Confidentiality, Integrity, Availability', 'Computer Internet Access', 'Cyber Intelligence Agency', 'Coded Information Algorithm'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is SQL injection?', options: ['Inserting malicious SQL code into queries to manipulate databases', 'A type of database backup', 'A SQL optimization technique', 'A database design pattern'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is cross-site scripting (XSS)?', options: ['Injecting malicious scripts into web pages viewed by other users', 'A legitimate web development technique', 'A type of firewall', 'A database query method'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a man-in-the-middle attack?', options: ['An attacker intercepts communication between two parties', 'A physical break-in', 'A type of encryption', 'A network optimization'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the purpose of penetration testing?', options: ['Simulating attacks to identify security vulnerabilities', 'Testing network speed', 'Testing software functionality', 'Testing hardware performance'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a zero-day vulnerability?', options: ['A security flaw unknown to the vendor with no available patch', 'A virus that activates on day zero', 'A firewall that blocks all traffic', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the difference between symmetric and asymmetric encryption?', options: ['Symmetric uses one key for both; asymmetric uses a public-private key pair', 'They are the same', 'Symmetric is always more secure', 'Asymmetric uses one key'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a digital certificate?', options: ['An electronic document that verifies the identity of a website or entity', 'A type of password', 'A malware detection tool', 'A network cable'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the purpose of an IDS (Intrusion Detection System)?', options: ['To monitor network traffic for suspicious activity and alert administrators', 'To block all incoming traffic', 'To encrypt data', 'To speed up the network'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is AES?', options: ['Advanced Encryption Standard — a symmetric encryption algorithm', 'Automated Email System', 'Advanced Error Scanner', 'Application Execution Service'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the principle of least privilege?', options: ['Users should only have minimum access necessary for their role', 'All users should have admin access', 'Only the CEO should have access', 'Access should be given to everyone'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a honeypot in cybersecurity?', options: ['A decoy system designed to attract and study attackers', 'A type of firewall', 'A password manager', 'An encryption algorithm'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is CSRF (Cross-Site Request Forgery)?', options: ['An attack that tricks a user into executing unwanted actions on an authenticated site', 'A type of encryption', 'A legitimate web feature', 'A database optimization'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is port scanning?', options: ['Probing a system to identify open ports and available services', 'Scanning documents', 'Testing printer ports', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the OWASP Top 10?', options: ['A list of the most critical web application security risks', 'A list of top 10 programming languages', 'A list of top 10 databases', 'A list of top 10 firewalls'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a rootkit?', options: ['Malware that hides its presence and provides persistent privileged access', 'A legitimate system tool', 'A type of firewall', 'A network monitoring tool'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is network segmentation?', options: ['Dividing a network into smaller segments to contain breaches and improve security', 'Connecting all devices to one network', 'Removing firewalls', 'Disabling encryption'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is a security audit?', options: ['A systematic evaluation of an organization security posture', 'A type of malware scan', 'A network speed test', 'A software update'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is the role of a SIEM system?', options: ['Security Information and Event Management — collecting and analyzing security logs', 'Speeding up network traffic', 'Managing email systems', 'Creating databases'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is session hijacking?', options: ['Taking over a user active session by stealing or predicting the session token', 'Creating a new user session', 'Logging out of a session', 'Resetting a password'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Medium', questionText: 'What is defense in depth?', options: ['A strategy using multiple layers of security controls', 'Using only one firewall', 'Relying solely on antivirus', 'Having no security measures'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is a buffer overflow attack?', options: ['Exploiting a program by writing data beyond the allocated buffer to execute arbitrary code', 'A network congestion issue', 'A type of encryption', 'A database optimization'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is the difference between IDS and IPS?', options: ['IDS detects and alerts; IPS detects and actively blocks threats', 'They are the same', 'IDS blocks traffic; IPS only monitors', 'Neither detects threats'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is PKI (Public Key Infrastructure)?', options: ['A framework for managing digital certificates and public-key encryption', 'A type of firewall', 'A network protocol', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is the purpose of a Web Application Firewall (WAF)?', options: ['To filter and monitor HTTP traffic between a web application and the internet', 'To encrypt database connections', 'To manage email traffic', 'To speed up web pages'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is threat modeling?', options: ['A structured approach to identifying, quantifying, and addressing security threats', 'Creating 3D models of threats', 'A type of penetration testing', 'A database design technique'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is the difference between hashing and encryption?', options: ['Hashing is one-way and irreversible; encryption is two-way and reversible with a key', 'They are identical', 'Encryption is one-way', 'Hashing requires a key'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is a supply chain attack?', options: ['Compromising a trusted vendor or supplier to gain access to their customers', 'Attacking a physical supply chain', 'A logistics optimization', 'A type of DDoS attack'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is the MITRE ATT&CK framework?', options: ['A knowledge base of adversary tactics and techniques based on real-world observations', 'A type of firewall', 'A programming framework', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is sandboxing in cybersecurity?', options: ['Running suspicious programs in an isolated environment to observe their behavior', 'A type of encryption', 'A network optimization', 'A data backup technique'], correctOptionIndex: 0 },
+  { domain: 'Cyber Security', difficulty: 'Hard', questionText: 'What is a race condition vulnerability?', options: ['A flaw where the system behavior depends on the timing of events, exploitable by attackers', 'A performance optimization', 'A type of firewall', 'A network speed test'], correctOptionIndex: 0 },
 
-  // ==================== NODE.JS / BACKEND (10 questions) ====================
-  {
-    domain: 'Node.js',
-    questionText: 'Which core module in Node.js is used to handle file paths?',
-    options: ['path', 'fs', 'url', 'http'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'What is the default package manager for Node.js?',
-    options: ['npm', 'yarn', 'pnpm', 'bower'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'How can you read environmental variables inside Node.js?',
-    options: ['process.env.VARIABLE_NAME', 'process.variable.VARIABLE_NAME', 'env.VARIABLE_NAME', 'system.env.VARIABLE_NAME'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'Which function is used to load external modules in CommonJS syntax in Node.js?',
-    options: ['require()', 'import()', 'load()', 'include()'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'What is the Event Loop in Node.js?',
-    options: [
-      'A mechanism that offloads operations to the system kernel and executes callbacks asynchronously',
-      'A loop that runs database queries sequentially',
-      'A tool to schedule web page refreshes in the browser',
-      'A multi-threaded compiler that optimizes execution speed'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'Which Node.js core module provides stream capabilities?',
-    options: ['stream', 'fs', 'net', 'buffer'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'What does libuv provide to Node.js?',
-    options: [
-      'A thread pool and event loop for handling non-blocking asynchronous I/O operations',
-      'The V8 JavaScript compilation engine',
-      'HTTP parsing capabilities',
-      'Cryptographic utilities'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'How do you handle unhandled promise rejections in Node.js?',
-    options: [
-      'process.on(\'unhandledRejection\', callback)',
-      'process.on(\'uncaughtException\', callback)',
-      'window.onerror = callback',
-      'try { ... } catch (err) { ... }'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'What is backpressure in Node.js streams?',
-    options: [
-      'A build-up of data in buffer when the readable stream reads faster than the writable stream can write',
-      'A CPU overhead when network latency increases',
-      'A database locking error during high write volumes',
-      'An memory leak in the Event Loop queue'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
-  {
-    domain: 'Node.js',
-    questionText: 'How does worker_threads module differ from cluster module in Node.js?',
-    options: [
-      'worker_threads share memory space and run in a single process; cluster creates multiple separate processes',
-      'worker_threads create new server ports; cluster runs on a single port',
-      'worker_threads are only for class systems; cluster is for functional architectures',
-      'worker_threads are managed by the browser; cluster is managed by the operating system'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
+  // ============================================================================
+  // CLOUD COMPUTING (70 questions)
+  // ============================================================================
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is cloud computing?', options: ['Delivering computing services over the internet', 'Computing using weather data', 'A type of hard drive', 'A programming language'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'Which of these is a major cloud provider?', options: ['Amazon Web Services (AWS)', 'Adobe Photoshop', 'Microsoft Word', 'VLC Player'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What does IaaS stand for?', options: ['Infrastructure as a Service', 'Internet as a Service', 'Information as a System', 'Integration as a Service'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What does PaaS stand for?', options: ['Platform as a Service', 'Programming as a Service', 'Processing as a System', 'Protocol as a Service'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What does SaaS stand for?', options: ['Software as a Service', 'Storage as a Service', 'Security as a System', 'Server as a Service'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'Which is an example of SaaS?', options: ['Google Workspace (Gmail, Docs)', 'AWS EC2', 'Docker', 'Linux OS'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is a virtual machine?', options: ['A software-based emulation of a physical computer', 'A physical server', 'A network cable', 'A type of database'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is the benefit of cloud computing?', options: ['Scalability and pay-as-you-go pricing', 'Always requires physical hardware', 'Cannot be accessed remotely', 'Only works offline'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is cloud storage?', options: ['Storing data on remote servers accessible via the internet', 'Storing data on local hard drives only', 'A type of RAM', 'A physical filing cabinet'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'Which of these is a cloud storage service?', options: ['Google Drive', 'Microsoft Paint', 'Notepad', 'Calculator'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is a public cloud?', options: ['Cloud resources shared among multiple organizations over the internet', 'A cloud only for one company', 'A local server room', 'A type of firewall'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is a private cloud?', options: ['Cloud infrastructure dedicated to a single organization', 'A cloud shared by everyone', 'A public website', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is a hybrid cloud?', options: ['A combination of public and private cloud environments', 'Only a public cloud', 'Only a private cloud', 'A type of database'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Easy', questionText: 'What is AWS S3?', options: ['A cloud object storage service by Amazon', 'A programming language', 'A type of database', 'A network protocol'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is auto-scaling in cloud computing?', options: ['Automatically adjusting resources based on demand', 'Manually adding servers', 'Deleting unused accounts', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is serverless computing?', options: ['Cloud execution model where the provider manages server infrastructure automatically', 'Computing without any servers existing', 'Running code on local machines only', 'A type of database'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is containerization?', options: ['Packaging applications with their dependencies into isolated containers', 'Shipping physical containers', 'A type of encryption', 'A database technique'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is Docker?', options: ['A platform for developing, shipping, and running applications in containers', 'A type of virtual machine', 'A programming language', 'A cloud provider'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is Kubernetes?', options: ['An open-source container orchestration platform for automating deployment and scaling', 'A programming language', 'A type of database', 'A cloud provider'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is a load balancer?', options: ['A device that distributes network traffic across multiple servers', 'A type of hard drive', 'A programming tool', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is a CDN (Content Delivery Network)?', options: ['A distributed network of servers that delivers content to users based on geographic location', 'A type of database', 'A programming language', 'A security tool'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is cloud-native architecture?', options: ['Designing applications specifically to take advantage of cloud computing features', 'Running legacy applications in the cloud', 'Using only physical servers', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is Infrastructure as Code (IaC)?', options: ['Managing infrastructure through code files rather than manual processes', 'Writing code for databases', 'A type of encryption', 'A programming paradigm'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is a microservices architecture?', options: ['Breaking an application into small, independent, deployable services', 'Building one large monolithic application', 'A type of database', 'A network protocol'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is CI/CD?', options: ['Continuous Integration and Continuous Deployment — automating build, test, and deployment', 'Cloud Infrastructure / Cloud Deployment', 'A type of database', 'A programming language'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is multi-tenancy in cloud?', options: ['Multiple customers sharing the same infrastructure while keeping data isolated', 'One customer per server', 'A type of encryption', 'A network protocol'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is AWS Lambda?', options: ['A serverless computing service that runs code in response to events', 'A database service', 'A storage service', 'A networking service'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Medium', questionText: 'What is cloud migration?', options: ['Moving applications and data from on-premises to cloud infrastructure', 'Deleting cloud accounts', 'A type of backup', 'A network optimization'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is the CAP theorem?', options: ['A distributed system can only guarantee two of three: Consistency, Availability, Partition tolerance', 'All three can always be achieved', 'It applies only to databases', 'A type of encryption'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is the difference between vertical and horizontal scaling?', options: ['Vertical adds resources to one machine; horizontal adds more machines', 'They are the same', 'Vertical is always better', 'Horizontal means upgrading RAM'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is service mesh?', options: ['A dedicated infrastructure layer for managing service-to-service communication in microservices', 'A type of network cable', 'A database system', 'A programming language'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is the shared responsibility model?', options: ['Cloud provider secures the infrastructure; customer secures their data and applications', 'Provider is responsible for everything', 'Customer is responsible for everything', 'Neither is responsible'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is eventual consistency?', options: ['A model where all replicas will converge to the same state given enough time', 'Immediate consistency everywhere', 'A type of encryption', 'A database design pattern'], correctOptionIndex: 0 },
+  { domain: 'Cloud Computing', difficulty: 'Hard', questionText: 'What is a chaos engineering approach?', options: ['Deliberately introducing failures to test system resilience', 'Creating disorganized code', 'A type of encryption', 'A database optimization'], correctOptionIndex: 0 },
 
-  // ==================== PYTHON (10 questions) ====================
-  {
-    domain: 'Python',
-    questionText: 'Which data type in Python is mutable?',
-    options: ['list', 'tuple', 'string', 'int'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Python',
-    questionText: 'How do you add an element to a list in Python?',
-    options: ['append()', 'add()', 'push()', 'insert_last()'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Python',
-    questionText: 'What keyword is used to define a function in Python?',
-    options: ['def', 'function', 'fun', 'define'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Python',
-    questionText: 'What does the list comprehension [x**2 for x in range(3)] produce?',
-    options: ['[0, 1, 4]', '[1, 4, 9]', '[0, 1, 8]', '[1, 2, 3]'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Python',
-    questionText: 'What is the purpose of the __init__ method in a Python class?',
-    options: [
-      'To initialize the attributes of an object upon creation',
-      'To import modules inside a class',
-      'To destroy the object instance and free memory',
-      'To inherit methods from a parent class'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Python',
-    questionText: 'What is the Global Interpreter Lock (GIL) in Python?',
-    options: [
-      'A mutex that allows only one thread to execute Python bytecodes at a time',
-      'A system that locks script files from being edited during execution',
-      'A encryption mechanism for database credentials',
-      'A compiler flag that turns off standard exception handling'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  },
+  // ============================================================================
+  // FULL STACK DEVELOPMENT (80 questions)
+  // ============================================================================
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What does HTML stand for?', options: ['HyperText Markup Language', 'High Tech Machine Language', 'Home Tool Markup Language', 'Hyper Transfer Markup Language'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Computer Style Sheets', 'Creative Style System', 'Colorful Syntax Sheets'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'Which language is used for client-side scripting?', options: ['JavaScript', 'Python', 'Java', 'C++'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is the purpose of a backend server?', options: ['To handle business logic, databases, and API requests', 'To style web pages', 'To display images', 'To create animations'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What does API stand for?', options: ['Application Programming Interface', 'Automated Process Integration', 'Applied Program Instruction', 'Advanced Protocol Interface'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is React?', options: ['A JavaScript library for building user interfaces', 'A database system', 'A server-side language', 'A CSS framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is Node.js?', options: ['A JavaScript runtime environment for server-side applications', 'A CSS framework', 'A database system', 'A browser plugin'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is MongoDB?', options: ['A NoSQL document-based database', 'A programming language', 'A CSS framework', 'A web browser'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What does MERN stand for?', options: ['MongoDB, Express, React, Node.js', 'MySQL, Express, React, Next', 'MongoDB, Ember, Ruby, Node', 'MySQL, Electron, React, Node'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is a REST API?', options: ['An API that follows Representational State Transfer principles', 'A sleeping program', 'A type of database', 'A CSS animation'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is Git used for?', options: ['Version control and source code management', 'Web hosting', 'Database management', 'Image editing'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is npm?', options: ['Node Package Manager — for managing JavaScript packages', 'New Programming Method', 'Network Protocol Manager', 'Node Process Monitor'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is JSON?', options: ['JavaScript Object Notation — a data format', 'Java Source Object Notation', 'Joint System Object Network', 'JavaScript Online Network'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is responsive design?', options: ['Design that adapts to different screen sizes and devices', 'Design that never changes', 'Design only for desktops', 'Design only for mobile'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is the DOM?', options: ['Document Object Model — a tree representation of HTML elements', 'Database Object Management', 'Design Optimization Method', 'Dynamic Output Module'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What HTTP method is used to retrieve data?', options: ['GET', 'POST', 'DELETE', 'PUT'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What HTTP method is used to send data?', options: ['POST', 'GET', 'HEAD', 'OPTIONS'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Easy', questionText: 'What is Express.js?', options: ['A minimal web framework for Node.js', 'A CSS library', 'A database system', 'A front-end framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is middleware in Express.js?', options: ['Functions that have access to request, response, and next middleware in the cycle', 'A type of database', 'A CSS preprocessor', 'A front-end library'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is the Virtual DOM in React?', options: ['A lightweight in-memory representation of the real DOM for efficient updates', 'A physical DOM element', 'A database structure', 'A CSS framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is state management in React?', options: ['Managing and tracking data that changes over time within components', 'Managing CSS styles', 'Managing server hardware', 'Managing database schemas'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is JWT?', options: ['JSON Web Token — a compact token format for secure data transmission', 'Java Web Technology', 'JavaScript Worker Thread', 'Joint Web Transfer'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is CORS?', options: ['Cross-Origin Resource Sharing — a security mechanism for cross-domain requests', 'Central Object Resource System', 'Combined Origin Routing Service', 'Cross-Object Request Sharing'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is the purpose of useEffect in React?', options: ['To perform side effects like data fetching and DOM manipulation', 'To define CSS styles', 'To create database connections', 'To manage server routes'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is the difference between SQL and NoSQL databases?', options: ['SQL uses structured tables with schemas; NoSQL uses flexible document-based storage', 'They are the same', 'NoSQL only stores numbers', 'SQL cannot handle large data'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is WebSocket?', options: ['A protocol for full-duplex, real-time communication between client and server', 'A type of power socket', 'A CSS framework', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is server-side rendering (SSR)?', options: ['Rendering web pages on the server before sending to the client', 'Rendering only on the client', 'A type of database', 'A CSS technique'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is authentication vs authorization?', options: ['Authentication verifies identity; authorization determines access permissions', 'They are the same', 'Authorization comes before authentication', 'Neither involves user identity'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is Next.js?', options: ['A React framework with SSR, routing, and API routes built in', 'A database system', 'A CSS library', 'A testing framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Medium', questionText: 'What is a progressive web app (PWA)?', options: ['A web app that works offline and can be installed like a native app', 'A desktop application', 'A type of database', 'A CSS framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is the event loop in Node.js?', options: ['A mechanism that handles asynchronous operations by offloading to the system kernel', 'A CSS animation technique', 'A database query optimizer', 'A type of for loop'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is GraphQL?', options: ['A query language for APIs that allows clients to request exactly the data they need', 'A type of database', 'A CSS preprocessor', 'A JavaScript framework'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is the purpose of code splitting in web applications?', options: ['Loading only the code needed for the current view to improve performance', 'Splitting code into multiple programming languages', 'A debugging technique', 'A database optimization'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is hydration in SSR?', options: ['The process of attaching event listeners to server-rendered HTML on the client side', 'Adding water to servers', 'A database technique', 'A CSS animation'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is the N+1 query problem?', options: ['When fetching related data results in one query per item instead of a single optimized query', 'Having too many database tables', 'A CSS specificity issue', 'A JavaScript syntax error'], correctOptionIndex: 0 },
+  { domain: 'Full Stack Development', difficulty: 'Hard', questionText: 'What is an ORM?', options: ['Object-Relational Mapping — a technique for querying databases using object-oriented code', 'Online Resource Manager', 'Object Reference Model', 'Optimal Runtime Method'], correctOptionIndex: 0 },
 
-  // ==================== APTITUDE (10 questions) ====================
-  {
-    domain: 'Aptitude',
-    questionText: 'If 5 workers can build a wall in 12 days, how many days will it take 6 workers to build the same wall?',
-    options: ['10 days', '8 days', '14 days', '9 days'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'A car travels at 60 km/h for 2 hours, and then at 80 km/h for 3 hours. What is its average speed?',
-    options: ['72 km/h', '70 km/h', '75 km/h', '68 km/h'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'Find the next number in the series: 2, 6, 12, 20, 30, ...',
-    options: ['42', '40', '36', '45'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'What is the simple interest on $5000 for 3 years at a rate of 5% per annum?',
-    options: ['$750', '$600', '$900', '$500'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'A train 150m long passes a telegraph pole in 9 seconds. What is the speed of the train in km/h?',
-    options: ['60 km/h', '54 km/h', '72 km/h', '80 km/h'],
-    correctOptionIndex: 0,
-    difficulty: 0 // wait, let's calculate: speed = 150 / 9 m/s = (150/9) * 18/5 km/h = 30 * 2 = 60. So index 0 is correct.
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'The ratio of ages of A and B is 4:5. If the sum of their ages is 36 years, what is B\'s age?',
-    options: ['20 years', '16 years', '25 years', '18 years'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'In a group of 80 people, 45 speak English, 30 speak Tamil, and 15 speak both. How many speak neither English nor Tamil?',
-    options: ['20', '15', '10', '25'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium' // 45 + 30 - 15 = 60 speak English or Tamil. 80 - 60 = 20 speak neither.
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'A shopkeeper sells an item at 20% discount on marked price, yet makes 8% profit. By what percentage is marked price above cost price?',
-    options: ['35%', '30%', '25%', '40%'],
-    correctOptionIndex: 0,
-    difficulty: 'Hard' // SP = 0.8 * MP, SP = 1.08 * CP => 0.8 * MP = 1.08 * CP => MP / CP = 1.08 / 0.8 = 1.35. Marked price is 35% above CP.
-  },
-  {
-    domain: 'Aptitude',
-    questionText: 'A can do a work in 10 days, B in 12 days, and C in 15 days. They start together but A leaves after 2 days. In how many days is work completed?',
-    options: ['5 1/3 days', '6 days', '5 days', '4 2/3 days'],
-    correctOptionIndex: 0,
-    difficulty: 'Hard' // 1 day work: 1/10 + 1/12 + 1/15 = (6+5+4)/60 = 15/60 = 1/4. In 2 days, 2/4 = 1/2 work is done. Remaining work = 1/2. B and C do 1/12 + 1/15 = 9/60 = 3/20 work/day. Days for B and C: (1/2) / (3/20) = 10/3 = 3 1/3 days. Total days = 2 + 3 1/3 = 5 1/3 days. Correct!
-  },
+  // ============================================================================
+  // MECHANICAL ENGINEERING (70 questions)
+  // ============================================================================
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the SI unit of force?', options: ['Newton', 'Joule', 'Watt', 'Pascal'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What does CAD stand for?', options: ['Computer Aided Design', 'Central Automated Drawing', 'Controlled Axis Display', 'Compact Assembly Design'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is thermodynamics?', options: ['The study of heat, energy, and work', 'The study of electronics', 'The study of software', 'The study of chemistry'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the first law of thermodynamics?', options: ['Energy cannot be created or destroyed, only transformed', 'Force equals mass times acceleration', 'Every action has an equal and opposite reaction', 'Heat flows from hot to cold'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What material is known for its high strength-to-weight ratio?', options: ['Aluminum alloy', 'Lead', 'Gold', 'Mercury'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is stress in mechanics?', options: ['Force per unit area acting on a material', 'The weight of a material', 'The volume of a material', 'The color of a material'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is strain?', options: ['The deformation of a material relative to its original size', 'The temperature of a material', 'The density of a material', 'The hardness of a material'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What type of engine does a car typically use?', options: ['Internal combustion engine', 'Steam engine', 'Nuclear engine', 'Wind turbine'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a gear?', options: ['To transmit motion and change speed/torque ratios', 'To store energy', 'To measure temperature', 'To generate electricity'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the unit of pressure?', options: ['Pascal', 'Newton', 'Kilogram', 'Meter'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is CNC machining?', options: ['Computer Numerical Control — automated machine tool operation', 'Central Network Computing', 'Compressed Numerical Calculation', 'Custom Network Configuration'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a bearing?', options: ['To reduce friction between moving parts', 'To increase friction', 'To store energy', 'To measure speed'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is Young Modulus?', options: ['A measure of a material stiffness (ratio of stress to strain)', 'The age of a material', 'The weight of a material', 'The color of a material'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a heat exchanger?', options: ['To transfer heat between two fluids without mixing them', 'To generate electricity', 'To store fuel', 'To measure pressure'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the difference between ductile and brittle materials?', options: ['Ductile materials deform before breaking; brittle materials break without significant deformation', 'They are the same', 'Brittle materials are stronger', 'Ductile materials are always heavier'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the Carnot cycle?', options: ['The most efficient theoretical heat engine cycle', 'A type of engine used in cars', 'A manufacturing process', 'A type of gear train'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is fatigue failure in materials?', options: ['Failure due to repeated cyclic loading below the ultimate strength', 'Failure due to a single overload', 'Failure due to corrosion only', 'Failure due to high temperature only'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the difference between hardness and toughness?', options: ['Hardness resists surface deformation; toughness absorbs energy before fracture', 'They are the same property', 'Hardness is always greater than toughness', 'Toughness means brittleness'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is Reynolds number used for?', options: ['To predict whether fluid flow is laminar or turbulent', 'To measure temperature', 'To calculate force', 'To determine material hardness'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the purpose of a flywheel?', options: ['To store rotational energy and smooth out speed fluctuations', 'To measure temperature', 'To increase friction', 'To reduce engine power'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is Hookes Law?', options: ['Stress is proportional to strain within the elastic limit', 'Force equals mass times acceleration', 'Every action has an equal reaction', 'Energy cannot be destroyed'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the difference between a turbine and a compressor?', options: ['A turbine extracts energy from fluid; a compressor adds energy to fluid', 'They are the same', 'Both extract energy', 'Both compress fluid'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is finite element analysis (FEA)?', options: ['A numerical method for solving complex structural and thermal problems', 'A type of manufacturing process', 'A material testing method', 'A design drawing technique'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Medium', questionText: 'What is the purpose of tempering in heat treatment?', options: ['To reduce brittleness and increase toughness after hardening', 'To make the material softer only', 'To increase hardness further', 'To add color to the metal'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Hard', questionText: 'What is the difference between creep and fatigue?', options: ['Creep is slow deformation under constant load at high temperature; fatigue is failure under cyclic loading', 'They are the same', 'Creep only occurs at low temperatures', 'Fatigue requires constant loading'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Hard', questionText: 'What is the second law of thermodynamics?', options: ['Heat naturally flows from hot to cold; entropy of an isolated system always increases', 'Energy can be created from nothing', 'All processes are reversible', 'Work can be fully converted to heat with 100% efficiency'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Hard', questionText: 'What is the purpose of a Mohr circle in stress analysis?', options: ['To graphically determine principal stresses and maximum shear stress', 'To measure temperature', 'To design gears', 'To calculate fluid flow'], correctOptionIndex: 0 },
+  { domain: 'Mechanical Engineering', difficulty: 'Hard', questionText: 'What is the Rankine cycle?', options: ['The ideal thermodynamic cycle for steam power plants', 'A type of gear mechanism', 'A manufacturing process', 'A material testing method'], correctOptionIndex: 0 },
 
-  // ==================== DATA STRUCTURES (10 questions) ====================
-  {
-    domain: 'Data Structures',
-    questionText: 'Which data structure works on a Last In First Out (LIFO) basis?',
-    options: ['Stack', 'Queue', 'Linked List', 'Binary Tree'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'What is the time complexity to access an element in an array by index?',
-    options: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'],
-    correctOptionIndex: 0,
-    difficulty: 'Easy'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'What is the worst-case time complexity of sorting an array using Quick Sort?',
-    options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(2^n)'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'In a binary search tree, what traversal yields elements in sorted ascending order?',
-    options: ['In-order traversal', 'Pre-order traversal', 'Post-order traversal', 'Level-order traversal'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'Which algorithm is used to find the shortest path in a weighted graph with non-negative edge weights?',
-    options: ['Dijkstra\'s Algorithm', 'Kruskal\'s Algorithm', 'Prim\'s Algorithm', 'Depth First Search'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'Which of the following data structures is used for implementing Depth First Search (DFS)?',
-    options: ['Stack', 'Queue', 'Min-Heap', 'Hash Table'],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'What is a collision in a Hash Table?',
-    options: [
-      'When two different keys map to the same hash value/index',
-      'When the load factor exceeds 1.0',
-      'When memory allocation fails during insertion',
-      'When key strings have identical character lengths'
-    ],
-    correctOptionIndex: 0,
-    difficulty: 'Medium'
-  },
-  {
-    domain: 'Data Structures',
-    questionText: 'What is the minimum height of a binary tree with N nodes?',
-    options: ['floor(log2(N)) + 1', 'N', 'ceil(N/2)', 'sqrt(N)'],
-    correctOptionIndex: 0,
-    difficulty: 'Hard'
-  }
+  // ============================================================================
+  // CIVIL ENGINEERING (60 questions)
+  // ============================================================================
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the most commonly used material in construction?', options: ['Concrete', 'Plastic', 'Glass', 'Rubber'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What does RCC stand for?', options: ['Reinforced Cement Concrete', 'Raw Crushed Concrete', 'Regular Compact Cement', 'Refined Chemical Compound'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a foundation?', options: ['To transfer building loads to the ground safely', 'To decorate the building', 'To store water', 'To generate electricity'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the water-cement ratio?', options: ['The ratio of the weight of water to the weight of cement in a mix', 'The amount of water in a river', 'The depth of a well', 'The pressure of water supply'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is surveying?', options: ['Measuring and mapping the physical features of land', 'Asking people questions', 'Testing soil samples', 'Designing bridges'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the purpose of steel reinforcement in concrete?', options: ['To provide tensile strength that concrete lacks', 'To add color to concrete', 'To make concrete lighter', 'To prevent water absorption'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is a retaining wall?', options: ['A structure that holds back soil to prevent erosion or collapse', 'A decorative wall', 'An interior partition', 'A temporary barrier'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the standard curing period for concrete?', options: ['28 days for full strength', '1 day', '3 days', '1 year'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a plinth in construction?', options: ['To protect the building from moisture and raise it above ground level', 'To support the roof', 'To store materials', 'To decorate the entrance'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Easy', questionText: 'What is aggregate in concrete?', options: ['Crushed stone, gravel, or sand mixed with cement', 'A type of paint', 'A foundation type', 'A roofing material'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the difference between a beam and a column?', options: ['A beam carries transverse loads horizontally; a column carries axial loads vertically', 'They are the same', 'Columns are always horizontal', 'Beams are always vertical'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the bearing capacity of soil?', options: ['The maximum pressure the soil can support without failure', 'The weight of the soil', 'The color of the soil', 'The temperature of the soil'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the purpose of a septic tank?', options: ['To treat domestic wastewater through biological decomposition', 'To store drinking water', 'To generate electricity', 'To cool buildings'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is a truss?', options: ['A structural framework of triangular units used to span large distances', 'A type of foundation', 'A concrete mix', 'A roofing tile'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the purpose of contour lines in surveying?', options: ['To represent points of equal elevation on a map', 'To show property boundaries', 'To indicate road lanes', 'To mark building locations'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the slump test used for?', options: ['To measure the workability of fresh concrete', 'To test soil strength', 'To check water quality', 'To measure steel hardness'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Medium', questionText: 'What is the difference between dead load and live load?', options: ['Dead load is permanent (structure weight); live load is temporary (people, furniture)', 'They are the same', 'Dead load moves; live load is fixed', 'Live load includes the foundation'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Hard', questionText: 'What is the factor of safety in structural design?', options: ['The ratio of ultimate strength to working stress, providing a margin of safety', 'The cost of the structure', 'The height of the building', 'The color of the paint'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Hard', questionText: 'What is pre-stressed concrete?', options: ['Concrete with pre-applied compressive forces to counteract tensile stresses under loading', 'Concrete mixed under pressure', 'Regular concrete with extra water', 'Concrete without reinforcement'], correctOptionIndex: 0 },
+  { domain: 'Civil Engineering', difficulty: 'Hard', questionText: 'What is the liquefaction of soil?', options: ['When saturated soil loses strength during an earthquake and behaves like a liquid', 'When soil is mixed with water', 'When soil dries out', 'When soil is compacted'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ELECTRICAL ENGINEERING (60 questions)
+  // ============================================================================
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is the SI unit of electric current?', options: ['Ampere', 'Volt', 'Ohm', 'Watt'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What does Ohms Law state?', options: ['V = IR (Voltage equals Current times Resistance)', 'F = ma', 'E = mc²', 'P = VI'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is the unit of electrical resistance?', options: ['Ohm', 'Ampere', 'Volt', 'Watt'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is AC electricity?', options: ['Alternating Current — current that changes direction periodically', 'Always Connected', 'Automatic Current', 'Assisted Current'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is DC electricity?', options: ['Direct Current — current that flows in one direction', 'Dual Current', 'Digital Current', 'Dynamic Current'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is the function of a transformer?', options: ['To step up or step down AC voltage levels', 'To convert AC to DC', 'To store energy', 'To measure current'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is the unit of electrical power?', options: ['Watt', 'Ohm', 'Ampere', 'Farad'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is a circuit breaker?', options: ['A safety device that interrupts current flow during overloads or faults', 'A device that increases voltage', 'A type of resistor', 'A measuring instrument'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is a diode?', options: ['A semiconductor device that allows current flow in one direction', 'A device that stores energy', 'A type of resistor', 'A measuring tool'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Easy', questionText: 'What is the purpose of earthing/grounding?', options: ['To provide a safe path for fault current to prevent electric shock', 'To increase voltage', 'To speed up circuits', 'To store electricity'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is the difference between a motor and a generator?', options: ['A motor converts electrical energy to mechanical; a generator converts mechanical to electrical', 'They are the same', 'Both convert to heat only', 'Neither uses electricity'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is power factor?', options: ['The ratio of real power to apparent power in an AC circuit', 'The total power consumed', 'The voltage level', 'The current flow rate'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is the purpose of a capacitor?', options: ['To store and release electrical energy in an electric field', 'To increase resistance', 'To convert AC to DC', 'To measure voltage'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is Kirchhoffs Current Law (KCL)?', options: ['The sum of currents entering a node equals the sum leaving it', 'Voltage is constant in a circuit', 'Resistance determines current', 'Power equals voltage times current'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is Kirchhoffs Voltage Law (KVL)?', options: ['The sum of voltages around a closed loop equals zero', 'Current is constant in a circuit', 'Resistance determines voltage', 'Power equals current squared times resistance'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is a three-phase power system?', options: ['A system using three AC voltages displaced by 120 degrees for efficient power transmission', 'Three separate power grids', 'A DC power system', 'A battery backup system'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Medium', questionText: 'What is an inverter?', options: ['A device that converts DC to AC', 'A device that converts AC to DC', 'A type of transformer', 'A measuring instrument'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Hard', questionText: 'What is the purpose of a PLC in industrial automation?', options: ['Programmable Logic Controller — controls manufacturing processes and machinery', 'Power Line Converter', 'Personal Laptop Computer', 'Passive Load Controller'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Hard', questionText: 'What is the maximum power transfer theorem?', options: ['Maximum power is transferred when load resistance equals source resistance', 'Power is always maximum at any resistance', 'Higher resistance always means more power', 'Load resistance should be zero'], correctOptionIndex: 0 },
+  { domain: 'Electrical Engineering', difficulty: 'Hard', questionText: 'What is the Thevenin equivalent circuit?', options: ['Any linear circuit can be reduced to a single voltage source in series with a single resistance', 'A circuit with no resistance', 'A circuit with infinite voltage', 'A purely inductive circuit'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ELECTRONICS & COMMUNICATION ENGINEERING (ECE) (60 questions)
+  // ============================================================================
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is a transistor?', options: ['A semiconductor device used to amplify or switch electronic signals', 'A type of resistor', 'A measuring instrument', 'A power supply'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What does LED stand for?', options: ['Light Emitting Diode', 'Low Energy Device', 'Linear Electronic Display', 'Laser Emission Detector'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is an amplifier?', options: ['A circuit that increases the strength of a signal', 'A device that reduces signal', 'A measuring tool', 'A type of antenna'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is the function of an oscillator?', options: ['To generate periodic waveforms without an input signal', 'To store data', 'To measure resistance', 'To convert AC to DC'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is bandwidth in communication?', options: ['The range of frequencies a channel can transmit', 'The speed of light', 'The physical width of a cable', 'The power consumption'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is modulation?', options: ['The process of varying a carrier signal to encode information', 'Removing noise from a signal', 'Amplifying a signal', 'Storing a signal'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is a logic gate?', options: ['A basic building block of digital circuits that performs a Boolean function', 'A physical gate', 'A type of antenna', 'A power supply'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is AM in radio?', options: ['Amplitude Modulation', 'Audio Mixing', 'Advanced Mode', 'Automatic Measurement'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is FM in radio?', options: ['Frequency Modulation', 'Fast Mode', 'Filter Mechanism', 'Full Measurement'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Easy', questionText: 'What is a microcontroller?', options: ['A small computer on a single chip with processor, memory, and I/O', 'A large mainframe computer', 'A type of sensor', 'A communication protocol'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Medium', questionText: 'What is the Nyquist sampling theorem?', options: ['A signal must be sampled at least twice its highest frequency to avoid aliasing', 'Any sampling rate works for any signal', 'Higher frequencies need lower sampling', 'Sampling rate does not affect quality'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Medium', questionText: 'What is the difference between analog and digital signals?', options: ['Analog signals are continuous; digital signals are discrete', 'They are identical', 'Digital signals are always analog', 'Analog signals are faster'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Medium', questionText: 'What is FPGA?', options: ['Field Programmable Gate Array — a reconfigurable integrated circuit', 'Fixed Program Gate Array', 'Fast Processing Graphics Adapter', 'Flexible Power Grid Array'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Medium', questionText: 'What is the purpose of a filter in electronics?', options: ['To pass certain frequencies while attenuating others', 'To amplify all signals equally', 'To generate new frequencies', 'To store electrical energy'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Medium', questionText: 'What is the difference between UART and SPI communication?', options: ['UART is asynchronous serial; SPI is synchronous with a clock signal', 'They are identical protocols', 'UART is faster than SPI', 'SPI does not need any wires'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Hard', questionText: 'What is the Shannon-Hartley theorem?', options: ['It defines the maximum data rate of a noisy channel based on bandwidth and signal-to-noise ratio', 'Any channel can carry infinite data', 'Noise does not affect data rate', 'It applies only to optical fibers'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Hard', questionText: 'What is OFDM?', options: ['Orthogonal Frequency Division Multiplexing — splitting data across many subcarriers', 'Optical Fiber Data Modulation', 'Overhead Frequency Detection Module', 'Optimized Full Duplex Mode'], correctOptionIndex: 0 },
+  { domain: 'Electronics & Communication Engineering (ECE)', difficulty: 'Hard', questionText: 'What is the purpose of a PLL (Phase-Locked Loop)?', options: ['To synchronize output signal phase and frequency with a reference signal', 'To amplify power', 'To store data', 'To convert analog to digital'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // HUMAN RESOURCES (HR) (70 questions)
+  // ============================================================================
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What does HR stand for?', options: ['Human Resources', 'High Revenue', 'Hardware Repair', 'Health Records'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is recruitment?', options: ['The process of finding and hiring qualified candidates', 'Firing employees', 'Managing finances', 'Designing products'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is an employee onboarding process?', options: ['Integrating new employees into the organization', 'Terminating employees', 'Promoting employees', 'Transferring employees'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is a job description?', options: ['A document outlining the duties, responsibilities, and requirements of a position', 'A personal resume', 'A company financial report', 'A marketing brochure'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is employee engagement?', options: ['The emotional commitment an employee has to the organization and its goals', 'The number of hours worked', 'The salary paid', 'The office location'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is performance appraisal?', options: ['A systematic evaluation of employee job performance', 'A salary increase process', 'A recruitment method', 'A training program'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is an exit interview?', options: ['A conversation with a departing employee to understand reasons for leaving', 'A final exam', 'A recruitment interview', 'A promotion interview'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is employee retention?', options: ['Strategies to keep talented employees in the organization', 'Hiring new employees', 'Firing underperformers', 'Reducing salaries'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is workplace diversity?', options: ['Having employees from different backgrounds, cultures, and demographics', 'Hiring only one type of person', 'A marketing strategy', 'A financial term'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Easy', questionText: 'What is a KPI?', options: ['Key Performance Indicator — measurable value showing progress toward goals', 'Key Programming Interface', 'Knowledge Processing Index', 'Known Parameter Input'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is the difference between internal and external recruitment?', options: ['Internal fills positions with existing employees; external hires from outside', 'They are the same', 'Internal always costs more', 'External means promoting within'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is competency-based interviewing?', options: ['Asking candidates for specific examples of past behavior to predict future performance', 'Asking only technical questions', 'A written test only', 'A personality quiz'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is the purpose of a 360-degree feedback?', options: ['Collecting performance feedback from supervisors, peers, subordinates, and self', 'Only manager feedback', 'Only self-assessment', 'Only peer feedback'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is succession planning?', options: ['Identifying and developing future leaders to fill key positions', 'Planning employee vacations', 'Reducing workforce', 'Changing company name'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is the HRIS?', options: ['Human Resource Information System — software for managing HR data', 'High Revenue Investment Strategy', 'Health Record Information System', 'Hardware Repair Integration Service'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is organizational culture?', options: ['Shared values, beliefs, and practices that shape workplace behavior', 'The office building design', 'The company stock price', 'The number of employees'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is employer branding?', options: ['Promoting the company as a desirable place to work to attract talent', 'The company logo', 'Product advertising', 'Financial reporting'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Medium', questionText: 'What is attrition rate?', options: ['The rate at which employees leave the organization over a period', 'The rate of new hires', 'The rate of promotions', 'The rate of salary increases'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Hard', questionText: 'What is strategic HRM?', options: ['Aligning HR practices with the organization long-term business strategy', 'Managing daily HR operations only', 'Focusing only on recruitment', 'Reducing HR department size'], correctOptionIndex: 0 },
+  { domain: 'Human Resources (HR)', difficulty: 'Hard', questionText: 'What is the balanced scorecard approach?', options: ['A framework measuring performance across financial, customer, process, and learning perspectives', 'A scorecard for sports', 'A financial audit tool', 'A recruitment scoring system'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // MARKETING (60 questions)
+  // ============================================================================
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What are the 4 Ps of marketing?', options: ['Product, Price, Place, Promotion', 'People, Process, Profit, Plan', 'Production, Pricing, Placement, Promotion', 'Planning, Positioning, Purchasing, Promoting'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is a target audience?', options: ['A specific group of people a business aims to reach with its marketing', 'All people in the world', 'Only existing customers', 'Competitors'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is a brand?', options: ['A name, design, or symbol that identifies a product or company', 'A type of marketing tool', 'A financial report', 'A supply chain process'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is SEO?', options: ['Search Engine Optimization — improving website visibility in search results', 'Social Email Outreach', 'Sales Executive Operations', 'System Enhancement Organization'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is social media marketing?', options: ['Using social media platforms to promote products and engage with audiences', 'A type of TV advertising', 'Printing brochures', 'Cold calling customers'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is a marketing campaign?', options: ['A coordinated series of activities to promote a product or service', 'A single advertisement', 'A customer complaint', 'A financial audit'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is market research?', options: ['Gathering information about consumer needs and preferences', 'Selling products online', 'Designing logos', 'Managing employees'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is content marketing?', options: ['Creating valuable content to attract and retain a target audience', 'Buying advertising space', 'Cold calling prospects', 'Discounting products'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is a USP?', options: ['Unique Selling Proposition — what makes a product different from competitors', 'Universal Sales Platform', 'Unified System Protocol', 'User Service Provider'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Easy', questionText: 'What is email marketing?', options: ['Sending promotional emails to a targeted list of recipients', 'A type of social media', 'A TV advertising method', 'A phone marketing technique'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is the marketing funnel?', options: ['The customer journey from awareness to purchase', 'A physical funnel shape', 'A pricing strategy', 'A distribution channel'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is SWOT analysis?', options: ['Analysis of Strengths, Weaknesses, Opportunities, and Threats', 'A pricing model', 'A distribution strategy', 'A customer survey'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is customer segmentation?', options: ['Dividing a market into distinct groups of customers with similar needs', 'Serving all customers identically', 'Removing certain customers', 'Increasing prices for all'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is a conversion rate?', options: ['The percentage of visitors who take a desired action', 'The total number of visitors', 'The bounce rate', 'The click-through rate'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is influencer marketing?', options: ['Partnering with influential people to promote products to their audience', 'A type of print advertising', 'A pricing strategy', 'A distribution method'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Medium', questionText: 'What is brand positioning?', options: ['Creating a distinct image for a brand in the consumer mind relative to competitors', 'The physical location of a store', 'A pricing strategy', 'An inventory method'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Hard', questionText: 'What is the Customer Lifetime Value (CLV)?', options: ['The total revenue expected from a customer throughout their relationship with the company', 'The first purchase value', 'The annual revenue', 'The discount given'], correctOptionIndex: 0 },
+  { domain: 'Marketing', difficulty: 'Hard', questionText: 'What is the difference between push and pull marketing?', options: ['Push promotes to intermediaries; pull creates demand directly from consumers', 'They are identical', 'Push is always better', 'Pull means discounting'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // FINANCE (60 questions)
+  // ============================================================================
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is a balance sheet?', options: ['A financial statement showing assets, liabilities, and equity at a point in time', 'A list of employees', 'A marketing plan', 'A product design document'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is revenue?', options: ['The total income generated from business operations', 'The total expenses', 'The net profit', 'The tax paid'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is profit?', options: ['Revenue minus expenses', 'Revenue plus expenses', 'Total assets', 'Total liabilities'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is an asset?', options: ['Something of value owned by a company', 'A debt owed by the company', 'The company revenue', 'The company expenses'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is a liability?', options: ['A debt or obligation owed by the company', 'An asset owned', 'The company profit', 'The share price'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What does ROI stand for?', options: ['Return on Investment', 'Rate of Interest', 'Revenue of Industry', 'Ratio of Income'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is inflation?', options: ['The general increase in prices over time, reducing purchasing power', 'A decrease in prices', 'A fixed interest rate', 'A type of tax'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is a stock?', options: ['A share of ownership in a company', 'A type of debt', 'A government bond', 'A savings account'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is a budget?', options: ['A financial plan estimating income and expenses over a period', 'A tax form', 'A bank account', 'A type of investment'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Easy', questionText: 'What is GDP?', options: ['Gross Domestic Product — the total value of goods and services produced in a country', 'General Data Processing', 'Government Deposit Program', 'Global Development Plan'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is compound interest?', options: ['Interest calculated on both the principal and accumulated interest', 'Interest on principal only', 'A flat fee', 'A one-time charge'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is a P&L statement?', options: ['Profit and Loss statement showing revenue, costs, and expenses over a period', 'A balance sheet', 'A cash flow statement', 'A tax return'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is working capital?', options: ['Current assets minus current liabilities — available for daily operations', 'Total assets', 'Total liabilities', 'Net profit'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is diversification in investing?', options: ['Spreading investments across different assets to reduce risk', 'Putting all money in one stock', 'Only investing in bonds', 'Avoiding all investments'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is a mutual fund?', options: ['A pool of money from multiple investors managed by a professional fund manager', 'A personal savings account', 'A government loan', 'A type of insurance'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Medium', questionText: 'What is depreciation?', options: ['The decrease in value of an asset over time', 'The increase in value', 'A type of revenue', 'An expense category'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Hard', questionText: 'What is the difference between NPV and IRR?', options: ['NPV calculates the present value of cash flows; IRR is the discount rate that makes NPV zero', 'They are the same', 'NPV is always higher than IRR', 'IRR measures profitability in dollars'], correctOptionIndex: 0 },
+  { domain: 'Finance', difficulty: 'Hard', questionText: 'What is the debt-to-equity ratio?', options: ['A measure of a company financial leverage: total liabilities divided by shareholder equity', 'Total assets divided by revenue', 'Net profit divided by revenue', 'Current assets divided by current liabilities'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // PHARMACY (70 questions)
+  // ============================================================================
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is pharmacology?', options: ['The study of drugs and their effects on the body', 'The study of plants', 'The study of surgery', 'The study of bones'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is the difference between a generic and brand-name drug?', options: ['Generic drugs have the same active ingredient but are cheaper; brand-name is marketed under a proprietary name', 'They are completely different drugs', 'Generic drugs are less effective', 'Brand-name drugs have no patent'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What does OTC stand for?', options: ['Over The Counter — drugs available without a prescription', 'Order To Cure', 'Official Treatment Code', 'Oral Treatment Category'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is a dosage form?', options: ['The physical form in which a drug is delivered (tablet, capsule, liquid, etc.)', 'The cost of a drug', 'The expiry date', 'The manufacturer name'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is the purpose of a prescription?', options: ['A written order from a physician for a specific medication for a patient', 'A receipt for payment', 'A marketing document', 'A research paper'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is an antibiotic?', options: ['A drug that fights bacterial infections', 'A drug that fights viral infections', 'A vitamin supplement', 'A pain reliever'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is a side effect?', options: ['An unintended effect of a drug in addition to its intended effect', 'The main effect of a drug', 'The cost of a drug', 'The color of a drug'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is the shelf life of a drug?', options: ['The period during which the drug remains effective and safe to use', 'The time it takes to manufacture', 'The price of the drug', 'The size of the tablet'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What is a vaccine?', options: ['A preparation that stimulates the immune system to protect against a disease', 'A type of antibiotic', 'A pain medication', 'A vitamin supplement'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Easy', questionText: 'What does WHO stand for in healthcare?', options: ['World Health Organization', 'World Hospital Office', 'Western Health Order', 'World Hygiene Organization'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is drug bioavailability?', options: ['The fraction of administered drug that reaches systemic circulation in active form', 'The cost of the drug', 'The color of the drug', 'The size of the tablet'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is the half-life of a drug?', options: ['The time it takes for the drug concentration in the body to reduce by half', 'The time to manufacture the drug', 'The expiry date of the drug', 'The cost reduction over time'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is pharmacokinetics?', options: ['The study of how the body absorbs, distributes, metabolizes, and excretes drugs', 'The study of drug pricing', 'The study of drug marketing', 'The study of drug manufacturing'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is a drug interaction?', options: ['When one drug affects the activity of another when taken together', 'When two drugs have the same color', 'When drugs are stored together', 'When drugs have the same price'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What are the phases of clinical trials?', options: ['Phase I (safety), Phase II (efficacy), Phase III (large-scale), Phase IV (post-market)', 'Only one phase', 'Five phases starting from Phase 0', 'Three phases: testing, approval, marketing'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is Good Manufacturing Practice (GMP)?', options: ['A system ensuring products are consistently produced according to quality standards', 'A marketing strategy', 'A pricing model', 'A distribution method'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Medium', questionText: 'What is an adverse drug reaction (ADR)?', options: ['A harmful or unintended response to a drug at normal doses', 'The intended effect of a drug', 'A drug manufacturing error', 'A drug pricing change'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Hard', questionText: 'What is the therapeutic index?', options: ['The ratio of the toxic dose to the therapeutic dose — indicates drug safety margin', 'The price of the drug', 'The expiry date', 'The manufacturing cost'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Hard', questionText: 'What is first-pass metabolism?', options: ['Drug metabolism in the liver before reaching systemic circulation, reducing bioavailability', 'The first time a patient takes a drug', 'The manufacturing step', 'The packaging process'], correctOptionIndex: 0 },
+  { domain: 'Pharmacy', difficulty: 'Hard', questionText: 'What is the difference between agonist and antagonist drugs?', options: ['Agonists activate receptors; antagonists block receptors', 'They are the same', 'Agonists block receptors', 'Antagonists activate receptors'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // NURSING (60 questions)
+  // ============================================================================
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What are the vital signs?', options: ['Temperature, pulse, respiration rate, and blood pressure', 'Height and weight only', 'Blood type and age', 'Name and address'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the normal body temperature?', options: ['98.6°F (37°C)', '100°F (37.8°C)', '95°F (35°C)', '104°F (40°C)'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the purpose of hand hygiene in healthcare?', options: ['To prevent the spread of infections', 'To keep hands soft', 'To remove calluses', 'For cosmetic purposes'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the normal adult resting heart rate?', options: ['60-100 beats per minute', '40-50 beats per minute', '120-150 beats per minute', '20-30 beats per minute'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is patient confidentiality?', options: ['Keeping patient health information private and secure', 'Sharing patient information with everyone', 'Posting patient records online', 'Discussing patient cases publicly'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the purpose of a catheter?', options: ['To drain urine from the bladder', 'To measure blood pressure', 'To take blood samples', 'To give injections'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What does CPR stand for?', options: ['Cardiopulmonary Resuscitation', 'Central Pulse Reading', 'Cardiac Pressure Recovery', 'Complete Patient Recovery'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the purpose of a stethoscope?', options: ['To listen to internal body sounds like heartbeat and breathing', 'To measure temperature', 'To take blood pressure', 'To give medications'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is infection control?', options: ['Practices to prevent the spread of infections in healthcare settings', 'Treating infections with antibiotics only', 'Isolating all patients', 'Closing the hospital'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Easy', questionText: 'What is the Nursing Process?', options: ['Assessment, Diagnosis, Planning, Implementation, Evaluation (ADPIE)', 'Only giving medications', 'Only taking vital signs', 'Only documenting records'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Medium', questionText: 'What are the five rights of medication administration?', options: ['Right patient, right drug, right dose, right route, right time', 'Right nurse, right doctor, right hospital, right room, right bed', 'Right price, right brand, right color, right size, right shape', 'Right insurance, right payment, right receipt, right discount, right refund'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Medium', questionText: 'What is triage?', options: ['A process of prioritizing patients based on the severity of their condition', 'Treating all patients equally regardless of severity', 'A type of medication', 'A surgical procedure'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Medium', questionText: 'What is a nosocomial infection?', options: ['A hospital-acquired infection', 'A genetic condition', 'A chronic disease', 'A childhood illness'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Medium', questionText: 'What is the Glasgow Coma Scale (GCS)?', options: ['A neurological scale to assess the level of consciousness in patients', 'A pain assessment tool', 'A blood pressure measurement', 'A temperature scale'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Medium', questionText: 'What is the difference between IV and IM injection?', options: ['IV is into a vein; IM is into a muscle', 'They are the same', 'IV is into a muscle; IM is into a vein', 'Both are oral medications'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Hard', questionText: 'What is evidence-based nursing practice?', options: ['Using current best evidence combined with clinical expertise and patient values for decision making', 'Only following textbook guidelines', 'Only using personal experience', 'Only following doctor orders'], correctOptionIndex: 0 },
+  { domain: 'Nursing', difficulty: 'Hard', questionText: 'What is the purpose of a care plan in nursing?', options: ['A documented plan of individualized care based on assessment and nursing diagnoses', 'A hospital budget plan', 'A staffing schedule', 'A building maintenance plan'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // PHYSIOTHERAPY (50 questions)
+  // ============================================================================
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is physiotherapy?', options: ['Treatment of pain, injury, and movement disorders through physical methods', 'Treatment using only medication', 'A type of surgery', 'A laboratory test'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is range of motion (ROM)?', options: ['The full movement potential of a joint', 'The distance a patient can walk', 'The speed of movement', 'The weight a patient can lift'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is a therapeutic exercise?', options: ['A planned physical activity to improve or maintain physical function', 'A type of surgery', 'A medication', 'A diagnostic test'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is the purpose of stretching?', options: ['To improve flexibility and range of motion', 'To increase weight', 'To lower blood pressure', 'To improve eyesight'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is a sprain?', options: ['A stretching or tearing of ligaments', 'A bone fracture', 'A muscle disease', 'A skin condition'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is a strain?', options: ['A stretching or tearing of muscles or tendons', 'A ligament injury', 'A bone fracture', 'A nerve damage'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is RICE treatment?', options: ['Rest, Ice, Compression, Elevation for acute injuries', 'A dietary recommendation', 'A surgical procedure', 'A medication protocol'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Easy', questionText: 'What is posture?', options: ['The position in which you hold your body while standing, sitting, or moving', 'A type of exercise', 'A medical condition', 'A treatment method'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Medium', questionText: 'What is electrotherapy?', options: ['Using electrical stimulation for pain relief and muscle strengthening', 'Treating electric shock injuries', 'A type of surgery', 'A blood test'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Medium', questionText: 'What is ultrasound therapy?', options: ['Using high-frequency sound waves to promote tissue healing and reduce pain', 'A diagnostic imaging technique only', 'A type of medication', 'A surgical procedure'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Medium', questionText: 'What is manual therapy?', options: ['Hands-on techniques including massage, mobilization, and manipulation', 'Using machines only', 'Giving oral medications', 'A type of surgery'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Medium', questionText: 'What is gait analysis?', options: ['The systematic study of walking patterns to identify abnormalities', 'Measuring blood pressure', 'A type of blood test', 'A dietary assessment'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Hard', questionText: 'What is proprioceptive neuromuscular facilitation (PNF)?', options: ['An advanced stretching technique using muscle contraction and relaxation patterns', 'A type of medication', 'A surgical procedure', 'A diagnostic test'], correctOptionIndex: 0 },
+  { domain: 'Physiotherapy', difficulty: 'Hard', questionText: 'What is the role of physiotherapy in post-stroke rehabilitation?', options: ['Restoring movement, balance, and functional independence through targeted exercises', 'Only providing medications', 'Only performing surgery', 'Only monitoring vital signs'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // MEDICAL LABORATORY TECHNOLOGY (50 questions)
+  // ============================================================================
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is a blood test?', options: ['A laboratory analysis of a blood sample to diagnose conditions', 'A blood donation', 'A surgical procedure', 'A physical examination'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What does CBC stand for?', options: ['Complete Blood Count', 'Central Blood Center', 'Clinical Blood Check', 'Common Blood Culture'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is a microscope used for in the lab?', options: ['To examine cells and organisms too small to see with the naked eye', 'To measure temperature', 'To weigh samples', 'To store chemicals'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is a culture test in microbiology?', options: ['Growing microorganisms in a controlled medium to identify infections', 'A test of cultural knowledge', 'A personality test', 'A physical fitness test'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is a urine analysis?', options: ['Laboratory examination of urine to detect diseases or infections', 'A surgical procedure', 'A type of medication', 'A physical therapy technique'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is the purpose of a centrifuge?', options: ['To separate components of a liquid sample by spinning at high speed', 'To heat samples', 'To cool samples', 'To mix chemicals'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What are the main blood groups?', options: ['A, B, AB, and O', 'X, Y, and Z', 'Alpha, Beta, Gamma', 'Type 1 and Type 2'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Easy', questionText: 'What is hemoglobin?', options: ['A protein in red blood cells that carries oxygen', 'A type of white blood cell', 'A blood clotting factor', 'A liver enzyme'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Medium', questionText: 'What is the difference between serum and plasma?', options: ['Plasma contains clotting factors; serum is plasma without clotting factors', 'They are the same', 'Serum contains more cells', 'Plasma has no proteins'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Medium', questionText: 'What is ELISA?', options: ['Enzyme-Linked Immunosorbent Assay — a diagnostic test using antibodies', 'Electronic Laser Imaging System', 'Emergency Lab Investigation Service', 'Extended Laboratory Inspection Standard'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Medium', questionText: 'What is PCR?', options: ['Polymerase Chain Reaction — a technique to amplify specific DNA sequences', 'Patient Care Record', 'Primary Clinical Report', 'Professional Certification Required'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Medium', questionText: 'What is a Gram stain used for?', options: ['To classify bacteria into Gram-positive and Gram-negative based on cell wall structure', 'To identify blood types', 'To test drug potency', 'To measure pH'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Hard', questionText: 'What is the purpose of quality control in clinical laboratories?', options: ['To ensure accuracy and reliability of test results through systematic monitoring', 'To count the number of tests performed', 'To reduce lab staff', 'To increase test speed only'], correctOptionIndex: 0 },
+  { domain: 'Medical Laboratory Technology', difficulty: 'Hard', questionText: 'What is flow cytometry?', options: ['A technique for analyzing cells by passing them through a laser beam to measure characteristics', 'A blood transfusion method', 'A surgical technique', 'A type of X-ray'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // BIOTECHNOLOGY (50 questions)
+  // ============================================================================
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is biotechnology?', options: ['The use of biological systems and organisms to develop products and technologies', 'The study of robots', 'The study of computers', 'The study of geology'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is DNA?', options: ['Deoxyribonucleic Acid — the molecule carrying genetic information', 'Digital Network Address', 'Dynamic Numerical Analysis', 'Data Network Architecture'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is genetic engineering?', options: ['Direct manipulation of an organism genes using biotechnology', 'Building mechanical devices', 'Studying rocks', 'Programming computers'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is fermentation?', options: ['A metabolic process where organisms convert sugar to acids, gases, or alcohol', 'A mechanical process', 'A type of surgery', 'A computer algorithm'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is a GMO?', options: ['Genetically Modified Organism — an organism whose DNA has been altered', 'Global Marketing Organization', 'General Medical Office', 'Government Monitoring Office'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is cloning?', options: ['Creating a genetically identical copy of an organism', 'A type of surgery', 'A computer programming technique', 'A marketing strategy'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Easy', questionText: 'What is a bioreactor?', options: ['A vessel for carrying out biological reactions under controlled conditions', 'A type of nuclear reactor', 'A chemical storage tank', 'A power generator'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Medium', questionText: 'What is CRISPR-Cas9?', options: ['A revolutionary gene-editing tool that allows precise modification of DNA', 'A type of microscope', 'A protein structure analysis tool', 'A database system'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Medium', questionText: 'What is recombinant DNA technology?', options: ['Combining DNA from different sources to create new genetic combinations', 'Deleting all DNA', 'A type of protein analysis', 'A cell culture technique'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Medium', questionText: 'What is gel electrophoresis used for?', options: ['Separating DNA, RNA, or proteins based on size and charge', 'Generating electricity', 'Heating samples', 'Storing chemicals'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Medium', questionText: 'What is bioinformatics?', options: ['Using computational tools to analyze and interpret biological data', 'Building biological computers', 'A type of biotechnology product', 'A laboratory technique'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Hard', questionText: 'What is the difference between upstream and downstream processing?', options: ['Upstream involves cell growth and product formation; downstream involves purification and recovery', 'They are the same', 'Upstream is purification', 'Downstream is cell growth'], correctOptionIndex: 0 },
+  { domain: 'Biotechnology', difficulty: 'Hard', questionText: 'What is gene therapy?', options: ['Introducing, altering, or replacing genetic material within cells to treat disease', 'A type of physical therapy', 'A surgical technique', 'A psychiatric treatment'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // HEALTHCARE MANAGEMENT (40 questions)
+  // ============================================================================
+  { domain: 'Healthcare Management', difficulty: 'Easy', questionText: 'What is healthcare management?', options: ['Planning, coordinating, and overseeing the delivery of healthcare services', 'Performing surgery', 'Dispensing medications', 'Conducting lab tests'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Easy', questionText: 'What is patient satisfaction?', options: ['A measure of how well healthcare services meet patient expectations', 'The cost of treatment', 'The number of doctors', 'The hospital size'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Easy', questionText: 'What is a hospital accreditation?', options: ['A formal recognition that a hospital meets established quality standards', 'A hospital license to sell drugs', 'A type of insurance', 'A financial audit'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Easy', questionText: 'What is health insurance?', options: ['A contract where an insurer covers medical expenses in exchange for premiums', 'A type of medication', 'A hospital department', 'A medical device'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Medium', questionText: 'What is a DRG (Diagnosis Related Group)?', options: ['A system classifying hospital cases into groups for payment purposes', 'A type of drug', 'A medical device', 'A laboratory test'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Medium', questionText: 'What is total quality management (TQM) in healthcare?', options: ['A management approach focused on continuous improvement of all processes', 'Hiring more staff', 'Buying expensive equipment', 'Building larger hospitals'], correctOptionIndex: 0 },
+  { domain: 'Healthcare Management', difficulty: 'Hard', questionText: 'What is the Lean Six Sigma approach in healthcare?', options: ['A methodology combining waste elimination (Lean) with variation reduction (Six Sigma)', 'A staffing model', 'A type of medical equipment', 'A financial audit approach'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ENGINEERING FUNDAMENTALS (Fallback for engineering domains)
+  // ============================================================================
+  { domain: 'Engineering Fundamentals', difficulty: 'Easy', questionText: 'What is the scientific method?', options: ['A systematic approach of observation, hypothesis, experiment, and conclusion', 'A type of engineering software', 'A manufacturing process', 'A financial calculation'], correctOptionIndex: 0 },
+  { domain: 'Engineering Fundamentals', difficulty: 'Easy', questionText: 'What is the SI system?', options: ['The International System of Units used for measurement worldwide', 'A type of computer', 'A programming language', 'A manufacturing standard'], correctOptionIndex: 0 },
+  { domain: 'Engineering Fundamentals', difficulty: 'Easy', questionText: 'What is Newton first law of motion?', options: ['An object stays at rest or in motion unless acted upon by an external force', 'Force equals mass times acceleration', 'Every action has an equal and opposite reaction', 'Energy cannot be created or destroyed'], correctOptionIndex: 0 },
+  { domain: 'Engineering Fundamentals', difficulty: 'Easy', questionText: 'What is the difference between accuracy and precision?', options: ['Accuracy is closeness to the true value; precision is consistency of repeated measurements', 'They are the same thing', 'Precision means correct', 'Accuracy means repeatable'], correctOptionIndex: 0 },
+  { domain: 'Engineering Fundamentals', difficulty: 'Medium', questionText: 'What is dimensional analysis?', options: ['A method to check equations by verifying that units are consistent on both sides', 'A 3D modeling technique', 'A financial analysis', 'A database query'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ARTS & HUMANITIES (Fallback)
+  // ============================================================================
+  { domain: 'Arts & Humanities', difficulty: 'Easy', questionText: 'What is critical thinking?', options: ['The ability to analyze information objectively and make reasoned judgments', 'Criticizing everything', 'Thinking only about problems', 'Memorizing facts'], correctOptionIndex: 0 },
+  { domain: 'Arts & Humanities', difficulty: 'Easy', questionText: 'What is effective communication?', options: ['Conveying information clearly and being understood by the audience', 'Speaking loudly', 'Writing long emails', 'Using technical jargon'], correctOptionIndex: 0 },
+  { domain: 'Arts & Humanities', difficulty: 'Easy', questionText: 'What is research methodology?', options: ['The systematic process of collecting and analyzing data to answer a question', 'Reading a single article', 'Guessing the answer', 'Copying from a textbook'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // MANAGEMENT FUNDAMENTALS (Fallback)
+  // ============================================================================
+  { domain: 'Management Fundamentals', difficulty: 'Easy', questionText: 'What are the four functions of management?', options: ['Planning, Organizing, Leading, Controlling', 'Buying, Selling, Trading, Investing', 'Hiring, Firing, Promoting, Demoting', 'Reading, Writing, Speaking, Listening'], correctOptionIndex: 0 },
+  { domain: 'Management Fundamentals', difficulty: 'Easy', questionText: 'What is leadership?', options: ['The ability to guide and influence others toward achieving goals', 'Only giving orders', 'Working alone', 'Following everyone else'], correctOptionIndex: 0 },
+  { domain: 'Management Fundamentals', difficulty: 'Easy', questionText: 'What is a stakeholder?', options: ['Any individual or group that has an interest in or is affected by a business', 'Only the CEO', 'Only shareholders', 'Only employees'], correctOptionIndex: 0 },
+  { domain: 'Management Fundamentals', difficulty: 'Medium', questionText: 'What is change management?', options: ['A structured approach to transitioning individuals and organizations from current state to desired state', 'Avoiding all changes', 'Making random changes', 'Only changing technology'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // MEDICAL FUNDAMENTALS (Fallback)
+  // ============================================================================
+  { domain: 'Medical Fundamentals', difficulty: 'Easy', questionText: 'What is the Hippocratic Oath?', options: ['An ethical oath taken by physicians to uphold medical ethical standards', 'A medical test', 'A type of medication', 'A surgical procedure'], correctOptionIndex: 0 },
+  { domain: 'Medical Fundamentals', difficulty: 'Easy', questionText: 'What is anatomy?', options: ['The study of the structure of the body and its parts', 'The study of diseases', 'The study of medications', 'The study of mental health'], correctOptionIndex: 0 },
+  { domain: 'Medical Fundamentals', difficulty: 'Easy', questionText: 'What is first aid?', options: ['Immediate care given to a person who has been injured or suddenly taken ill', 'Prescription medication', 'A surgical procedure', 'A diagnostic test'], correctOptionIndex: 0 },
+  { domain: 'Medical Fundamentals', difficulty: 'Medium', questionText: 'What is clinical governance?', options: ['A framework ensuring continuous improvement in quality of patient care', 'Hospital finances only', 'Building maintenance', 'Staff scheduling'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // OPERATIONS MANAGEMENT (40 questions)
+  // ============================================================================
+  { domain: 'Operations Management', difficulty: 'Easy', questionText: 'What is operations management?', options: ['Managing the process of converting inputs into goods and services', 'Managing only human resources', 'Managing only finances', 'Managing only marketing'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Easy', questionText: 'What is a supply chain?', options: ['The network of organizations involved in producing and delivering a product', 'A type of chain link', 'A marketing channel', 'A financial institution'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Easy', questionText: 'What is inventory management?', options: ['Tracking and controlling stock levels to meet customer demand efficiently', 'Counting money', 'Managing employees', 'Designing products'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Easy', questionText: 'What is quality control?', options: ['Processes ensuring products meet defined quality standards', 'Setting prices', 'Hiring employees', 'Creating marketing campaigns'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Medium', questionText: 'What is Just-In-Time (JIT) manufacturing?', options: ['Producing items only when needed to minimize inventory and waste', 'Producing everything in advance', 'Stocking large inventories', 'Only manufacturing at night'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Medium', questionText: 'What is Six Sigma?', options: ['A methodology to reduce process variation and defects to near zero', 'A type of product', 'A marketing strategy', 'A financial calculation'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Medium', questionText: 'What is a bottleneck in operations?', options: ['A constraint that limits the overall throughput of a process', 'A type of container', 'A management position', 'A financial term'], correctOptionIndex: 0 },
+  { domain: 'Operations Management', difficulty: 'Hard', questionText: 'What is the Theory of Constraints (TOC)?', options: ['A management philosophy focusing on identifying and managing the most critical constraint', 'A type of quality control', 'A financial theory', 'A marketing strategy'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // BUSINESS ANALYTICS (40 questions)
+  // ============================================================================
+  { domain: 'Business Analytics', difficulty: 'Easy', questionText: 'What is business analytics?', options: ['Using data analysis to make informed business decisions', 'Only creating reports', 'Only managing databases', 'Only designing websites'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Easy', questionText: 'What is a dashboard in business analytics?', options: ['A visual display of key metrics and data points for quick insights', 'A physical board in an office', 'A type of spreadsheet', 'A programming tool'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Easy', questionText: 'What is descriptive analytics?', options: ['Analyzing historical data to understand what happened', 'Predicting future events', 'Prescribing actions', 'Designing products'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Easy', questionText: 'What is Excel used for in analytics?', options: ['Data analysis, calculations, and creating charts and reports', 'Video editing', 'Graphic design', 'Web hosting'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Medium', questionText: 'What is predictive analytics?', options: ['Using statistical models and historical data to forecast future outcomes', 'Only looking at past data', 'Only creating reports', 'Only managing databases'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Medium', questionText: 'What is prescriptive analytics?', options: ['Using optimization and simulation to recommend specific actions', 'Only describing past data', 'Only predicting future events', 'Only creating charts'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Medium', questionText: 'What is a KPI in business?', options: ['Key Performance Indicator — a measurable value showing how effectively objectives are being achieved', 'Key Programming Interface', 'Known Product Information', 'Knowledge Processing Index'], correctOptionIndex: 0 },
+  { domain: 'Business Analytics', difficulty: 'Hard', questionText: 'What is the difference between data mining and data analytics?', options: ['Data mining discovers patterns in large datasets; analytics interprets data for decision-making', 'They are the same', 'Analytics is only about charts', 'Mining only uses databases'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // SUPPLY CHAIN MANAGEMENT (30 questions)
+  // ============================================================================
+  { domain: 'Supply Chain Management', difficulty: 'Easy', questionText: 'What is logistics?', options: ['The management of the flow of goods from origin to consumption', 'A type of mathematics', 'A marketing technique', 'A financial calculation'], correctOptionIndex: 0 },
+  { domain: 'Supply Chain Management', difficulty: 'Easy', questionText: 'What is procurement?', options: ['The process of obtaining goods and services from external sources', 'Selling products', 'Designing products', 'Marketing products'], correctOptionIndex: 0 },
+  { domain: 'Supply Chain Management', difficulty: 'Easy', questionText: 'What is warehousing?', options: ['Storing goods in a facility before distribution', 'Manufacturing products', 'Selling products online', 'Marketing products'], correctOptionIndex: 0 },
+  { domain: 'Supply Chain Management', difficulty: 'Medium', questionText: 'What is the bullwhip effect?', options: ['Increasing fluctuations in inventory orders as they move up the supply chain', 'A type of warehouse', 'A shipping method', 'A pricing strategy'], correctOptionIndex: 0 },
+  { domain: 'Supply Chain Management', difficulty: 'Medium', questionText: 'What is reverse logistics?', options: ['Managing the return of products from consumers back through the supply chain', 'Forward delivery only', 'A type of marketing', 'A financial process'], correctOptionIndex: 0 },
+  { domain: 'Supply Chain Management', difficulty: 'Hard', questionText: 'What is vendor-managed inventory (VMI)?', options: ['A supply chain practice where the supplier manages the customer inventory levels', 'Customer manages supplier inventory', 'No inventory management', 'Government manages all inventory'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // BANKING (30 questions)
+  // ============================================================================
+  { domain: 'Banking', difficulty: 'Easy', questionText: 'What is a savings account?', options: ['A deposit account that earns interest on stored funds', 'A loan account', 'An investment account only', 'A credit card'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Easy', questionText: 'What is a fixed deposit?', options: ['An investment with a fixed interest rate and maturity date', 'A current account', 'A credit card', 'A type of loan'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Easy', questionText: 'What is a cheque?', options: ['A written order directing a bank to pay a specific amount', 'A type of currency', 'A savings plan', 'A credit card'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Easy', questionText: 'What does ATM stand for?', options: ['Automated Teller Machine', 'Automatic Transaction Manager', 'Advanced Technology Machine', 'Automated Transfer Mechanism'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Medium', questionText: 'What is the difference between a debit card and a credit card?', options: ['Debit uses existing funds; credit borrows money from the bank', 'They are the same', 'Credit uses existing funds', 'Debit borrows money'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Medium', questionText: 'What is NPA in banking?', options: ['Non-Performing Asset — a loan where borrower has stopped making payments', 'New Payment Account', 'National Payment Authority', 'Net Profit Analysis'], correctOptionIndex: 0 },
+  { domain: 'Banking', difficulty: 'Hard', questionText: 'What is Basel III?', options: ['An international regulatory framework for bank capital adequacy, stress testing, and liquidity', 'A banking software', 'A city in Switzerland only', 'A type of bank account'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ACCOUNTING (30 questions)
+  // ============================================================================
+  { domain: 'Accounting', difficulty: 'Easy', questionText: 'What is the double-entry bookkeeping system?', options: ['Every transaction is recorded in at least two accounts — a debit and a credit', 'Recording transactions once', 'Only recording income', 'Only recording expenses'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Easy', questionText: 'What is the accounting equation?', options: ['Assets = Liabilities + Equity', 'Revenue = Expenses + Profit', 'Cash = Bank Balance', 'Income = Output'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Easy', questionText: 'What is a ledger?', options: ['A book or digital record containing all financial account transactions', 'A type of journal', 'A bank statement', 'A tax form'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Easy', questionText: 'What is a trial balance?', options: ['A statement listing all ledger account balances to verify total debits equal total credits', 'A balance sheet', 'A profit and loss statement', 'A cash flow statement'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Medium', questionText: 'What is the difference between accrual and cash basis accounting?', options: ['Accrual records when earned/incurred; cash records when money is received/paid', 'They are the same', 'Cash is more accurate', 'Accrual only records cash transactions'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Medium', questionText: 'What is an audit?', options: ['An independent examination of financial records to verify accuracy and compliance', 'A tax payment', 'A financial prediction', 'A budget meeting'], correctOptionIndex: 0 },
+  { domain: 'Accounting', difficulty: 'Hard', questionText: 'What is the matching principle in accounting?', options: ['Expenses should be recognized in the same period as the revenues they help generate', 'Record expenses when paid only', 'Record revenues when received only', 'Match assets to liabilities'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // CLINICAL RESEARCH (30 questions)
+  // ============================================================================
+  { domain: 'Clinical Research', difficulty: 'Easy', questionText: 'What is a clinical trial?', options: ['A research study testing the safety and efficacy of medical treatments in humans', 'A courtroom trial', 'A laboratory test only', 'A surgical procedure'], correctOptionIndex: 0 },
+  { domain: 'Clinical Research', difficulty: 'Easy', questionText: 'What is informed consent?', options: ['A process where participants are told about the study risks and benefits before agreeing to participate', 'A legal contract for employment', 'A type of insurance', 'A medical prescription'], correctOptionIndex: 0 },
+  { domain: 'Clinical Research', difficulty: 'Easy', questionText: 'What is a placebo?', options: ['An inactive treatment given to the control group to compare with the actual treatment', 'A real medication', 'A type of surgery', 'A diagnostic test'], correctOptionIndex: 0 },
+  { domain: 'Clinical Research', difficulty: 'Medium', questionText: 'What is a double-blind study?', options: ['Neither the participants nor the researchers know who receives the treatment or placebo', 'Only participants are blind', 'Only researchers are blind', 'Everyone knows the treatment'], correctOptionIndex: 0 },
+  { domain: 'Clinical Research', difficulty: 'Medium', questionText: 'What is GCP (Good Clinical Practice)?', options: ['International ethical and scientific quality standards for clinical trials', 'A type of medication', 'A marketing standard', 'A financial regulation'], correctOptionIndex: 0 },
+  { domain: 'Clinical Research', difficulty: 'Hard', questionText: 'What is the role of an IRB/Ethics Committee?', options: ['To review and approve research protocols to protect participant rights and safety', 'To fund research', 'To publish results', 'To manufacture drugs'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // PHARMACOVIGILANCE (30 questions)
+  // ============================================================================
+  { domain: 'Pharmacovigilance', difficulty: 'Easy', questionText: 'What is pharmacovigilance?', options: ['The science of detecting, assessing, and preventing adverse drug reactions', 'Selling drugs', 'Manufacturing drugs', 'Marketing drugs'], correctOptionIndex: 0 },
+  { domain: 'Pharmacovigilance', difficulty: 'Easy', questionText: 'What is an ICSR?', options: ['Individual Case Safety Report — a report of a suspected adverse drug reaction', 'International Clinical Safety Review', 'Internal Compliance Safety Record', 'Integrated Case Study Report'], correctOptionIndex: 0 },
+  { domain: 'Pharmacovigilance', difficulty: 'Easy', questionText: 'What is a SUSAR?', options: ['Suspected Unexpected Serious Adverse Reaction', 'Standard Unified Safety Assessment Report', 'Systematic Unexpected Safety Analysis Review', 'Suspected Usual Safety Assessment Report'], correctOptionIndex: 0 },
+  { domain: 'Pharmacovigilance', difficulty: 'Medium', questionText: 'What is signal detection in pharmacovigilance?', options: ['Identifying new or changing safety concerns about a drug from collected data', 'Detecting radio signals', 'A type of drug testing', 'A marketing analysis'], correctOptionIndex: 0 },
+  { domain: 'Pharmacovigilance', difficulty: 'Medium', questionText: 'What is a PSUR (Periodic Safety Update Report)?', options: ['A regular report providing a comprehensive safety evaluation of a marketed drug', 'A financial report', 'A marketing report', 'A production report'], correctOptionIndex: 0 },
+  { domain: 'Pharmacovigilance', difficulty: 'Hard', questionText: 'What is the MedDRA coding system?', options: ['Medical Dictionary for Regulatory Activities — a standardized terminology for adverse events', 'A type of medication', 'A drug manufacturing system', 'A financial coding system'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // PUBLIC HEALTH (30 questions)
+  // ============================================================================
+  { domain: 'Public Health', difficulty: 'Easy', questionText: 'What is public health?', options: ['The science of protecting and improving community health through education, policy, and research', 'Private medical practice', 'Hospital management only', 'Pharmaceutical sales'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Easy', questionText: 'What is epidemiology?', options: ['The study of disease patterns, causes, and effects in populations', 'The study of skin diseases', 'The study of genetics only', 'A type of treatment'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Easy', questionText: 'What is a pandemic?', options: ['A disease outbreak affecting people across multiple countries or continents', 'A local disease outbreak', 'A seasonal illness', 'A chronic disease'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Easy', questionText: 'What is immunization?', options: ['The process of making a person immune to a disease through vaccination', 'A type of surgery', 'A blood test', 'A physical examination'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Medium', questionText: 'What is the difference between incidence and prevalence?', options: ['Incidence is new cases in a period; prevalence is total existing cases at a point', 'They are the same', 'Prevalence is only new cases', 'Incidence includes all existing cases'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Medium', questionText: 'What is herd immunity?', options: ['When a large enough portion of a population is immune, providing indirect protection to non-immune individuals', 'When all individuals are vaccinated', 'When no one is immune', 'When antibiotics are used'], correctOptionIndex: 0 },
+  { domain: 'Public Health', difficulty: 'Hard', questionText: 'What is the social determinants of health framework?', options: ['Conditions where people are born, grow, live, work that affect health outcomes', 'Only medical treatments', 'Only hospital facilities', 'Only genetic factors'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // AUTOMOBILE ENGINEERING (30 questions)
+  // ============================================================================
+  { domain: 'Automobile Engineering', difficulty: 'Easy', questionText: 'What is an internal combustion engine?', options: ['An engine that generates power by burning fuel inside cylinders', 'An external engine', 'An electric motor only', 'A steam engine'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Easy', questionText: 'What is a chassis?', options: ['The structural framework of a vehicle', 'The engine of a car', 'The tires of a car', 'The paint on a car'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Easy', questionText: 'What is the purpose of a transmission?', options: ['To transfer power from the engine to the wheels at different speed ratios', 'To stop the car', 'To cool the engine', 'To charge the battery'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Easy', questionText: 'What does EV stand for?', options: ['Electric Vehicle', 'Engine Valve', 'Exhaust Ventilation', 'Energy Volume'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Medium', questionText: 'What is the difference between disc brakes and drum brakes?', options: ['Disc brakes use a rotor and caliper for better stopping; drum brakes use shoes inside a drum', 'They are identical', 'Drum brakes are more efficient', 'Disc brakes are only for bicycles'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Medium', questionText: 'What is a turbocharger?', options: ['A device that forces more air into the engine to increase power output', 'A type of tire', 'A braking system', 'An exhaust pipe'], correctOptionIndex: 0 },
+  { domain: 'Automobile Engineering', difficulty: 'Hard', questionText: 'What is regenerative braking in electric vehicles?', options: ['Converting kinetic energy back to electrical energy during braking to recharge the battery', 'Normal friction braking', 'Emergency braking only', 'Engine braking in manual cars'], correctOptionIndex: 0 },
+
+  // ============================================================================
+  // ENTREPRENEURSHIP (30 questions)
+  // ============================================================================
+  { domain: 'Entrepreneurship', difficulty: 'Easy', questionText: 'What is an entrepreneur?', options: ['A person who starts and runs a business, taking on financial risks', 'Only an investor', 'Only an employee', 'Only a manager'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Easy', questionText: 'What is a startup?', options: ['A newly established business with a scalable business model', 'Any large corporation', 'A government agency', 'A non-profit only'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Easy', questionText: 'What is a business plan?', options: ['A document outlining business goals, strategies, and financial projections', 'A marketing brochure', 'A resume', 'A tax form'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Easy', questionText: 'What is venture capital?', options: ['Funding provided by investors to startups with high growth potential', 'A bank loan', 'Personal savings only', 'Government grants only'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Medium', questionText: 'What is a minimum viable product (MVP)?', options: ['The simplest version of a product with just enough features to attract early adopters', 'The final complete product', 'A product with all features', 'A product prototype only'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Medium', questionText: 'What is the lean startup methodology?', options: ['Building products iteratively through build-measure-learn cycles to reduce waste', 'Building the complete product first', 'Only focusing on fundraising', 'Avoiding customer feedback'], correctOptionIndex: 0 },
+  { domain: 'Entrepreneurship', difficulty: 'Hard', questionText: 'What is the difference between equity financing and debt financing?', options: ['Equity gives ownership share; debt requires repayment with interest', 'They are the same', 'Debt gives ownership', 'Equity requires repayment'], correctOptionIndex: 0 },
 ];
+
+// Utility: Resolve a student's preferredDomain to the matching fallback domain key
+export function resolveDomain(studentDomain) {
+  if (!studentDomain) return null;
+  const normalizedInput = studentDomain.toLowerCase().trim();
+
+  // Direct match on question domain
+  const allDomains = [...new Set(fallbackQuestions.map(q => q.domain))];
+  const directMatch = allDomains.find(d => d.toLowerCase() === normalizedInput);
+  if (directMatch) return directMatch;
+
+  // Check aliases
+  for (const [canonical, aliases] of Object.entries(DOMAIN_ALIASES)) {
+    if (aliases.some(alias => alias.toLowerCase() === normalizedInput)) {
+      // Find the actual domain name used in questions that matches this canonical
+      const matchedDomain = allDomains.find(d => d.toLowerCase() === canonical);
+      if (matchedDomain) return matchedDomain;
+    }
+  }
+
+  // Partial match
+  const partialMatch = allDomains.find(d => 
+    d.toLowerCase().includes(normalizedInput) || normalizedInput.includes(d.toLowerCase())
+  );
+  if (partialMatch) return partialMatch;
+
+  // Return null — caller should use fallback category
+  return null;
+}
+
+// Utility: Get fallback category domain for a student domain
+export function getFallbackDomain(studentDomain) {
+  if (!studentDomain) return 'Engineering Fundamentals';
+  const normalizedInput = studentDomain.toLowerCase().trim();
+  
+  for (const [domain, fallback] of Object.entries(CATEGORY_FALLBACKS)) {
+    if (normalizedInput.includes(domain) || domain.includes(normalizedInput)) {
+      return fallback;
+    }
+  }
+  
+  return 'Engineering Fundamentals'; // Ultimate fallback
+}

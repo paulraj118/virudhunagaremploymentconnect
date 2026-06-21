@@ -14,38 +14,157 @@ export default function AssessmentPage() {
   const [isActive, setIsActive] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [result, setResult] = useState(null);
+  const [studentName, setStudentName] = useState('Student');
 
   // Runner state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({}); // { [questionIdx]: selectedOptionIdx }
   const [visited, setVisited] = useState({ 0: true }); // { [questionIdx]: boolean }
-  const [timeLeft, setTimeLeft] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('assessmentTimeLeft');
-      return saved ? parseInt(saved) : 420; // 7 minutes
-    }
-    return 420;
-  });
+  const [timeLeft, setTimeLeft] = useState(840); // 14 minutes
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [warningsCount, setWarningsCount] = useState(0);
 
-  // Timer Ref
+  // Proctoring and Session integrity states
+  const [isAgreementAccepted, setIsAgreementAccepted] = useState(false);
+  const [sessionId, setSessionId] = useState('');
+  const [loginTimestamp, setLoginTimestamp] = useState('');
+  const [systemSpecs, setSystemSpecs] = useState({});
+  const [sessionBlocked, setSessionBlocked] = useState(false);
+  
+  const [violationsTracker, setViolationsTracker] = useState({
+    tabSwitchCount: 0,
+    fullscreenExitCount: 0,
+    devtoolsAttemptCount: 0,
+    clipboardAttemptCount: 0,
+    totalCount: 0,
+    integrityScore: 100
+  });
+
+  // Job application flow states
+  const [appliedSuccessfully, setAppliedSuccessfully] = useState(false);
+  const [pendingJobId, setPendingJobId] = useState(null);
+  const [pendingJobTitle, setPendingJobTitle] = useState('');
+  const [pendingJobCompany, setPendingJobCompany] = useState('');
+
+  // Timer and Scroll Refs
   const timerRef = useRef(null);
+  const bottomRef = useRef(null);
 
-  // Fetch status or result on mount
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Helper: Shuffle array (Fisher-Yates)
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Helper: Get OS, Browser, Device, Resolution info
+  const getSystemSpecs = () => {
+    if (typeof window === 'undefined') return {};
+    const userAgent = navigator.userAgent;
+    let browserName = "Unknown Browser";
+    let browserVersion = "";
+    let operatingSystem = "Unknown OS";
+    let deviceType = "Desktop";
+
+    if (/chrome|crios/i.test(userAgent) && !/edge|edg/i.test(userAgent) && !/opr/i.test(userAgent)) {
+      browserName = "Google Chrome";
+      const match = userAgent.match(/Chrome\/([0-9.]+)/);
+      if (match) browserVersion = match[1];
+    } else if (/firefox|iceweasel/i.test(userAgent)) {
+      browserName = "Mozilla Firefox";
+      const match = userAgent.match(/Firefox\/([0-9.]+)/);
+      if (match) browserVersion = match[1];
+    } else if (/safari/i.test(userAgent) && !/chrome|crios/i.test(userAgent)) {
+      browserName = "Apple Safari";
+    } else if (/edge|edg/i.test(userAgent)) {
+      browserName = "Microsoft Edge";
+    }
+
+    if (/windows/i.test(userAgent)) operatingSystem = "Windows";
+    else if (/macintosh|mac os x/i.test(userAgent)) operatingSystem = "macOS";
+    else if (/linux/i.test(userAgent)) operatingSystem = "Linux";
+    else if (/android/i.test(userAgent)) operatingSystem = "Android";
+    else if (/iphone|ipad|ipod/i.test(userAgent)) operatingSystem = "iOS";
+
+    if (/mobile/i.test(userAgent)) {
+      deviceType = "Mobile";
+    }
+
+    return {
+      browserName,
+      browserVersion,
+      operatingSystem,
+      deviceType,
+      screenResolution: `${window.screen.width}x${window.screen.height}`
+    };
+  };
+
+  // Load target job on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPendingJobId(sessionStorage.getItem('pendingApplyJobId'));
+      setPendingJobTitle(sessionStorage.getItem('pendingApplyJobTitle') || '');
+      setPendingJobCompany(sessionStorage.getItem('pendingApplyJobCompany') || '');
+    }
+  }, []);
+
+  // Fetch status or result on mount with state recovery verification
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await fetch('/api/student/assessment');
+        const specs = getSystemSpecs();
+        setSystemSpecs(specs);
+
+        // Check for active proctored session in localStorage
+        const savedStateStr = localStorage.getItem('activeAssessmentState');
+        if (savedStateStr) {
+          const savedState = JSON.parse(savedStateStr);
+          
+          // Verify with server using ping
+          const pingRes = await fetch(`/api/student/assessment?ping=true&sessionId=${savedState.sessionId}`);
+          const pingData = await pingRes.json();
+          
+          const currentJobId = sessionStorage.getItem('pendingApplyJobId');
+          
+          if (pingData.success && pingData.active && savedState.jobId === currentJobId) {
+            // Restore active test state
+            setSessionId(savedState.sessionId);
+            setLoginTimestamp(savedState.loginTimestamp);
+            setQuestions(savedState.questions);
+            setAnswers(savedState.answers);
+            setTimeLeft(savedState.timeLeft);
+            setVisited(savedState.visited);
+            setCurrentQuestionIndex(savedState.currentQuestionIndex);
+            setViolationsTracker(savedState.violationsTracker);
+            setIsAgreementAccepted(true);
+            setIsActive(true);
+            setLoading(false);
+            return;
+          } else {
+            // Invalid/expired session, remove it
+            localStorage.removeItem('activeAssessmentState');
+          }
+        }
+
+        const storedJobId = sessionStorage.getItem('pendingApplyJobId');
+        const res = await fetch(`/api/student/assessment?jobId=${storedJobId}`);
         const data = await res.json();
         
         if (data.success) {
           if (data.completed) {
             setIsFinished(true);
             setResult(data.result);
+            setStudentName(data.studentName || 'Student');
           } else {
             setQuestions(data.questions || []);
+            setStudentName(data.studentName || 'Student');
           }
         } else {
           setError(data.message || 'Unable to load assessment.');
@@ -69,10 +188,8 @@ export default function AssessmentPage() {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           handleAutoSubmit('timeout');
-          if (typeof window !== 'undefined') sessionStorage.removeItem('assessmentTimeLeft');
           return 0;
         }
-        if (typeof window !== 'undefined') sessionStorage.setItem('assessmentTimeLeft', prev - 1);
         return prev - 1;
       });
     }, 1000);
@@ -80,81 +197,195 @@ export default function AssessmentPage() {
     return () => clearInterval(timerRef.current);
   }, [isActive, isFinished]);
 
-  const startAssessment = () => {
+  // Multiple Login check: periodically ping server
+  useEffect(() => {
+    if (!isActive || isFinished || !sessionId) return;
+
+    const pingInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/student/assessment?ping=true&sessionId=${sessionId}`);
+        const data = await res.json();
+        if (data.success && !data.active) {
+          // Terminate active test session
+          setSessionBlocked(true);
+          setIsActive(false);
+          setIsFinished(true);
+          localStorage.removeItem('activeAssessmentState');
+        }
+      } catch (err) {
+        console.error('Active session check ping failed:', err);
+      }
+    }, 10000);
+
+    return () => clearInterval(pingInterval);
+  }, [isActive, isFinished, sessionId]);
+
+  // Auto-Save active state to localStorage on any updates
+  useEffect(() => {
+    if (!isActive || isFinished || !sessionId) return;
+
+    const state = {
+      active: true,
+      sessionId,
+      jobId: pendingJobId,
+      loginTimestamp,
+      questions,
+      answers,
+      timeLeft,
+      visited,
+      currentQuestionIndex,
+      violationsTracker
+    };
+    localStorage.setItem('activeAssessmentState', JSON.stringify(state));
+  }, [isActive, isFinished, sessionId, loginTimestamp, questions, answers, timeLeft, visited, currentQuestionIndex, violationsTracker]);
+
+  const startAssessment = async () => {
+    const newSessionId = 'sess_' + Math.random().toString(36).substring(2, 14);
+    const now = new Date().toISOString();
+
+    setSessionId(newSessionId);
+    setLoginTimestamp(now);
+
+    // Call server to store active Session ID
+    try {
+      const initRes = await fetch(`/api/student/assessment?start=true&sessionId=${newSessionId}`);
+      const initData = await initRes.json();
+      if (!initData.success) {
+        alert(initData.message || 'Failed to initialize security session.');
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error. Failed to start proctoring session.');
+      return;
+    }
+
+    // Shuffle questions and options
+    const shuffled = shuffleArray(questions).map(q => ({
+      ...q,
+      options: shuffleArray(q.options)
+    }));
+
+    setQuestions(shuffled);
     setIsActive(true);
-    // Mark first question as visited
     setVisited({ 0: true });
+
+    // Save initial state to localStorage
+    const initialState = {
+      active: true,
+      sessionId: newSessionId,
+      jobId: pendingJobId,
+      loginTimestamp: now,
+      questions: shuffled,
+      answers: {},
+      timeLeft: 840,
+      visited: { 0: true },
+      currentQuestionIndex: 0,
+      violationsTracker: {
+        tabSwitchCount: 0,
+        fullscreenExitCount: 0,
+        devtoolsAttemptCount: 0,
+        clipboardAttemptCount: 0,
+        totalCount: 0,
+        integrityScore: 100
+      }
+    };
+    localStorage.setItem('activeAssessmentState', JSON.stringify(initialState));
   };
 
-  // Auto-submit (timeout or security violation)
-  const handleAutoSubmit = async (reason) => {
+  const triggerAutoApply = async (jobId) => {
+    try {
+      const res = await fetch('/api/student/jobs/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppliedSuccessfully(true);
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('pendingApplyJobId');
+          sessionStorage.removeItem('pendingApplyJobTitle');
+          sessionStorage.removeItem('pendingApplyJobCompany');
+        }
+      } else {
+        console.error("Auto apply failed:", data.message);
+      }
+    } catch (err) {
+      console.error("Auto apply error:", err);
+    }
+  };
+
+  // Submit Handler
+  const submitAssessment = async (isAuto, reason = '') => {
     setIsActive(false);
     setIsFinished(true);
     setSubmitting(true);
+    localStorage.removeItem('activeAssessmentState');
 
     try {
-      const formattedAnswers = questions.map((q, idx) => ({
-        questionText: q.questionText,
-        selectedOption: answers[idx] !== undefined ? answers[idx] : -1
-      }));
+      const formattedAnswers = questions.map((q, idx) => {
+        const selectedIdx = answers[idx];
+        const selectedText = selectedIdx !== undefined && selectedIdx !== -1 ? q.options[selectedIdx] : '';
+        return {
+          questionText: q.questionText,
+          selectedOption: selectedIdx !== undefined ? selectedIdx : -1,
+          selectedOptionText: selectedText,
+          options: q.options
+        };
+      });
+
+      const targetJobId = sessionStorage.getItem('pendingApplyJobId');
+
+      const payload = {
+        answers: formattedAnswers,
+        autoSubmitted: isAuto,
+        jobId: targetJobId,
+        violations: violationsTracker.totalCount,
+        sessionId,
+        loginTimestamp,
+        browserName: systemSpecs.browserName,
+        browserVersion: systemSpecs.browserVersion,
+        operatingSystem: systemSpecs.operatingSystem,
+        deviceType: systemSpecs.deviceType,
+        screenResolution: systemSpecs.screenResolution,
+        tabSwitchCount: violationsTracker.tabSwitchCount,
+        fullscreenExitCount: violationsTracker.fullscreenExitCount,
+        devtoolsAttemptCount: violationsTracker.devtoolsAttemptCount,
+        clipboardAttemptCount: violationsTracker.clipboardAttemptCount,
+        integrityScore: violationsTracker.integrityScore
+      };
 
       const res = await fetch('/api/student/assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers: formattedAnswers,
-          autoSubmitted: true,
-          violations: reason === 'violation' ? 3 : 0
-        })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
+      
       if (data.success) {
         setResult(data.result);
+        const targetJobId = sessionStorage.getItem('pendingApplyJobId');
+        if (targetJobId) {
+          await triggerAutoApply(targetJobId);
+        }
       } else {
-        setError(data.message || 'Error occurred during auto-submission.');
+        setError(data.message || 'Failed to submit proctored assessment.');
       }
-      if (typeof window !== 'undefined') sessionStorage.removeItem('assessmentTimeLeft');
     } catch (err) {
-      console.error('Auto-submit failed:', err);
+      console.error('Submission failed:', err);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Manual submission handler
+  const handleAutoSubmit = async (reason) => {
+    await submitAssessment(true, reason);
+  };
+
   const handleManualSubmit = async () => {
     setShowSubmitModal(false);
-    setSubmitting(true);
-    setIsActive(false);
-    setIsFinished(true);
-
-    try {
-      const formattedAnswers = questions.map((q, idx) => ({
-        questionText: q.questionText,
-        selectedOption: answers[idx] !== undefined ? answers[idx] : -1
-      }));
-
-      const res = await fetch('/api/student/assessment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers: formattedAnswers,
-          autoSubmitted: false,
-          violations: 0
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setResult(data.result);
-      } else {
-        setError(data.message || 'Failed to submit test.');
-      }
-      if (typeof window !== 'undefined') sessionStorage.removeItem('assessmentTimeLeft');
-    } catch (err) {
-      console.error('Manual submit failed:', err);
-    } finally {
-      setSubmitting(false);
-    }
+    await submitAssessment(false);
   };
 
   const handleSelectOption = (optionIndex) => {
@@ -178,7 +409,6 @@ export default function AssessmentPage() {
       setCurrentQuestionIndex(nextIndex);
       setVisited((prev) => ({ ...prev, [nextIndex]: true }));
     } else {
-      // Last question: open final confirmation modal
       setShowSubmitModal(true);
     }
   };
@@ -202,11 +432,43 @@ export default function AssessmentPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const getDurationString = (start, end) => {
+    if (!start || !end) return 'N/A';
+    const durationMs = new Date(end) - new Date(start);
+    const totalSecs = Math.floor(durationMs / 1000);
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins}m ${secs}s`;
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-slate-500 font-medium animate-pulse">Loading assessment data...</p>
+        <p className="text-slate-500 font-medium animate-pulse">Loading proctoring modules...</p>
+      </div>
+    );
+  }
+
+  // Session Blocked layout
+  if (sessionBlocked) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-center select-none">
+        <div className="bg-slate-800 p-8 rounded-[2.5rem] max-w-md w-full border border-slate-700 shadow-2xl">
+          <div className="w-16 h-16 bg-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+          </div>
+          <h2 className="text-2xl font-black mb-3 text-red-400">Session Terminated</h2>
+          <p className="text-slate-350 text-sm leading-relaxed mb-6 font-semibold">
+            This assessment session has been terminated because the assessment was started on another device or browser.
+          </p>
+          <button 
+            onClick={() => router.push('/student/jobs')}
+            className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-4 rounded-xl transition-all shadow-md"
+          >
+            Back to Job Board
+          </button>
+        </div>
       </div>
     );
   }
@@ -220,38 +482,38 @@ export default function AssessmentPage() {
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Access Restrained</h2>
         <p className="text-slate-600 mb-6 font-medium">{error}</p>
         <button 
-          onClick={() => router.push('/student')} 
+          onClick={() => router.push('/student/jobs')} 
           className="bg-slate-900 text-white font-bold py-3 px-8 rounded-xl hover:bg-slate-800 transition-all shadow-md"
         >
-          Go Back to Dashboard
+          Go Back to Job Board
         </button>
       </div>
     );
   }
 
-  // Finished Assessment / Result Screen
+  // Result screen with full audit trail logs
   if (isFinished && result) {
     const isPass = result.passFail === 'Pass';
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center py-10 px-4 sm:px-6">
-        <div className="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100/60 overflow-hidden relative group">
-          {/* Decorative Top Glow */}
-          <div className={`absolute top-0 left-0 w-full h-2 ${isPass ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gradient-to-r from-rose-500 to-red-600'}`}></div>
+      <div className="min-h-screen flex flex-col items-center justify-center py-10 px-4 sm:px-6 bg-slate-50">
+        <div className="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.06)] border border-slate-100/60 overflow-hidden relative group">
+          
+          <div className={`absolute top-0 left-0 w-full h-2.5 ${isPass ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gradient-to-r from-rose-500 to-red-600'}`}></div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12">
-            {/* Left/Top Banner Side */}
-            <div className={`lg:col-span-5 p-10 md:p-14 flex flex-col items-center justify-center relative overflow-hidden ${isPass ? 'bg-gradient-to-b from-emerald-50/50 to-white' : 'bg-gradient-to-b from-rose-50/50 to-white'}`}>
+            
+            {/* Left Column Status Panel */}
+            <div className={`lg:col-span-5 p-10 md:p-14 flex flex-col items-center justify-center relative overflow-hidden ${isPass ? 'bg-gradient-to-b from-emerald-50/40 to-white' : 'bg-gradient-to-b from-rose-50/40 to-white'}`}>
               <div className={`absolute w-72 h-72 rounded-full blur-3xl opacity-20 -top-20 -left-20 ${isPass ? 'bg-emerald-400' : 'bg-rose-400'}`}></div>
-              <div className={`absolute w-72 h-72 rounded-full blur-3xl opacity-20 -bottom-20 -right-20 ${isPass ? 'bg-teal-400' : 'bg-red-400'}`}></div>
               
               <div className="relative z-10 flex flex-col items-center">
-                <div className={`w-32 h-32 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-2xl backdrop-blur-md transform transition-transform group-hover:scale-105 duration-500 ${isPass ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-rose-500 shadow-rose-500/40'}`}>
+                <div className={`w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl transform transition-transform group-hover:scale-105 duration-500 ${isPass ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-rose-500 shadow-rose-500/40'}`}>
                   {isPass ? (
-                    <svg className="w-16 h-16 text-white drop-shadow-md" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className="w-14 h-14 text-white drop-shadow-md" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   ) : (
-                    <svg className="w-16 h-16 text-white drop-shadow-md" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className="w-14 h-14 text-white drop-shadow-md" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   )}
@@ -261,22 +523,29 @@ export default function AssessmentPage() {
                   {isPass ? 'Passed!' : 'Failed!'}
                 </h1>
                 
-                <p className="text-slate-500 text-center text-base font-medium leading-relaxed max-w-[280px]">
+                <p className="text-slate-500 text-center text-sm font-bold leading-relaxed max-w-[280px]">
                   {result.violations >= 3 
                     ? 'Terminated due to multiple proctoring violations.' 
                     : isPass 
-                      ? 'Outstanding performance! You have proven your technical expertise.' 
-                      : 'You fell short of the minimum 70% requirement. Keep practicing!'}
+                      ? appliedSuccessfully
+                        ? 'Assessment Completed! Your application was submitted successfully!'
+                        : 'Outstanding performance! You have proven your technical expertise.' 
+                      : 'Assessment not cleared. Minimum 70% required.'}
                 </p>
+                {isPass && appliedSuccessfully && (
+                  <div className="mt-5 bg-emerald-50 border border-emerald-250 text-emerald-800 text-xs font-black px-5 py-2.5 rounded-xl text-center shadow-inner">
+                    ✓ Applied Successfully
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right/Bottom Content Side */}
+            {/* Right Column Details & Audit Trail logs */}
             <div className="lg:col-span-7 p-10 md:p-14 lg:pl-16 lg:border-l border-slate-100 flex flex-col justify-center bg-white z-10 relative">
               
-              <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-10 mb-12">
+              <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-10 mb-8">
                 {/* Circular Progress */}
-                <div className="relative flex items-center justify-center shrink-0">
+                <div className="relative flex items-center justify-center shrink-0 select-none">
                   <svg className="w-36 h-36 transform -rotate-90">
                     <circle cx="72" cy="72" r="62" className="text-slate-100" strokeWidth="14" fill="transparent" />
                     <circle 
@@ -312,7 +581,7 @@ export default function AssessmentPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-50 hover:bg-slate-100 transition-colors rounded-2xl p-4 border border-slate-100">
                       <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Domain</span>
-                      <span className="font-bold text-slate-700 text-lg">{result.domain}</span>
+                      <span className="font-bold text-slate-700 text-lg leading-tight">{result.domain}</span>
                     </div>
                     <div className="bg-slate-50 hover:bg-slate-100 transition-colors rounded-2xl p-4 border border-slate-100">
                       <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Warnings</span>
@@ -322,25 +591,84 @@ export default function AssessmentPage() {
                 </div>
               </div>
 
+              {/* Phase 5 Audit Log / Integrity Trail UI */}
+              <div className="border-t border-slate-100 pt-6">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Security & Audit Log</h4>
+                <div className="grid grid-cols-2 gap-y-4 gap-x-6 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/50 text-xs text-slate-600 font-semibold mb-6">
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Candidate Name</span>
+                    <span className="text-sm font-black text-slate-800 truncate block">
+                      {studentName}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Integrity Score</span>
+                    <span className={`text-sm font-black ${
+                      (result.integrityScore || 100) >= 80 ? 'text-emerald-600' :
+                      (result.integrityScore || 100) >= 50 ? 'text-amber-600' : 'text-rose-600'
+                    }`}>
+                      {result.integrityScore || 100}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Duration Taken</span>
+                    <span className="text-sm font-black text-slate-800">
+                      {getDurationString(result.loginTimestamp || result.createdAt, result.submissionTimestamp || result.updatedAt)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">OS / Device</span>
+                    <span className="text-sm font-black text-slate-800 truncate block">
+                      {result.operatingSystem || 'N/A'} ({result.deviceType || 'Desktop'})
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">System Browser Specification</span>
+                    <span className="text-sm font-black text-slate-800 truncate block">
+                      {result.browserName || 'N/A'} {result.browserVersion || ''} @ {result.screenResolution || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sub-violations detail list */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[10px] font-bold text-slate-500">
+                  <div className="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${result.tabSwitchCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                    <span>Tab Switch: <strong>{result.tabSwitchCount || 0}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${result.fullscreenExitCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                    <span>Fullscreen: <strong>{result.fullscreenExitCount || 0}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${result.devtoolsAttemptCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                    <span>DevTools: <strong>{result.devtoolsAttemptCount || 0}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${result.clipboardAttemptCount > 0 ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                    <span>Clipboard: <strong>{result.clipboardAttemptCount || 0}</strong></span>
+                  </div>
+                </div>
+              </div>
+
               {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+              <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-slate-100">
                 <button 
                   onClick={() => router.push('/student')} 
-                  className="flex-1 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="flex-1 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-black py-3.5 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-sm text-sm"
                 >
-                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l-7-7m-7 7h18" /></svg>
                   Dashboard
                 </button>
-                {isPass && (
-                  <button 
-                    onClick={() => router.push('/student/jobs')} 
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
-                  >
-                    Find Jobs
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </button>
-                )}
+                <button 
+                  onClick={() => router.push('/student/jobs')} 
+                  className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-755 hover:to-purple-755 text-white font-black py-3.5 px-6 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group text-sm"
+                >
+                  {appliedSuccessfully ? 'Back to Job Board' : 'Find Jobs'}
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                </button>
               </div>
+
             </div>
           </div>
         </div>
@@ -348,16 +676,34 @@ export default function AssessmentPage() {
     );
   }
 
-  // Pre-Test Rules View
   const currentQuestion = questions[currentQuestionIndex];
   
   return (
-    <ProctoringWrapper isAssessmentActive={isActive} onAutoSubmit={handleAutoSubmit}>
-      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <ProctoringWrapper 
+      isAssessmentActive={isActive} 
+      onAutoSubmit={handleAutoSubmit}
+      violationsTracker={violationsTracker}
+      setViolationsTracker={setViolationsTracker}
+    >
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-y-auto">
         
         {!isActive ? (
-          <div className="flex-1 flex items-center justify-center p-6 md:p-12">
-            <div className="max-w-3xl w-full bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-200/60 animate-in fade-in zoom-in-95 duration-300">
+          <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+            <div className="max-w-3xl w-full bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-200/60 animate-in fade-in zoom-in-95 duration-300 max-h-[95vh] overflow-y-auto">
+              
+              {/* Dynamic pending job header */}
+              {pendingJobId && pendingJobTitle && (
+                <div className="bg-blue-50 border border-blue-150 p-4.5 rounded-2xl text-blue-800 font-medium mb-6 text-sm flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.083.87l-.467 1.327a.75.75 0 00.596.992l.04.005A.75.75 0 0112 15a3 3 0 01-3-3 3 3 0 013-3z"></path>
+                  </svg>
+                  <div>
+                    <span className="font-extrabold block text-blue-900 mb-0.5">Assessment Required</span>
+                    You are launching this assessment to automatically apply for the <strong className="text-blue-950 font-bold">{pendingJobTitle}</strong> position at <strong className="text-blue-950 font-bold">{pendingJobCompany || 'our partner company'}</strong>. Passing the test is required to submit your application.
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-3.5 mb-6">
                 <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -368,7 +714,7 @@ export default function AssessmentPage() {
                 </div>
               </div>
 
-              <div className="prose text-slate-600 space-y-4 mb-8 leading-relaxed">
+              <div className="prose text-slate-600 space-y-4 mb-6 leading-relaxed">
                 <p className="text-lg font-medium text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                   You are about to launch the official screening assessment. Please read the security guidelines carefully before beginning.
                 </p>
@@ -384,11 +730,11 @@ export default function AssessmentPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-red-500 font-bold mt-0.5">•</span>
-                    <span><strong>Window Switching:</strong> Minimizing the browser or shifting tabs will log warnings. <strong>Exceeding 3 warnings results in auto-failure.</strong></span>
+                    <span><strong>Window Switching:</strong> Minimizing the browser or shifting tabs will log warnings. <strong>Exceeding 2 warnings results in auto-failure.</strong></span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-red-500 font-bold mt-0.5">•</span>
-                    <span><strong>Key Actions:</strong> Right-click, developer console shortcuts (F12, Ctrl+Shift+I), view source, copy/paste are completely blocked.</span>
+                    <span><strong>Key Actions & DevTools:</strong> Right-click, developer console shortcuts (F12, Ctrl+Shift+I), view source, copy/paste/cut are completely blocked.</span>
                   </li>
                 </ul>
 
@@ -398,11 +744,11 @@ export default function AssessmentPage() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-semibold text-center text-sm">
                   <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl">
-                    <p className="text-indigo-600 text-2xl font-black mb-1">10</p>
+                    <p className="text-indigo-600 text-2xl font-black mb-1">20</p>
                     <p className="text-slate-500 text-xs">Total MCQs</p>
                   </div>
                   <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl">
-                    <p className="text-indigo-600 text-2xl font-black mb-1">7m</p>
+                    <p className="text-indigo-600 text-2xl font-black mb-1">14m</p>
                     <p className="text-slate-500 text-xs">Time Limit</p>
                   </div>
                   <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl">
@@ -412,9 +758,25 @@ export default function AssessmentPage() {
                 </div>
               </div>
 
+
+              {/* Rule 9 Agreement accept checkbox */}
+              <div ref={bottomRef} className="bg-slate-50 border border-slate-150 p-4.5 rounded-2xl mb-8 flex items-start gap-3 select-none">
+                <input 
+                  type="checkbox" 
+                  id="agreement" 
+                  checked={isAgreementAccepted} 
+                  onChange={(e) => setIsAgreementAccepted(e.target.checked)} 
+                  className="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 shrink-0 mt-0.5 cursor-pointer"
+                />
+                <label htmlFor="agreement" className="text-xs font-bold text-slate-650 leading-normal cursor-pointer">
+                  I understand that tab switching, fullscreen violations, copy/paste attempts, and other suspicious activities are monitored. Violations may result in automatic submission.
+                </label>
+              </div>
+
               <button 
                 onClick={startAssessment}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl text-lg transition-all shadow-xl shadow-indigo-600/20 hover:shadow-indigo-600/30 hover:-translate-y-0.5"
+                disabled={!isAgreementAccepted}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-black py-4 rounded-2xl text-lg transition-all shadow-xl shadow-indigo-600/15 disabled:shadow-none hover:-translate-y-0.5 disabled:hover:translate-y-0 active:translate-y-0"
               >
                 Accept Rules & Start Assessment
               </button>
@@ -430,19 +792,19 @@ export default function AssessmentPage() {
                   {currentQuestion?.domain || 'React'}
                 </span>
                 <span className="hidden sm:inline text-slate-400 font-bold">|</span>
-                <h2 className="text-slate-700 font-extrabold text-sm tracking-tight hidden sm:block">Proctored Assessment Session</h2>
+                <h2 className="text-slate-700 font-extrabold text-sm tracking-tight hidden sm:block">Assessment In Progress</h2>
               </div>
               
               <div className="flex items-center gap-6">
                 {/* Live Countdown Timer */}
-                <div className={`flex items-center gap-2 px-4.5 py-2 rounded-2xl border font-bold ${timeLeft < 300 ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+                <div className={`flex items-center gap-2 px-4.5 py-2 rounded-2xl border font-bold ${timeLeft < 180 ? 'bg-red-50 border-red-200 text-red-650 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-705'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   <span className="text-lg font-black font-mono">{formatTime(timeLeft)}</span>
                 </div>
 
                 <button 
                   onClick={() => setShowSubmitModal(true)} 
-                  className="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 font-extrabold px-6 py-2.5 rounded-xl transition-all shadow-sm shadow-rose-200/50"
+                  className="bg-rose-550 text-white hover:bg-rose-650 font-extrabold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-rose-200/50"
                 >
                   Submit Test
                 </button>
@@ -465,12 +827,8 @@ export default function AssessmentPage() {
                       <span className="text-slate-400 font-bold">{questions.length}</span>
                     </div>
 
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      currentQuestion?.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-700' :
-                      currentQuestion?.difficulty === 'Medium' ? 'bg-amber-50 text-amber-700' :
-                      'bg-red-50 text-red-700'
-                    }`}>
-                      {currentQuestion?.difficulty}
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
+                      Easy
                     </span>
                   </div>
 
@@ -503,8 +861,8 @@ export default function AssessmentPage() {
                             }`}>
                               {optionLabels[i]}
                             </div>
-                            <span className={`font-semibold text-[15px] ${isSelected ? 'text-indigo-900' : 'text-slate-700'}`}>
-                              {option}
+                            <span className={`font-semibold text-[15px] ${isSelected ? 'text-indigo-900' : 'text-slate-750'}`}>
+                                {option}
                             </span>
                           </label>
                         );
@@ -517,7 +875,7 @@ export default function AssessmentPage() {
                     <button 
                       onClick={handlePrevious}
                       disabled={currentQuestionIndex === 0}
-                      className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 disabled:opacity-40 disabled:hover:bg-white font-bold px-5 py-3 rounded-xl transition-all shadow-sm text-sm"
+                      className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-650 disabled:opacity-40 disabled:hover:bg-white font-bold px-5 py-3 rounded-xl transition-all shadow-sm text-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                       Previous
@@ -532,7 +890,7 @@ export default function AssessmentPage() {
 
                     <button 
                       onClick={handleSaveAndNext}
-                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:translate-y-px text-sm"
+                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-750 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:translate-y-px text-sm"
                     >
                       {currentQuestionIndex === questions.length - 1 ? 'Save & Submit' : 'Save & Next'}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>
@@ -555,7 +913,7 @@ export default function AssessmentPage() {
                         const isAnswered = answers[i] !== undefined;
                         const isVis = visited[i];
                         
-                        let bubbleClass = 'border-slate-200 hover:border-slate-400 text-slate-600';
+                        let bubbleClass = 'border-slate-200 hover:border-slate-400 text-slate-650';
                         if (isAnswered) {
                           bubbleClass = 'bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700';
                         } else if (isVis) {
@@ -604,28 +962,28 @@ export default function AssessmentPage() {
 
         {/* Submit Confirmation Modal */}
         {showSubmitModal && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+          <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-[2rem] max-w-md w-full p-8 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 select-none">
               <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
               </div>
 
               <h3 className="text-2xl font-black text-slate-800 mb-2">Finish Assessment?</h3>
-              <p className="text-slate-500 font-medium text-[15px] mb-6 leading-relaxed">
+              <p className="text-slate-500 font-medium text-[15px] mb-6 leading-relaxed font-semibold">
                 Are you sure you want to submit your assessment? You have answered <strong>{Object.keys(answers).length}</strong> of <strong>{questions.length}</strong> questions. You cannot change your answers once submitted.
               </p>
 
-              <div className="flex gap-4">
+              <div className="flex gap-4 font-bold text-sm">
                 <button 
                   onClick={() => setShowSubmitModal(false)} 
-                  className="flex-1 bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold py-3.5 rounded-xl transition-all shadow-sm text-sm"
+                  className="flex-1 bg-slate-50 border border-slate-200 text-slate-650 hover:bg-slate-100 py-3.5 rounded-xl transition-all shadow-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleManualSubmit}
                   disabled={submitting}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:translate-y-px text-sm disabled:opacity-50"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl transition-all shadow-md active:translate-y-px disabled:opacity-50"
                 >
                   {submitting ? 'Submitting...' : 'Yes, Submit'}
                 </button>

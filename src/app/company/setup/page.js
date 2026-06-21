@@ -28,6 +28,7 @@ export default function CompanySetup() {
   });
 
   const [isRegistered, setIsRegistered] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     fetchCompanyData();
@@ -81,6 +82,7 @@ export default function CompanySetup() {
       const data = await res.json();
       if (data.success) {
         setIsRegistered(true);
+        setEditMode(false);
         setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company registered successfully!');
         setTimeout(() => setMessage(''), 3000);
       } else {
@@ -96,18 +98,26 @@ export default function CompanySetup() {
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a temporary object URL for preview
-      const previewUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, logoUrl: previewUrl });
+      // Limit file size to 2MB for logos
+      if (file.size > 2 * 1024 * 1024) {
+        setMessage('Logo size must be less than 2MB');
+        setTimeout(() => setMessage(''), 3000);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, logoUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleCertificateUpload = (e, fieldName) => {
     const file = e.target.files[0];
     if (file) {
-      // Limit file size to 5MB
-      if (file.size > 5 * 1024 * 1024) {
-        setMessage('File size must be less than 5MB');
+      // Limit file size to 4MB
+      if (file.size > 4 * 1024 * 1024) {
+        setMessage('File size must be less than 4MB');
         setTimeout(() => setMessage(''), 3000);
         return;
       }
@@ -161,10 +171,23 @@ export default function CompanySetup() {
         
         {/* Branding Section */}
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Company Branding
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              Company Branding
+            </h2>
+            {!editMode && (
+              <button type="button" onClick={() => setEditMode(true)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#0B1E40] bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Edit
+              </button>
+            )}
+            {editMode && (
+              <button type="button" onClick={() => setEditMode(false)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                Cancel
+              </button>
+            )}
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-8 items-start mb-6">
             <div className="flex-shrink-0">
@@ -186,7 +209,8 @@ export default function CompanySetup() {
                 rows="4" 
                 value={formData.description} 
                 onChange={e => setFormData({...formData, description: e.target.value})} 
-                className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 focus:bg-white transition-all font-medium resize-none"
+                readOnly={!editMode}
+                className={`w-full px-5 py-3 rounded-xl border border-slate-200 outline-none font-medium resize-none ${editMode ? 'focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white' : 'bg-slate-50 cursor-default'}`}
                 placeholder="Write a short description about your company, culture, and vision..."
               ></textarea>
             </div>
@@ -195,23 +219,36 @@ export default function CompanySetup() {
 
         {/* General Info */}
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-            General Information
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+              General Information
+            </h2>
+            {!editMode && (
+              <button type="button" onClick={() => setEditMode(true)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#0B1E40] bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Edit
+              </button>
+            )}
+            {editMode && (
+              <button type="button" onClick={() => setEditMode(false)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                Cancel
+              </button>
+            )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">Company Name</label>
-              <input type="text" value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 focus:bg-white font-medium" />
+              <input type="text" value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} readOnly={!editMode} className={`w-full px-5 py-3 rounded-xl border border-slate-200 outline-none font-medium ${editMode ? 'focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white' : 'bg-slate-50 cursor-default'}`} />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">HR Manager Name</label>
-              <input type="text" value={formData.hrName} onChange={e => setFormData({...formData, hrName: e.target.value})} className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 focus:bg-white font-medium" />
+              <input type="text" value={formData.hrName} onChange={e => setFormData({...formData, hrName: e.target.value})} readOnly={!editMode} className={`w-full px-5 py-3 rounded-xl border border-slate-200 outline-none font-medium ${editMode ? 'focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white' : 'bg-slate-50 cursor-default'}`} />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">Industry Type</label>
-              <select value={formData.industryType} onChange={e => setFormData({...formData, industryType: e.target.value})} className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 focus:bg-white font-medium appearance-none">
+              <select value={formData.industryType} onChange={e => setFormData({...formData, industryType: e.target.value})} disabled={!editMode} className={`w-full px-5 py-3 rounded-xl border border-slate-200 outline-none font-medium appearance-none ${editMode ? 'focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white' : 'bg-slate-50 cursor-default'}`}>
                 <option value="IT Services">IT Services</option>
                 <option value="Product Based">Product Based</option>
                 <option value="Fintech">Fintech</option>
@@ -221,7 +258,7 @@ export default function CompanySetup() {
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">Company Size</label>
-              <select value={formData.companySize} onChange={e => setFormData({...formData, companySize: e.target.value})} className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50 focus:bg-white font-medium appearance-none">
+              <select value={formData.companySize} onChange={e => setFormData({...formData, companySize: e.target.value})} disabled={!editMode} className={`w-full px-5 py-3 rounded-xl border border-slate-200 outline-none font-medium appearance-none ${editMode ? 'focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white' : 'bg-slate-50 cursor-default'}`}>
                 <option value="1-50">1-50 Employees</option>
                 <option value="51-200">51-200 Employees</option>
                 <option value="201-500">201-500 Employees</option>
@@ -233,10 +270,23 @@ export default function CompanySetup() {
 
         {/* Contact Details */}
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            Contact & Links
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Contact & Links
+            </h2>
+            {!editMode && (
+              <button type="button" onClick={() => setEditMode(true)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#0B1E40] bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Edit
+              </button>
+            )}
+            {editMode && (
+              <button type="button" onClick={() => setEditMode(false)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                Cancel
+              </button>
+            )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -327,11 +377,16 @@ export default function CompanySetup() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4">
-          <button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-            {saving ? 'Saving Changes...' : 'Save Profile Settings'}
-          </button>
-        </div>
+        {editMode && (
+          <div className="flex justify-end gap-3">
+            <button type="button" onClick={() => setEditMode(false)} className="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="bg-[#0B1E40] hover:bg-[#152d54] text-white font-semibold py-2.5 px-8 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed text-sm">
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        )}
 
       </form>
 

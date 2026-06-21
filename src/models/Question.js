@@ -4,8 +4,6 @@ const QuestionSchema = new mongoose.Schema({
   domain: {
     type: String,
     required: true,
-    enum: ['React', 'Node.js', 'Python', 'Aptitude', 'Java', 'Data Structures', 'Other'],
-    default: 'React'
   },
   questionText: {
     type: String,

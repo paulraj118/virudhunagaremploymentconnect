@@ -44,11 +44,14 @@ export async function POST(request) {
       job.experience
     );
 
+    const hasPassedAssessment = (student.assessmentScore || 0) >= 70;
+    const stage = hasPassedAssessment ? 'Assessment Completed' : 'Applied';
+
     const application = await JobApplication.create({
       jobId: job._id,
       companyId: job.companyId,
       studentId: student._id,
-      stage: 'Applied',
+      stage,
       aiResumeScore: aiScores.resumeScore,
       aiSkillMatch: aiScores.skillMatchPercentage,
       aiExperienceMatch: aiScores.experienceMatchPercentage,

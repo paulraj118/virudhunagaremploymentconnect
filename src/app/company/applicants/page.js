@@ -80,7 +80,27 @@ export default function PlacementTracking() {
       alert('Update failed');
     }
   };
+  const [sendingEmailId, setSendingEmailId] = useState(null);
 
+  const handleSendEmail = async (id) => {
+    setSendingEmailId(id);
+    try {
+      const res = await fetch(`/api/company/applications/${id}/send-email`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Email sent successfully.');
+        fetchApplications(); // Refresh to show updated stage
+      } else {
+        alert(data.message || 'Unable to send email. Please try again.');
+      }
+    } catch (error) {
+      alert('Unable to send email. Please try again.');
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
   const handleScheduleInterview = (e) => {
     e.preventDefault();
     updateStage(selectedApp._id, 'Interview Scheduled', {
@@ -101,27 +121,27 @@ export default function PlacementTracking() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Pipeline Tracker</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">Candidate Tracker</h1>
 
       {/* Filters Section */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-end">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 mb-5 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Search Candidates</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Search Candidates</label>
           <input 
             type="text" 
             placeholder="Search by name or job..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-medium"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
           />
         </div>
         
-        <div className="w-full md:w-64">
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Filter by Job Role</label>
+        <div className="w-full md:w-56">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Filter by Job Role</label>
           <select 
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-bold text-indigo-700 bg-indigo-50"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
           >
             <option value="All Jobs">All Jobs</option>
             {jobRoles.map(role => (
@@ -130,12 +150,12 @@ export default function PlacementTracking() {
           </select>
         </div>
 
-        <div className="w-full md:w-48">
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+        <div className="w-full md:w-44">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Status</label>
           <select 
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-medium"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
           >
             <option value="All Status">All Status</option>
             {STAGES.map(stage => (
@@ -151,9 +171,9 @@ export default function PlacementTracking() {
               setSelectedRole('All Jobs');
               setStatusFilter('All Status');
             }}
-            className="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
           >
-            Clear Filters
+            Clear
           </button>
         </div>
       </div>
@@ -161,23 +181,23 @@ export default function PlacementTracking() {
       {/* Pipeline Statistics Cards */}
       {(() => {
         const stats = [
-          { label: 'Total Applicants', count: applications.length, color: 'bg-slate-900', textColor: 'text-white', icon: '👥' },
-          { label: 'Applied', count: applications.filter(a => a.stage === 'Applied').length, color: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200', icon: '📩' },
-          { label: 'Shortlisted', count: applications.filter(a => a.stage === 'Shortlisted').length, color: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200', icon: '⭐' },
-          { label: 'Interview Scheduled', count: applications.filter(a => a.stage === 'Interview Scheduled').length, color: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200', icon: '📅' },
-          { label: 'Selected', count: applications.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released').length, color: 'bg-emerald-50', textColor: 'text-emerald-700', borderColor: 'border-emerald-200', icon: '✅' },
-          { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, color: 'bg-red-50', textColor: 'text-red-700', borderColor: 'border-red-200', icon: '❌' },
+          { label: 'Total Applicants', count: applications.length, iconColor: 'text-slate-700', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> },
+          { label: 'Applied', count: applications.filter(a => a.stage === 'Applied').length, iconColor: 'text-blue-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> },
+          { label: 'Shortlisted', count: applications.filter(a => a.stage === 'Shortlisted').length, iconColor: 'text-amber-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg> },
+          { label: 'Interview', count: applications.filter(a => a.stage === 'Interview Scheduled').length, iconColor: 'text-purple-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> },
+          { label: 'Selected', count: applications.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released').length, iconColor: 'text-emerald-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
+          { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, iconColor: 'text-red-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
         ];
         return (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className={`${stat.color} ${stat.borderColor ? 'border ' + stat.borderColor : ''} rounded-2xl p-5 transition-transform hover:scale-105 ${stat.label === 'Total Applicants' ? 'shadow-lg' : 'shadow-sm'}`}
+                className="bg-white rounded-xl p-3 border border-slate-200 hover:border-slate-300 transition-colors"
               >
-                <div className="text-2xl mb-2">{stat.icon}</div>
-                <div className={`text-3xl font-black ${stat.textColor}`}>{stat.count}</div>
-                <div className={`text-xs font-semibold mt-1 ${stat.label === 'Total Applicants' ? 'text-slate-300' : 'text-slate-500'}`}>{stat.label}</div>
+                <div className={`${stat.iconColor} mb-2`}>{stat.icon}</div>
+                <div className="text-xl font-bold text-slate-800">{stat.count}</div>
+                <div className="text-[11px] font-medium text-slate-500 mt-0.5">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -269,14 +289,11 @@ export default function PlacementTracking() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button 
-                      onClick={() => {
-                        setSelectedApp(app);
-                        setInterviewData({ date: '', link: `https://meet.google.com/job-${Math.floor(Math.random()*10000)}` });
-                        setShowInterviewModal(true);
-                      }}
-                      className="text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-4 py-2 rounded-lg transition-colors"
+                      onClick={() => handleSendEmail(app._id)}
+                      disabled={sendingEmailId === app._id}
+                      className="text-xs font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-4 py-2 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      Schedule Interview
+                      {sendingEmailId === app._id ? 'Sending...' : 'Send Email'}
                     </button>
                   </td>
                 </tr>

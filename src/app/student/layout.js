@@ -48,11 +48,22 @@ export default function StudentLayout({ children }) {
   const links = [
     { name: 'Dashboard', path: '/student' },
     { name: 'Profile & Resume', path: '/student/profile' },
-    { name: 'Assessments', path: '/student/assessments' },
     { name: 'My Applications', path: '/student/applications' },
     { name: 'Job Board', path: '/student/jobs' },
     { name: 'Certificates', path: '/student/certificates' },
   ];
+
+  const isAssessmentPage = pathname === '/student/assessments';
+
+  if (isAssessmentPage) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex overflow-y-auto w-full">
+        <main className="flex-1 min-h-screen relative overflow-y-auto w-full">
+          {children}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">

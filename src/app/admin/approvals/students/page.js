@@ -30,29 +30,29 @@ export default function StudentApprovals() {
     }
   };
 
-  const handleAction = async (id, status) => {
-    if (!confirm(`Are you sure you want to ${status} this student?`)) return;
-    
-    setActionLoading(id);
-    try {
-      const res = await fetch(`/api/admin/enrollments/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      });
-      const data = await res.json();
-      if (data.success) {
-        // Refresh list
-        fetchEnrollments();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert('Action failed');
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  // const handleAction = async (id, status) => {
+  //   if (!confirm(`Are you sure you want to ${status} this student?`)) return;
+  //   
+  //   setActionLoading(id);
+  //   try {
+  //     const res = await fetch(`/api/admin/enrollments/${id}`, {
+  //       method: 'PUT',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ status })
+  //     });
+  //     const data = await res.json();
+  //     if (data.success) {
+  //       // Refresh list
+  //       fetchEnrollments();
+  //     } else {
+  //       alert(data.message);
+  //     }
+  //   } catch (error) {
+  //     alert('Action failed');
+  //   } finally {
+  //     setActionLoading(false);
+  //   }
+  // };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this enrollment permanently?')) return;
@@ -75,29 +75,29 @@ export default function StudentApprovals() {
     }
   };
 
-  const handleEdit = async (student) => {
-    const newCollege = prompt('Enter new college name:', student.collegeName);
-    if (!newCollege) return;
-    
-    setActionLoading(student._id);
-    try {
-      const res = await fetch(`/api/admin/enrollments/${student._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collegeName: newCollege })
-      });
-      const data = await res.json();
-      if (data.success) {
-        fetchEnrollments();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert('Edit failed');
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  // const handleEdit = async (student) => {
+  //   const newCollege = prompt('Enter new college name:', student.collegeName);
+  //   if (!newCollege) return;
+  //   
+  //   setActionLoading(student._id);
+  //   try {
+  //     const res = await fetch(`/api/admin/enrollments/${student._id}`, {
+  //       method: 'PUT',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ collegeName: newCollege })
+  //     });
+  //     const data = await res.json();
+  //     if (data.success) {
+  //       fetchEnrollments();
+  //     } else {
+  //       alert(data.message);
+  //     }
+  //   } catch (error) {
+  //     alert('Edit failed');
+  //   } finally {
+  //     setActionLoading(false);
+  //   }
+  // };
 
   const handleView = async (id) => {
     setActionLoading(id);
@@ -241,46 +241,12 @@ export default function StudentApprovals() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
-                    {student.enrollmentStatus === 'pending' && (
-                      <>
-                        <button 
-                          onClick={() => handleAction(student._id, 'approved')}
-                          disabled={actionLoading === student._id}
-                          className="text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                        >
-                          Approve
-                        </button>
-                        <button 
-                          onClick={() => handleAction(student._id, 'rejected')}
-                          disabled={actionLoading === student._id}
-                          className="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {student.enrollmentStatus === 'approved' && (
-                      <button 
-                        onClick={() => handleAction(student._id, 'rejected')}
-                        disabled={actionLoading === student._id}
-                        className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                      >
-                        Revoke Access
-                      </button>
-                    )}
                     <button 
                       onClick={() => handleView(student._id)}
                       disabled={actionLoading === student._id}
                       className="text-purple-600 hover:text-purple-800 font-medium bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-md transition-colors text-xs"
                     >
                       View
-                    </button>
-                    <button 
-                      onClick={() => handleEdit(student)}
-                      disabled={actionLoading === student._id}
-                      className="text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                    >
-                      Edit
                     </button>
                     <button 
                       onClick={() => handleDelete(student._id)}

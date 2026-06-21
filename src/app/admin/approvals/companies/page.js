@@ -87,29 +87,7 @@ export default function CompanyApprovals() {
     }
   };
 
-  const handleEdit = async (company) => {
-    const newName = prompt('Enter new company name:', company.companyName);
-    if (!newName) return;
-    
-    setActionLoading(company._id);
-    try {
-      const res = await fetch(`/api/admin/companies/${company._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyName: newName })
-      });
-      const data = await res.json();
-      if (data.success) {
-        fetchCompanies();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert('Edit failed');
-    } finally {
-      setActionLoading(false);
-    }
-  };
+
 
   const handleView = async (id) => {
     setActionLoading(id);
@@ -174,34 +152,34 @@ export default function CompanyApprovals() {
       </div>
 
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors flex items-center gap-4 shadow-sm">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Companies</div>
-              <div className="text-3xl font-black text-blue-600 tracking-tight">{stats.totalCompanies}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Companies</div>
+              <div className="text-xl font-bold text-slate-800">{stats.totalCompanies}</div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors flex items-center gap-4 shadow-sm">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
             </div>
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Active Companies</div>
-              <div className="text-3xl font-black text-emerald-600 tracking-tight">{stats.activeCompanies}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Companies</div>
+              <div className="text-xl font-bold text-slate-800">{stats.activeCompanies}</div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/5 hover:scale-[1.02] transition-all duration-300 transform flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] group">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-amber-50 text-amber-600 transition-transform duration-300 group-hover:scale-110 shadow-sm">
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-300 transition-colors flex items-center gap-4 shadow-sm">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-50 text-amber-600">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Pending Approvals</div>
-              <div className="text-3xl font-black text-amber-600 tracking-tight">{stats.pendingApprovals}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Approvals</div>
+              <div className="text-xl font-bold text-slate-800">{stats.pendingApprovals}</div>
             </div>
           </div>
         </div>
@@ -248,55 +226,50 @@ export default function CompanyApprovals() {
                       {company.approvalStatus.charAt(0).toUpperCase() + company.approvalStatus.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    {company.approvalStatus === 'pending' && (
-                      <>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {company.approvalStatus === 'pending' && (
+                        <>
+                          <button 
+                            onClick={() => handleAction(company._id, 'approved')}
+                            disabled={actionLoading === company._id}
+                            className="text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                          >
+                            Approve
+                          </button>
+                          <button 
+                            onClick={() => handleAction(company._id, 'rejected')}
+                            disabled={actionLoading === company._id}
+                            className="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {company.approvalStatus === 'approved' && (
                         <button 
-                          onClick={() => handleAction(company._id, 'approved')}
+                          onClick={() => handleAction(company._id, 'suspended')}
                           disabled={actionLoading === company._id}
-                          className="text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                          className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors text-xs"
                         >
-                          Approve
+                          Suspend
                         </button>
-                        <button 
-                          onClick={() => handleAction(company._id, 'rejected')}
-                          disabled={actionLoading === company._id}
-                          className="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {company.approvalStatus === 'approved' && (
+                      )}
                       <button 
-                        onClick={() => handleAction(company._id, 'suspended')}
+                        onClick={() => handleView(company._id)}
                         disabled={actionLoading === company._id}
-                        className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors text-xs"
                       >
-                        Suspend
+                        View
                       </button>
-                    )}
-                    <button 
-                      onClick={() => handleView(company._id)}
-                      disabled={actionLoading === company._id}
-                      className="text-purple-600 hover:text-purple-800 font-medium bg-purple-50 hover:bg-purple-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                    >
-                      View
-                    </button>
-                    <button 
-                      onClick={() => handleEdit(company)}
-                      disabled={actionLoading === company._id}
-                      className="text-blue-600 hover:text-blue-800 font-medium bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors text-xs"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(company._id)}
-                      disabled={actionLoading === company._id}
-                      className="text-slate-500 hover:text-red-600 font-medium bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors text-xs"
-                    >
-                      Delete
-                    </button>
+                      <button 
+                        onClick={() => handleDelete(company._id)}
+                        disabled={actionLoading === company._id}
+                        className="text-slate-500 hover:text-red-600 font-medium bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors text-xs"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

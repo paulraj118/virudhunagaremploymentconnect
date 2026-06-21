@@ -84,28 +84,19 @@ export default function CompanyDashboard() {
 
   if (approvalStatus) {
     return (
-      <div className="min-h-screen bg-[#FAFAFF] font-sans selection:bg-indigo-200">
-        
-        {/* Soft Light Mode Decorative Background */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-indigo-300/30 blur-[120px] rounded-full mix-blend-multiply"></div>
-          <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-pink-300/30 blur-[120px] rounded-full mix-blend-multiply"></div>
-          <div className="absolute top-[20%] right-[15%] w-[30%] h-[30%] bg-blue-300/20 blur-[100px] rounded-full mix-blend-multiply"></div>
-        </div>
+      <div className="min-h-screen bg-white font-sans">
 
-        {/* Top Navbar removed because layout handles it */}
-
-        <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">
                 Dashboard Overview
               </h1>
-              <p className="text-slate-500 font-medium text-lg">Real-time metrics and hiring pipeline for <span className="text-indigo-600 font-bold">{approvalStatus.companyName}</span></p>
+              <p className="text-slate-500 font-medium text-sm">Real-time metrics and hiring pipeline for <span className="text-[#0B1E40] font-semibold">{approvalStatus.companyName}</span></p>
             </div>
             {approvalStatus.approvalStatus === 'approved' && (
-              <button onClick={() => router.push('/company/jobs')} className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all hover:scale-105 flex items-center gap-2 group cursor-pointer z-20 relative">
-                <span className="group-hover:rotate-90 transition-transform duration-300 text-xl leading-none">+</span> Create Job Listing
+              <button onClick={() => router.push('/company/jobs')} className="bg-[#0B1E40] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#152d54] transition-colors flex items-center gap-2 text-sm">
+                <span className="text-lg leading-none">+</span> Create Job Listing
               </button>
             )}
           </div>
@@ -139,64 +130,64 @@ export default function CompanyDashboard() {
 
           {approvalStatus.approvalStatus === 'approved' && (
             <>
-              {/* Extra Cards Section (4 columns) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 
                 {/* Card 1 */}
-                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.1)] hover:-translate-y-1 transition-all duration-300 group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 border border-indigo-100 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">Live</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">Live</span>
                   </div>
-                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.activeJobs}</p>
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Active Jobs</h3>
+                  <p className="text-2xl font-bold text-slate-800">{stats.activeJobs}</p>
+                  <h3 className="text-xs font-medium text-slate-500 mt-0.5">Active Jobs</h3>
                 </div>
                 
                 {/* Card 2 */}
-                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(16,185,129,0.1)] hover:-translate-y-1 transition-all duration-300 group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full">+0%</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full">+0%</span>
                   </div>
-                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.totalApplicants}</p>
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Applicants</h3>
+                  <p className="text-2xl font-bold text-slate-800">{stats.totalApplicants}</p>
+                  <h3 className="text-xs font-medium text-slate-500 mt-0.5">Total Applicants</h3>
                 </div>
 
                 {/* Card 3 */}
-                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(245,158,11,0.1)] hover:-translate-y-1 transition-all duration-300 group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-600 rounded-full border border-amber-100">This Week</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full">This Week</span>
                   </div>
-                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.interviews}</p>
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Interviews</h3>
+                  <p className="text-2xl font-bold text-slate-800">{stats.interviews}</p>
+                  <h3 className="text-xs font-medium text-slate-500 mt-0.5">Interviews</h3>
                 </div>
 
                 {/* Card 4 */}
-                <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(236,72,153,0.1)] hover:-translate-y-1 transition-all duration-300 group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-pink-600 border border-pink-100 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="w-9 h-9 bg-rose-50 rounded-lg flex items-center justify-center text-rose-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 bg-pink-50 text-pink-600 rounded-full border border-pink-100">Success</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 bg-rose-50 text-rose-600 rounded-full">Success</span>
                   </div>
-                  <p className="text-4xl font-black text-slate-800 mb-1">{stats.hired}</p>
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Hired Candidates</h3>
+                  <p className="text-2xl font-bold text-slate-800">{stats.hired}</p>
+                  <h3 className="text-xs font-medium text-slate-500 mt-0.5">Hired Candidates</h3>
                 </div>
 
               </div>
 
               {/* Advanced Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 
-                {/* Advanced Bar Chart - 2 Columns wide */}
-                <div className="lg:col-span-2 bg-white/90 backdrop-blur-xl p-8 rounded-3xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                {/* Application Trends */}
+                <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200">
                   <div className="flex justify-between items-center mb-8">
                     <div>
                       <h3 className="text-xl font-black text-slate-800">Application Trends</h3>
@@ -241,13 +232,12 @@ export default function CompanyDashboard() {
                   </div>
                 </div>
 
-                {/* Advanced Circular Progress Chart - 1 Column wide */}
-                <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 rounded-3xl shadow-[0_10px_40px_rgba(79,70,229,0.15)] relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                {/* Hiring Efficiency */}
+                <div className="bg-white p-6 rounded-xl border border-slate-200 flex flex-col justify-between">
                   
                   <div>
-                    <h3 className="text-xl font-black text-white mb-1">Hiring Efficiency</h3>
-                    <p className="text-sm font-medium text-indigo-200/70">Candidate conversion rate</p>
+                    <h3 className="text-xl font-black text-slate-800 mb-1">Hiring Efficiency</h3>
+                    <p className="text-sm font-medium text-slate-500">Candidate conversion rate</p>
                   </div>
 
                   {/* Circular CSS Chart */}
@@ -255,25 +245,25 @@ export default function CompanyDashboard() {
                     <div className="relative w-40 h-40">
                       {/* Background circle */}
                       <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/10" />
+                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
                         {/* Progress circle (dummy 0% for now) */}
-                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="440" strokeDashoffset="440" strokeLinecap="round" className="text-indigo-400 transition-all duration-1000" />
+                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="440" strokeDashoffset="440" strokeLinecap="round" className="text-[#0B1E40] transition-all duration-1000" />
                       </svg>
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                        <span className="text-4xl font-black text-white">{stats.totalApplicants > 0 ? Math.round((stats.hired / stats.totalApplicants) * 100) : 0}%</span>
-                        <span className="block text-xs font-bold text-indigo-300 uppercase mt-1">Conversion</span>
+                        <span className="text-4xl font-black text-slate-800">{stats.totalApplicants > 0 ? Math.round((stats.hired / stats.totalApplicants) * 100) : 0}%</span>
+                        <span className="block text-xs font-bold text-slate-500 uppercase mt-1">Conversion</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mt-2">
-                    <div className="bg-white/10 backdrop-blur border border-white/10 rounded-2xl p-4">
-                      <p className="text-indigo-200 text-xs font-bold uppercase mb-1">Interviews</p>
-                      <p className="text-white text-2xl font-black">{stats.interviews}</p>
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                      <p className="text-slate-500 text-xs font-bold uppercase mb-1">Interviews</p>
+                      <p className="text-slate-800 text-2xl font-black">{stats.interviews}</p>
                     </div>
-                    <div className="bg-white/10 backdrop-blur border border-white/10 rounded-2xl p-4">
-                      <p className="text-indigo-200 text-xs font-bold uppercase mb-1">Offers</p>
-                      <p className="text-white text-2xl font-black">{stats.hired}</p>
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                      <p className="text-slate-500 text-xs font-bold uppercase mb-1">Offers</p>
+                      <p className="text-slate-800 text-2xl font-black">{stats.hired}</p>
                     </div>
                   </div>
                 </div>

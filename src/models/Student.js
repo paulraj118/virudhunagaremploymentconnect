@@ -37,7 +37,7 @@ const StudentSchema = new mongoose.Schema(
     },
     industryTrack: {
       type: String,
-      enum: ['IT', 'NON-IT'],
+      enum: ['Arts / Engineering', 'Admin / Management', 'Pharma / Medical'],
       required: [true, 'Please select your industry track'],
     },
     resumeUrl: {
@@ -66,7 +66,11 @@ const StudentSchema = new mongoose.Schema(
       issuedBy: String,
       fileUrl: String,
       date: { type: Date, default: Date.now }
-    }]
+    }],
+    activeSessionId: {
+      type: String,
+      default: null,
+    }
   },
   { timestamps: true }
 );

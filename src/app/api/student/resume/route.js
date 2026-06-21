@@ -4,6 +4,7 @@ import Student from '@/models/Student';
 import { getCurrentUser } from '@/lib/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { processAtsScore } from '@/lib/atsScorer';
 
 export async function POST(request) {
   try {
@@ -35,19 +36,29 @@ export async function POST(request) {
     const filepath = path.join(uploadsDir, filename);
     await writeFile(filepath, buffer);
 
-    const resumeUrl = `/uploads/${filename}`;
-
-    // Simulate ATS Scanning based on file size/random
-    // In a real app, we would use pdf-parse here to read the text and compare against Job Descriptions
-    const atsScore = Math.floor(Math.random() * 21) + 75; // Random score between 75 and 95
+    const baseResumeUrl = `/uploads/${filename}`;
 
     await dbConnect();
+    const existingStudent = await Student.findOne({ userId: decoded.id });
+    if (!existingStudent) {
+      return NextResponse.json({
+        success: true,
+        message: 'Resume uploaded successfully. Score will be calculated upon enrollment submission.',
+        resumeUrl: baseResumeUrl,
+        atsScore: 0
+      });
+    }
+
+    // Temporarily attach baseResumeUrl so processAtsScore can find it on disk if needed
+    existingStudent.resumeUrl = baseResumeUrl;
+
+    const { atsScore, resumeUrl: finalResumeUrl } = await processAtsScore(existingStudent, buffer);
     
     const student = await Student.findOneAndUpdate(
       { userId: decoded.id },
       { 
         $set: { 
-          resumeUrl,
+          resumeUrl: finalResumeUrl,
           atsScore
         } 
       },
@@ -57,7 +68,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       message: 'Resume uploaded and scanned successfully',
-      resumeUrl,
+      resumeUrl: finalResumeUrl,
       atsScore,
       student
     });
@@ -67,3 +78,4 @@ export async function POST(request) {
     return NextResponse.json({ success: false, message: 'Server error during upload' }, { status: 500 });
   }
 }
+

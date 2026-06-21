@@ -9,24 +9,44 @@ export default function StudentDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [enrollmentStatus, setEnrollmentStatus] = useState(null); // null means not enrolled, else object
+  const [showAssessmentsModal, setShowAssessmentsModal] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     collegeName: '', degree: '', department: '', yearOfPassedOut: '',
     yearsOfExperience: '0', industryTrack: '',
-    skills: '', preferredDomain: '', resumeUrl: 'https://example.com/resume.pdf'
+    skills: '', preferredDomain: '', resumeUrl: ''
   });
 
-  const IT_DOMAINS = [
-    'Software Development', 'Web Development', 'Frontend', 'Backend', 'Full Stack',
-    'Android', 'iOS', 'Data Science', 'Data Analytics', 'AI & ML', 'Cyber Security',
-    'Cloud', 'DevOps', 'UI/UX', 'QA Testing'
-  ];
+  // Resume Upload State
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [atsScore, setAtsScore] = useState(0);
 
-  const NON_IT_DOMAINS = [
-    'Sales & Marketing', 'Human Resources (HR)', 'Finance & Accounting', 'Business Development',
-    'Customer Support', 'Operations Management', 'Mechanical Engineering', 'Electrical Engineering',
-    'Civil Engineering', 'Administration', 'Healthcare & Medical', 'Content Writing'
-  ];
+  const TRACK_DOMAINS = {
+    'Arts / Engineering': [
+      'English Literature', 'Tamil Literature', 'History', 'Economics', 'Psychology',
+      'Sociology', 'Journalism & Mass Communication', 'Visual Communication', 'Fine Arts',
+      'Data Science', 'Artificial Intelligence & Machine Learning', 'Cyber Security',
+      'Cloud Computing', 'Full Stack Development', 'Mechanical Engineering',
+      'Civil Engineering', 'Electrical Engineering',
+      'Electronics & Communication Engineering (ECE)', 'Automobile Engineering', 'Others'
+    ],
+    'Admin / Management': [
+      'Human Resources (HR)', 'Marketing', 'Finance', 'Operations Management',
+      'Business Analytics', 'Supply Chain Management', 'Banking', 'Accounting',
+      'Entrepreneurship', 'Others'
+    ],
+    'Pharma / Medical': [
+      'Pharmacy', 'Clinical Research', 'Nursing', 'Physiotherapy',
+      'Medical Laboratory Technology', 'Healthcare Management', 'Biotechnology',
+      'Pharmacovigilance', 'Public Health', 'Others'
+    ],
+  };
+
+  const TRACKS = Object.keys(TRACK_DOMAINS);
+
+  const [customDomain, setCustomDomain] = useState('');
 
   const handleTrackChange = (track) => {
     setFormData(prev => ({
@@ -34,7 +54,84 @@ export default function StudentDashboard() {
       industryTrack: track,
       preferredDomain: ''
     }));
+    setCustomDomain('');
   };
+
+  const handleDomainSelect = (domain) => {
+    if (domain === 'Others') {
+      setFormData(prev => ({ ...prev, preferredDomain: 'Others' }));
+      setCustomDomain('');
+    } else {
+      setFormData(prev => ({ ...prev, preferredDomain: domain }));
+      setCustomDomain('');
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const selected = e.target.files[0];
+    if (selected && selected.type === 'application/pdf') {
+      setFile(selected);
+      await handleUploadAndScan(selected);
+    } else {
+      alert("Please upload a PDF file.");
+    }
+  };
+
+  const handleUploadAndScan = async (selectedFile) => {
+    setUploading(true);
+    setScanProgress(0);
+    
+    // Simulate scan progress animation
+    const progressInterval = setInterval(() => {
+      setScanProgress(prev => {
+        if (prev >= 90) return prev; // Hold at 90% until backend responds
+        return prev + 10;
+      });
+    }, 300);
+
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('resume', selectedFile);
+
+      const res = await fetch('/api/student/resume', {
+        method: 'POST',
+        body: formDataObj,
+      });
+
+      const data = await res.json();
+      
+      clearInterval(progressInterval);
+      setScanProgress(100);
+
+      if (data.success) {
+        setTimeout(() => {
+          setFormData(prev => ({ ...prev, resumeUrl: data.resumeUrl }));
+          setAtsScore(data.atsScore);
+          setUploading(false);
+        }, 800); // give time for 100% animation to show
+      } else {
+        alert(data.message);
+        setUploading(false);
+        setFile(null);
+      }
+
+    } catch (error) {
+      clearInterval(progressInterval);
+      setUploading(false);
+      setFile(null);
+      alert('Upload failed');
+    }
+  };
+
+  // Compute the final domain value for submission
+  const getFinalDomain = () => {
+    if (formData.preferredDomain === 'Others') {
+      return customDomain.trim();
+    }
+    return formData.preferredDomain;
+  };
+
+  const isDomainValid = formData.preferredDomain && (formData.preferredDomain !== 'Others' || customDomain.trim().length > 0);
 
   useEffect(() => {
     fetchEnrollmentStatus();
@@ -45,7 +142,7 @@ export default function StudentDashboard() {
       const res = await fetch('/api/student/enrollment');
       const data = await res.json();
       if (data.enrolled) {
-        setEnrollmentStatus(data.student);
+        setEnrollmentStatus({ ...data.student, assessments: data.assessments || [] });
       }
     } catch (error) {
       console.error(error);
@@ -61,6 +158,7 @@ export default function StudentDashboard() {
       // Convert comma separated skills to array
       const payload = {
         ...formData,
+        preferredDomain: getFinalDomain(),
         skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean)
       };
 
@@ -108,55 +206,30 @@ export default function StudentDashboard() {
 
         {enrollmentStatus.enrollmentStatus === 'approved' && (
           <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500 pb-10">
-            {/* Header Banner */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[2.5rem] p-8 md:p-12 text-white shadow-xl shadow-indigo-600/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl"></div>
-              
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">Welcome back, Future Expert!</h2>
-                <p className="text-indigo-100 font-medium text-lg max-w-xl">
-                  Your profile is approved and active. Keep upgrading your skills and applying to top jobs.
-                </p>
-              </div>
-            </div>
-
             {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Assessment Card with Chart */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700"></div>
-                <div className="relative z-10 flex items-center gap-6">
-                  <div className="relative flex items-center justify-center shrink-0">
-                    <svg className="w-24 h-24 transform -rotate-90 drop-shadow-sm">
-                      <circle cx="48" cy="48" r="38" className="text-slate-100" strokeWidth="8" fill="transparent" />
-                      <circle 
-                        cx="48" 
-                        cy="48" 
-                        r="38" 
-                        className="text-indigo-500 transition-all duration-1500 ease-out" 
-                        strokeWidth="8" 
-                        fill="transparent" 
-                        strokeDasharray={2 * Math.PI * 38} 
-                        strokeDashoffset={2 * Math.PI * 38 * (1 - (enrollmentStatus.assessmentScore || 0) / 100)} 
-                        strokeLinecap="round" 
-                        stroke="currentColor"
-                      />
-                    </svg>
-                    <div className="absolute flex flex-col items-center justify-center">
-                      <span className="text-xl font-black text-slate-800">{enrollmentStatus.assessmentScore || 0}%</span>
-                    </div>
+              {/* Assessment Card */}
+              <div className="bg-white p-6 rounded-xl border border-slate-200 border-t-4 border-t-indigo-500 flex flex-col justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 border border-indigo-100">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
                   <div>
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Assessment</h3>
-                    <p className="text-slate-600 text-sm font-semibold leading-snug">Your current competency score.</p>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Assessment</h3>
+                    <div className="text-xl font-black text-slate-800 mt-0.5">{enrollmentStatus.assessmentScore || 0}% Score</div>
                   </div>
                 </div>
+                <button 
+                  onClick={() => setShowAssessmentsModal(true)}
+                  className="mt-5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-sm px-4 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  View All Attempts
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </button>
               </div>
 
               {/* Status Card */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700"></div>
+              <div className="bg-white p-6 rounded-xl border border-slate-200 border-t-4 border-t-emerald-500 flex flex-col justify-center">
                 <div className="relative z-10 h-full flex flex-col justify-center">
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Placement Status</h3>
                   <div className="flex items-center gap-5">
@@ -172,8 +245,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Domain Card */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-shadow group relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700"></div>
+              <div className="bg-white p-6 rounded-xl border border-slate-200 border-t-4 border-t-purple-500 flex flex-col justify-center">
                 <div className="relative z-10 h-full flex flex-col justify-center">
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Career Track</h3>
                   <div className="flex items-center gap-5">
@@ -182,7 +254,7 @@ export default function StudentDashboard() {
                     </div>
                     <div>
                       <span className="text-xl font-black text-slate-800 leading-tight block">{enrollmentStatus.preferredDomain}</span>
-                      <p className="text-purple-600 text-sm font-bold mt-1">{enrollmentStatus.industryTrack || 'IT'} Track</p>
+                      <p className="text-purple-600 text-sm font-bold mt-1">{enrollmentStatus.industryTrack} Track</p>
                     </div>
                   </div>
                 </div>
@@ -191,11 +263,11 @@ export default function StudentDashboard() {
 
             {/* Profile Analytics Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Skills Radar / Bar Chart Mockup */}
-              <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              {/* Profile Analytics Section */}
+              <div className="bg-white p-6 rounded-xl border border-slate-200 border-t-4 border-t-indigo-500">
                 <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                   </div>
                   Profile Strength Analytics
                 </h3>
@@ -232,12 +304,9 @@ export default function StudentDashboard() {
               </div>
 
               {/* Skills Tags */}
-              <div className="bg-slate-900 p-8 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-800 text-white relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-110 duration-700"></div>
-                <div className="absolute bottom-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl -ml-10 -mb-10"></div>
-                
-                <h3 className="text-xl font-black mb-8 flex items-center gap-3 relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300 backdrop-blur-sm border border-white/5">
+              <div className="bg-white p-6 rounded-xl border border-slate-200 border-t-4 border-t-indigo-500">
+                <h3 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3 relative z-10">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
                   </div>
                   Your Top Skills
@@ -246,7 +315,7 @@ export default function StudentDashboard() {
                 <div className="flex flex-wrap gap-3.5 relative z-10">
                   {enrollmentStatus.skills && enrollmentStatus.skills.length > 0 ? (
                     enrollmentStatus.skills.map((skill, i) => (
-                      <span key={i} className="bg-white/10 hover:bg-white/20 border border-white/10 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-default backdrop-blur-sm drop-shadow-md">
+                      <span key={i} className="bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-default">
                         {skill}
                       </span>
                     ))
@@ -256,6 +325,46 @@ export default function StudentDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* Assessments Modal */}
+            {showAssessmentsModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                <div className="bg-white rounded-3xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-350 border border-slate-100">
+                  <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="text-2xl font-black text-slate-800">Assessment History</h3>
+                    <button 
+                      onClick={() => setShowAssessmentsModal(false)}
+                      className="text-slate-400 hover:text-slate-650 transition-colors p-2 rounded-full hover:bg-slate-150"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+                    {enrollmentStatus.assessments && enrollmentStatus.assessments.length > 0 ? (
+                      enrollmentStatus.assessments.map((attempt, index) => (
+                        <div key={index} className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div>
+                            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{attempt.domain || 'General Assessment'}</div>
+                            <div className="text-sm font-semibold text-slate-700">Attempted on {new Date(attempt.submissionTimestamp || attempt.createdAt).toLocaleDateString()}</div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1 text-xs font-bold rounded-lg border ${attempt.passFail === 'Pass' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                              {attempt.passFail}
+                            </span>
+                            <div className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center font-black text-slate-800 shadow-sm">
+                              {attempt.percentage || attempt.score}%
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-10 text-slate-500 font-medium">No assessment history available.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
@@ -306,16 +415,14 @@ export default function StudentDashboard() {
               <h3 className="font-semibold text-lg text-slate-700 border-b pb-2">Professional Details</h3>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Industry Track (IT / NON-IT)</label>
-                <div className="flex gap-4">
-                  <label className={`flex-1 cursor-pointer border rounded-lg px-4 py-3 text-sm text-center transition-colors ${formData.industryTrack === 'IT' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}>
-                    <input type="radio" name="industryTrack" className="hidden" checked={formData.industryTrack === 'IT'} onChange={() => handleTrackChange('IT')} required />
-                    IT
-                  </label>
-                  <label className={`flex-1 cursor-pointer border rounded-lg px-4 py-3 text-sm text-center transition-colors ${formData.industryTrack === 'NON-IT' ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}>
-                    <input type="radio" name="industryTrack" className="hidden" checked={formData.industryTrack === 'NON-IT'} onChange={() => handleTrackChange('NON-IT')} required />
-                    NON-IT
-                  </label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Industry Track</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {TRACKS.map(track => (
+                    <label key={track} className={`cursor-pointer border rounded-lg px-4 py-3 text-sm text-center transition-colors ${formData.industryTrack === track ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}>
+                      <input type="radio" name="industryTrack" className="hidden" checked={formData.industryTrack === track} onChange={() => handleTrackChange(track)} required />
+                      {track}
+                    </label>
+                  ))}
                 </div>
               </div>
               
@@ -336,20 +443,58 @@ export default function StudentDashboard() {
                     Please select an Industry Track first.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {(formData.industryTrack === 'IT' ? IT_DOMAINS : NON_IT_DOMAINS).map(domain => (
-                      <label key={domain} className={`cursor-pointer border rounded-lg px-3 py-2 text-sm text-center transition-colors ${formData.preferredDomain === domain ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-medium' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}>
-                        <input type="radio" name="domain" className="hidden" checked={formData.preferredDomain === domain} onChange={() => setFormData({...formData, preferredDomain: domain})} />
-                        {domain}
-                      </label>
-                    ))}
+                  <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {TRACK_DOMAINS[formData.industryTrack].map(domain => (
+                        <label key={domain} className={`cursor-pointer border rounded-lg px-3 py-2 text-sm text-center transition-colors ${formData.preferredDomain === domain ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-medium' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}>
+                          <input type="radio" name="domain" className="hidden" checked={formData.preferredDomain === domain} onChange={() => handleDomainSelect(domain)} />
+                          {domain}
+                        </label>
+                      ))}
+                    </div>
+                    {formData.preferredDomain === 'Others' && (
+                      <input
+                        type="text"
+                        required
+                        value={customDomain}
+                        onChange={e => setCustomDomain(e.target.value)}
+                        placeholder="Enter your preferred domain"
+                        className="w-full mt-3 px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Upload Resume (PDF)</label>
+                {!uploading ? (
+                  <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer hover:bg-slate-50 hover:border-indigo-400 transition-all group overflow-hidden">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                      </div>
+                      <p className="mb-1 text-sm font-bold text-slate-700">
+                        {formData.resumeUrl ? 'Resume Uploaded! Click to replace' : 'Click to upload or drag PDF'}
+                      </p>
+                    </div>
+                    <input type="file" className="hidden" accept=".pdf" onChange={handleFileChange} />
+                  </label>
+                ) : (
+                  <div className="w-full h-32 border-2 border-indigo-200 bg-indigo-50/50 rounded-xl flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.8)] animate-[scan_2s_ease-in-out_infinite]"></div>
+                    <svg className="w-8 h-8 text-indigo-500 mb-2 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <div className="w-full max-w-xs bg-indigo-200/50 rounded-full h-2 overflow-hidden">
+                      <div className="bg-indigo-600 h-full rounded-full transition-all duration-300 ease-out" style={{ width: `${scanProgress}%` }}></div>
+                    </div>
+                    <div className="text-xs font-bold text-indigo-500 mt-2">Uploading Resume... {scanProgress}%</div>
                   </div>
                 )}
               </div>
 
               <div className="flex gap-4 pt-4 border-t mt-6">
                 <button type="button" onClick={() => setStep(1)} className="px-6 py-3 border border-slate-200 text-slate-600 font-medium rounded-lg hover:bg-slate-50 transition-colors">Back</button>
-                <button type="submit" disabled={!formData.preferredDomain || loading} className="flex-1 bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
+                <button type="submit" disabled={!isDomainValid || !formData.resumeUrl || loading || uploading} className="flex-1 bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
                   {loading ? 'Submitting...' : 'Submit Enrollment'}
                 </button>
               </div>
@@ -357,6 +502,14 @@ export default function StudentDashboard() {
           )}
         </form>
       </div>
+      <style jsx>{`
+        @keyframes scan {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
