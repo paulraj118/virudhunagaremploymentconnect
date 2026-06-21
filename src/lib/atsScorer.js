@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { PDFParse } from 'pdf-parse';
-
 export const DOMAIN_KEYWORDS = {
   'English Literature': ['Creative Writing', 'Content Writing', 'Copyediting', 'Textual Analysis', 'Literary Theory', 'Research'],
   'Tamil Literature': ['Tamil Translation', 'Content Writing', 'Proofreading', 'Linguistic Analysis', 'Tamil Keyboard', 'Public Speaking'],
@@ -125,10 +123,9 @@ export async function processAtsScore(student, buffer = null) {
   // Parse PDF if buffer exists using pdf-parse library
   if (buffer) {
     try {
-      const parser = new PDFParse({ data: buffer });
-      const parseResult = await parser.getText();
+      const pdfParse = (await import('pdf-parse')).default;
+      const parseResult = await pdfParse(buffer);
       pdfText = (parseResult.text || '').toLowerCase();
-      await parser.destroy();
     } catch (parseError) {
       console.error('pdf-parse failed, falling back to raw text:', parseError);
       pdfText = buffer.toString('utf-8').toLowerCase() + ' ' + buffer.toString('binary').toLowerCase();
