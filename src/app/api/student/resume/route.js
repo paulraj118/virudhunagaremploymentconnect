@@ -20,23 +20,23 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'No resume file provided' }, { status: 400 });
     }
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'public/uploads');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (e) {
-      // ignore
-    }
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
     // Create a unique filename
     const filename = `resume_${decoded.id}_${Date.now()}.pdf`;
-    const filepath = path.join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
 
-    const baseResumeUrl = `/uploads/${filename}`;
+    await dbConnect();
+    
+    // Store in FileStore instead of local file system
+    const { default: FileStore } = await import('@/models/FileStore');
+    const newFile = await FileStore.create({
+      buffer,
+      contentType: file.type || 'application/pdf',
+      filename
+    });
+
+    const baseResumeUrl = `/api/file/${newFile._id}`;
 
     await dbConnect();
     const existingStudent = await Student.findOne({ userId: decoded.id });

@@ -101,10 +101,21 @@ export async function processAtsScore(student, buffer = null) {
   if (!buffer && finalResumeUrl) {
     try {
       const cleanUrl = finalResumeUrl.split('#')[0];
-      const filename = cleanUrl.replace(/^\/uploads\//, '');
-      const filepath = path.join(process.cwd(), 'public/uploads', filename);
-      if (fs.existsSync(filepath)) {
-        buffer = fs.readFileSync(filepath);
+      if (cleanUrl.startsWith('/api/file/')) {
+        const fileId = cleanUrl.split('/').pop();
+        const FileStore = (await import('@/models/FileStore')).default;
+        const dbConnect = (await import('@/lib/mongodb')).default;
+        await dbConnect();
+        const fileData = await FileStore.findById(fileId);
+        if (fileData) {
+          buffer = fileData.buffer;
+        }
+      } else {
+        const filename = cleanUrl.replace(/^\/uploads\//, '');
+        const filepath = path.join(process.cwd(), 'public/uploads', filename);
+        if (fs.existsSync(filepath)) {
+          buffer = fs.readFileSync(filepath);
+        }
       }
     } catch (err) {
       console.error('Failed to read PDF file from resumeUrl:', err);
