@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Student from '@/models/Student';
 import { getCurrentUser } from '@/lib/auth';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 export async function POST(request) {
   try {
@@ -21,25 +19,23 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'No certificate file provided' }, { status: 400 });
     }
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'public/uploads/certificates');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (e) {
-      // ignore
-    }
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
     // Create a unique filename
-    const filename = `cert_${decoded.id}_${Date.now()}_${file.name.replace(/\\s+/g, '_')}`;
-    const filepath = path.join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
-
-    const fileUrl = `/uploads/certificates/${filename}`;
+    const filename = `cert_${decoded.id}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
 
     await dbConnect();
+    
+    // Store in FileStore instead of local file system
+    const { default: FileStore } = await import('@/models/FileStore');
+    const newFile = await FileStore.create({
+      buffer,
+      contentType: file.type || 'application/pdf',
+      filename
+    });
+
+    const fileUrl = `/api/file/${newFile._id}`;
     
     // Add to student certificates array
     const student = await Student.findOneAndUpdate(
