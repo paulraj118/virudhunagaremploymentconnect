@@ -70,6 +70,10 @@ export default function StudentDashboard() {
   const handleFileChange = async (e) => {
     const selected = e.target.files[0];
     if (selected && selected.type === 'application/pdf') {
+      if (selected.size > 4 * 1024 * 1024) {
+        alert("File size must be less than 4MB. Vercel limits uploads to 4MB.");
+        return;
+      }
       setFile(selected);
       await handleUploadAndScan(selected);
     } else {
