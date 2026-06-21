@@ -73,10 +73,8 @@ export const AuthProvider = ({ children }) => {
     
     const data = await res.json();
     if (data.success) {
-      // Store this tab's expected role so we can detect cross-tab overwrites
-      sessionStorage.setItem(SESSION_ROLE_KEY, data.user.role);
-      setUser(data.user);
-      return { success: true, user: data.user };
+      // Return success without logging the user in
+      return { success: true, message: data.message };
     }
     return { success: false, message: data.message };
   };

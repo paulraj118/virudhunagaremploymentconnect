@@ -79,27 +79,9 @@ export async function POST(request) {
       role
     });
 
-    const token = signToken(user._id, user.role);
-
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: 'token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: '/',
-    });
-
     return NextResponse.json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      }
+      message: 'Registration successful. Please login to continue.'
     }, { status: 201 });
 
   } catch (error) {

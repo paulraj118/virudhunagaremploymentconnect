@@ -63,6 +63,7 @@ export default function Register() {
   const [touched, setTouched] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
@@ -127,11 +128,11 @@ export default function Register() {
 
     const res = await register(payload);
     if (res.success) {
-      if (res.user?.role === 'hr_company') {
-        router.push('/company');
-      } else {
-        router.push('/student');
-      }
+      setSuccessMsg(res.message || 'Registration successful. Please login to continue.');
+      setLoading(false);
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
     } else {
       setError(res.message || 'Registration failed');
       setLoading(false);
@@ -167,6 +168,12 @@ export default function Register() {
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-6 border border-red-100 text-center">
             {error}
+          </div>
+        )}
+
+        {successMsg && (
+          <div className="bg-green-50 text-green-600 p-3 rounded-xl text-sm mb-6 border border-green-100 text-center font-medium">
+            {successMsg}
           </div>
         )}
 
