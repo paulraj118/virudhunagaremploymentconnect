@@ -395,8 +395,8 @@ export default function CompanyDashboard() {
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all mt-4 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-            {loading ? 'Submitting...' : 'Submit Registration for Approval'}
+          <button type="submit" disabled={profileLoading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all mt-4 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+            {profileLoading ? 'Submitting...' : 'Submit Registration for Approval'}
           </button>
         </form>
       </div>
