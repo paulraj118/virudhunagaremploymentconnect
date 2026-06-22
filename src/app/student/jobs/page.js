@@ -11,50 +11,30 @@ export default function JobBoard() {
   const [gated, setGated] = useState(false);
   const [gateMessage, setGateMessage] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
-  const [localAppliedJobs, setLocalAppliedJobs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
 
   useEffect(() => {
-    // Read local applied jobs from storage
-    const applied = JSON.parse(localStorage.getItem('localAppliedJobs') || '[]');
+    if (authLoading) return;
+
+    // Only check sessionStorage for pending/started jobs that we just completed
     const startedJobId = sessionStorage.getItem('startedAssessmentJobId');
     const pendingJobId = sessionStorage.getItem('pendingApplyJobId');
     
-    let updatedApplied = [...applied];
-    
-    // If startedJobId exists but pendingJobId is gone, it means the assessment was successfully completed
-    // and triggerAutoApply cleared the pending state. OR even if it failed, we want to mark it as applied
-    // so it doesn't stay as 'Apply Now'.
-    // Actually, to just mark it applied if they finish it (pass or fail):
-    // Wait, the prompt says "After successfully completing the assessment: ONLY that specific job card's button must automatically change".
-    // If they just finish, we can mark it.
-    if (startedJobId && !pendingJobId) {
-      if (!updatedApplied.includes(startedJobId)) {
-        updatedApplied.push(startedJobId);
-        localStorage.setItem('localAppliedJobs', JSON.stringify(updatedApplied));
-      }
+    if (startedJobId) {
       sessionStorage.removeItem('startedAssessmentJobId');
-    } else if (startedJobId && pendingJobId) {
-      // They didn't finish or failed and it didn't auto-apply. But wait!
-      // "one time one card apply now kututhu assessment attend pannita ennaku antha card laa already appilied nuu varanum"
-      // If we want it to be applied regardless of pass/fail, we should mark it anyway if they returned!
-      if (!updatedApplied.includes(startedJobId)) {
-        updatedApplied.push(startedJobId);
-        localStorage.setItem('localAppliedJobs', JSON.stringify(updatedApplied));
+      if (pendingJobId) {
+        sessionStorage.removeItem('pendingApplyJobId');
       }
-      sessionStorage.removeItem('startedAssessmentJobId');
-      sessionStorage.removeItem('pendingApplyJobId');
     }
 
-    setLocalAppliedJobs(updatedApplied);
     fetchJobs();
-  }, []);
+  }, [authLoading]);
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch('/api/student/jobs');
+      const res = await fetch(`/api/student/jobs?t=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         if (data.gated) {
@@ -257,16 +237,16 @@ export default function JobBoard() {
 
                 <button 
                   onClick={() => handleApplyClick(job)}
-                  disabled={applyingTo === job._id || job.hasApplied || localAppliedJobs.includes(job._id)}
+                  disabled={applyingTo === job._id || job.hasApplied}
                   className={`font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm active:translate-y-px shrink-0 ${
-                    job.hasApplied || localAppliedJobs.includes(job._id)
+                    job.hasApplied
                       ? 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-450 text-white'
                   }`}
                 >
                   {applyingTo === job._id 
                     ? 'Applying...' 
-                    : (job.hasApplied || localAppliedJobs.includes(job._id))
+                    : job.hasApplied
                       ? 'Already Applied' 
                       : 'Apply Now'
                   }
@@ -376,16 +356,16 @@ export default function JobBoard() {
                   handleApplyClick(selectedJob);
                   setSelectedJob(null);
                 }}
-                disabled={applyingTo === selectedJob._id || selectedJob.hasApplied || localAppliedJobs.includes(selectedJob._id)}
+                  disabled={applyingTo === selectedJob._id || selectedJob.hasApplied}
                 className={`font-bold px-6 py-2.5 rounded-xl text-sm transition-colors shadow-md disabled:opacity-50 ${
-                  selectedJob.hasApplied || localAppliedJobs.includes(selectedJob._id)
+                  selectedJob.hasApplied
                     ? 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-750 text-white'
                 }`}
               >
                 {applyingTo === selectedJob._id 
                   ? 'Applying...' 
-                  : (selectedJob.hasApplied || localAppliedJobs.includes(selectedJob._id))
+                  : selectedJob.hasApplied
                     ? 'Already Applied' 
                     : 'Apply Now'
                 }

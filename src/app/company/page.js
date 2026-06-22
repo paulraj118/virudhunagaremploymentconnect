@@ -46,7 +46,7 @@ export default function CompanyDashboard() {
 
   const fetchCompanyStatus = async () => {
     try {
-      const res = await fetch('/api/company/profile', { cache: 'no-store' });
+      const res = await fetch(`/api/company/profile?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.registered) {
         setApprovalStatus(data.company);
@@ -77,7 +77,7 @@ export default function CompanyDashboard() {
     e.preventDefault();
     setProfileLoading(true);
     try {
-      const res = await fetch('/api/company/profile', {
+      const res = await fetch(`/api/company/profile?t=${Date.now()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

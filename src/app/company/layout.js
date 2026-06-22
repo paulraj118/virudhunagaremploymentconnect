@@ -30,7 +30,7 @@ export default function CompanyLayout({ children }) {
 
   useEffect(() => {
     if (!loading && user && user.role === 'hr_company') {
-      fetch('/api/company/profile', { cache: 'no-store' })
+      fetch(`/api/company/profile?t=${Date.now()}`, { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
           if (data.registered && data.company) {
