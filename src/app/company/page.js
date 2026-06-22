@@ -10,28 +10,10 @@ export default function CompanyDashboard() {
   const [loading, setLoading] = useState(true);
   const [approvalStatus, setApprovalStatus] = useState(null); // null means not registered
   const [stats, setStats] = useState({ activeJobs: 0, totalApplicants: 0, interviews: 0, hired: 0 });
-  
-  const [formData, setFormData] = useState({
-    companyName: '', hrName: '', website: '', address: '',
-    linkedIn: '', description: '', industryType: 'IT Services', companySize: '1-50', dpiitRegistered: 'No'
-  });
 
   useEffect(() => {
-    const saved = localStorage.getItem('hrRegistrationForm');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed) {
-          setFormData(prev => ({ ...prev, ...parsed }));
-        }
-      } catch(e) { console.error(e) }
-    }
     fetchCompanyStatus();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('hrRegistrationForm', JSON.stringify(formData));
-  }, [formData]);
 
   const fetchCompanyStatus = async () => {
     try {
@@ -59,29 +41,6 @@ export default function CompanyDashboard() {
       }
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const handleRegistrationSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch('/api/company/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        localStorage.removeItem('hrRegistrationForm');
-        setApprovalStatus(data.company);
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert('Submission failed');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -292,101 +251,13 @@ export default function CompanyDashboard() {
 
   // Company Registration Form
   return (
-    <div className="flex items-center justify-center relative w-full pb-12">
-      <div className="max-w-4xl w-full bg-white rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden relative z-10">
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-10 py-10 text-white relative overflow-hidden flex flex-col items-start">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 blur-[50px] rounded-full"></div>
-          <h2 className="text-3xl font-black tracking-tight relative z-10">HR Company Setup</h2>
-          <p className="text-slate-300 mt-2 font-medium relative z-10">Complete your company profile to unlock the hiring portal</p>
-        </div>
-        
-        <form onSubmit={handleRegistrationSubmit} className="p-10 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Company Name</label>
-              <input required type="text" value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">HR Manager Name</label>
-              <input required type="text" value={formData.hrName} onChange={e => setFormData({...formData, hrName: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Company Website</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                </div>
-                <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full pl-11 pr-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium hover:border-indigo-300" placeholder="https://..." />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">LinkedIn Profile <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                </div>
-                <input required type="url" value={formData.linkedIn} onChange={e => setFormData({...formData, linkedIn: e.target.value})} className="w-full pl-11 pr-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium hover:border-indigo-300" placeholder="https://linkedin.com/company/..." />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Company Address</label>
-            <textarea required rows="2" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium"></textarea>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-8">
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Industry Type</label>
-              <div className="relative">
-                 <select value={formData.industryType} onChange={e => setFormData({...formData, industryType: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium appearance-none hover:border-indigo-300 cursor-pointer">
-                  <option value="IT Services">IT Services</option>
-                  <option value="Product Based">Product Based</option>
-                  <option value="Fintech">Fintech</option>
-                  <option value="EdTech">EdTech</option>
-                  <option value="Healthcare">Healthcare</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Company Size</label>
-              <div className="relative">
-                <select value={formData.companySize} onChange={e => setFormData({...formData, companySize: e.target.value})} className="w-full px-5 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-slate-50 focus:bg-white transition-all font-medium appearance-none hover:border-indigo-300 cursor-pointer">
-                  <option value="1-50">1-50 Employees</option>
-                  <option value="51-200">51-200 Employees</option>
-                  <option value="201-500">201-500 Employees</option>
-                  <option value="500+">500+ Employees</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-3">DPIIT Registered?</label>
-              <div className="flex items-center gap-4">
-                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all duration-300 font-bold ${formData.dpiitRegistered === 'Yes' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-200' : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300'}`}>
-                  <input type="radio" name="dpiit" value="Yes" className="hidden" checked={formData.dpiitRegistered === 'Yes'} onChange={e => setFormData({...formData, dpiitRegistered: e.target.value})} />
-                  Yes
-                </label>
-                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-xl border-2 transition-all duration-300 font-bold ${formData.dpiitRegistered === 'No' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-200' : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300'}`}>
-                  <input type="radio" name="dpiit" value="No" className="hidden" checked={formData.dpiitRegistered === 'No'} onChange={e => setFormData({...formData, dpiitRegistered: e.target.value})} />
-                  No
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4.5 rounded-xl shadow-lg shadow-indigo-500/20 transition-all mt-4 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-            {loading ? 'Submitting...' : 'Submit Registration for Approval'}
-          </button>
-        </form>
+    <div className="min-h-screen flex items-center justify-center bg-[#FAFAFF]">
+      <div className="flex flex-col items-center gap-4 text-center p-8 bg-white rounded-2xl shadow-sm border border-slate-200">
+        <h2 className="text-2xl font-bold text-slate-800">Welcome to HR Portal</h2>
+        <p className="text-slate-600">Please complete your company setup to view the dashboard.</p>
+        <button onClick={() => router.push('/company/setup')} className="mt-4 bg-[#0B1E40] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#152d54] transition-colors">
+          Go to Company Setup
+        </button>
       </div>
     </div>
   );

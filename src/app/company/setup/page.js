@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function CompanySetup() {
   const { user } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -31,8 +33,23 @@ export default function CompanySetup() {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
+    const saved = localStorage.getItem('hrRegistrationForm');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed) {
+          setFormData(prev => ({ ...prev, ...parsed }));
+        }
+      } catch(e) { console.error(e) }
+    }
     fetchCompanyData();
   }, []);
+
+  useEffect(() => {
+    if (!isRegistered) {
+      localStorage.setItem('hrRegistrationForm', JSON.stringify(formData));
+    }
+  }, [formData, isRegistered]);
 
   const fetchCompanyData = async () => {
     try {
@@ -59,6 +76,7 @@ export default function CompanySetup() {
         });
       } else {
         setIsRegistered(false);
+        setEditMode(true);
       }
     } catch (error) {
       console.error(error);
@@ -83,8 +101,12 @@ export default function CompanySetup() {
       if (data.success) {
         setIsRegistered(true);
         setEditMode(false);
-        setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company registered successfully!');
-        setTimeout(() => setMessage(''), 3000);
+        localStorage.removeItem('hrRegistrationForm');
+        setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company profile submitted successfully. Waiting for admin approval.');
+        setTimeout(() => {
+          setMessage('');
+          router.push('/company');
+        }, 1500);
       } else {
         setMessage(data.message || 'Failed to save profile');
       }
@@ -383,7 +405,7 @@ export default function CompanySetup() {
               Cancel
             </button>
             <button type="submit" disabled={saving} className="bg-[#0B1E40] hover:bg-[#152d54] text-white font-semibold py-2.5 px-8 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed text-sm">
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? 'Saving...' : (isRegistered ? 'Save Changes' : 'Complete Setup')}
             </button>
           </div>
         )}
