@@ -502,8 +502,8 @@ export default function StudentDashboard() {
 
               <div className="flex gap-4 pt-4 border-t mt-6">
                 <button type="button" onClick={() => setStep(1)} className="px-6 py-3 border border-slate-200 text-slate-600 font-medium rounded-lg hover:bg-slate-50 transition-colors">Back</button>
-                <button type="submit" disabled={!isDomainValid || !formData.resumeUrl || loading || uploading} className="flex-1 bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
-                  {loading ? 'Submitting...' : 'Submit Enrollment'}
+                <button type="submit" disabled={!isDomainValid || !formData.resumeUrl || profileLoading || uploading} className="flex-1 bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
+                  {profileLoading ? 'Submitting...' : 'Submit Enrollment'}
                 </button>
               </div>
             </div>
