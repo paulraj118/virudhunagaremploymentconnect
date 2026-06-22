@@ -22,7 +22,7 @@ export default function CompanyDashboard() {
 
   const fetchCompanyStatus = async () => {
     try {
-      const res = await fetch('/api/company/profile');
+      const res = await fetch('/api/company/profile', { cache: 'no-store' });
       const data = await res.json();
       if (data.registered) {
         setApprovalStatus(data.company);
@@ -39,7 +39,7 @@ export default function CompanyDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/company/dashboard');
+      const res = await fetch('/api/company/dashboard', { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setStats(data.stats);
