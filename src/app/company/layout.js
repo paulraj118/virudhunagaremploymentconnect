@@ -10,8 +10,8 @@ export default function CompanyLayout({ children }) {
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [companyStatus, setCompanyStatus] = useState(null); // 'loading', 'unregistered', 'pending', 'approved', 'rejected'
-  const [fetchingProfile, setFetchingProfile] = useState(true);
+  const [approvalStatus, setApprovalStatus] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     if (!loading) {
@@ -29,29 +29,23 @@ export default function CompanyLayout({ children }) {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user && user.role === 'hr_company') {
+    if (!loading && user && user.role === 'hr_company') {
       fetch('/api/company/profile', { cache: 'no-store' })
         .then(res => res.json())
         .then(data => {
-          if (!data.registered) {
-            setCompanyStatus('unregistered');
-            if (pathname !== '/company/setup') router.push('/company/setup');
+          if (data.registered && data.company) {
+            setApprovalStatus(data.company.approvalStatus);
           } else {
-            setCompanyStatus(data.company.approvalStatus);
-            if (data.company.approvalStatus === 'pending' && pathname !== '/company' && pathname !== '/company/setup') {
-              router.push('/company');
-            }
+            setApprovalStatus('unregistered');
           }
-          setFetchingProfile(false);
+          setProfileLoading(false);
         })
         .catch(err => {
-          console.error(err);
-          setFetchingProfile(false);
+          console.error('Failed to fetch profile in layout:', err);
+          setProfileLoading(false);
         });
-    } else {
-      setFetchingProfile(false);
     }
-  }, [user, pathname, router]);
+  }, [user, loading, pathname]);
 
   // Removed full layout override so /company renders inside the dashboard layout
 
@@ -64,18 +58,15 @@ export default function CompanyLayout({ children }) {
     );
   }
 
-  if (!user || user.role !== 'hr_company' || fetchingProfile) {
+  if (!user || user.role !== 'hr_company') {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-slate-500 font-medium">{fetchingProfile ? 'Loading profile...' : 'Redirecting...'}</p>
+        <p className="text-slate-500 font-medium">Redirecting...</p>
         <div className="hidden">{children}</div>
       </div>
     );
   }
-
-  const isRestrictedPath = pathname !== '/company' && pathname !== '/company/setup';
-  const showRestrictedMessage = (companyStatus === 'pending' || companyStatus === 'rejected' || companyStatus === 'unregistered') && isRestrictedPath;
 
   const links = [
     { name: 'Dashboard', path: '/company', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> },
@@ -158,7 +149,7 @@ export default function CompanyLayout({ children }) {
               Home
             </Link>
             
-            {companyStatus === 'approved' && (
+            {approvalStatus === 'approved' && (
               <Link href="/company/jobs" className="bg-[#0B1E40] text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-[#152d54] transition-colors ml-1 md:ml-2">
                 + Post Job
               </Link>
@@ -166,17 +157,30 @@ export default function CompanyLayout({ children }) {
           </div>
         </div>
         <div className="p-4 md:p-8 flex-1">
-          {showRestrictedMessage ? (
-            <div className="flex flex-col items-center justify-center h-full pt-16 text-center">
-              <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-6 shadow-sm">
-                <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-              </div>
-              <h2 className="text-3xl font-black text-slate-800 tracking-tight mb-3">Access Restricted</h2>
-              <p className="text-slate-600 text-lg max-w-md font-medium">Your company profile is {companyStatus === 'rejected' ? 'rejected' : 'under review'}. Please wait for admin approval to access recruitment features.</p>
-            </div>
-          ) : (
-            children
-          )}
+          {(() => {
+            if (profileLoading) {
+              return (
+                <div className="flex justify-center items-center py-12">
+                  <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              );
+            }
+
+            const isRestrictedRoute = pathname.startsWith('/company/jobs') || pathname.startsWith('/company/applicants') || pathname.startsWith('/company/analytics');
+            
+            if (isRestrictedRoute && approvalStatus !== 'approved') {
+              return (
+                <div className="bg-amber-50 p-8 rounded-3xl border border-amber-200 text-amber-800 text-center max-w-2xl mx-auto mt-12 shadow-sm">
+                  <svg className="w-16 h-16 mx-auto text-amber-500 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                  <h2 className="text-2xl font-black mb-3">Access Restricted</h2>
+                  <p className="font-medium text-amber-700/80 text-lg mb-8">Your company profile is under review. Please wait for admin approval.</p>
+                  <button onClick={() => router.push('/company')} className="px-8 py-3 bg-[#0B1E40] text-white rounded-xl font-bold hover:bg-[#152d54] transition-all shadow-md hover:-translate-y-0.5">Go to Dashboard</button>
+                </div>
+              );
+            }
+
+            return children;
+          })()}
         </div>
       </main>
     </div>

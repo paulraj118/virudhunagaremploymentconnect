@@ -102,7 +102,8 @@ export default function CompanySetup() {
         setIsRegistered(true);
         setEditMode(false);
         localStorage.removeItem('hrRegistrationForm');
-        setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company profile submitted successfully. Waiting for admin approval.');
+        setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company registered successfully!');
+        
         setTimeout(() => {
           setMessage('');
           router.push('/company');
