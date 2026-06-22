@@ -17,8 +17,21 @@ export default function CompanyDashboard() {
   });
 
   useEffect(() => {
+    const saved = localStorage.getItem('hrRegistrationForm');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed) {
+          setFormData(prev => ({ ...prev, ...parsed }));
+        }
+      } catch(e) { console.error(e) }
+    }
     fetchCompanyStatus();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('hrRegistrationForm', JSON.stringify(formData));
+  }, [formData]);
 
   const fetchCompanyStatus = async () => {
     try {
@@ -60,6 +73,7 @@ export default function CompanyDashboard() {
       });
       const data = await res.json();
       if (data.success) {
+        localStorage.removeItem('hrRegistrationForm');
         setApprovalStatus(data.company);
       } else {
         alert(data.message);
