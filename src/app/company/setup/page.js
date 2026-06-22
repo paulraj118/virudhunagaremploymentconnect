@@ -33,23 +33,25 @@ export default function CompanySetup() {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('hrRegistrationForm');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed) {
-          setFormData(prev => ({ ...prev, ...parsed }));
-        }
-      } catch(e) { console.error(e) }
+    if (user?.id) {
+      const saved = localStorage.getItem(`hrRegistrationForm_${user.id}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && !isRegistered) {
+            setFormData(prev => ({ ...prev, ...parsed }));
+          }
+        } catch(e) { console.error(e) }
+      }
     }
     fetchCompanyData();
-  }, []);
+  }, [user?.id, isRegistered]);
 
   useEffect(() => {
-    if (!isRegistered) {
-      localStorage.setItem('hrRegistrationForm', JSON.stringify(formData));
+    if (user?.id && !isRegistered && editMode) {
+      localStorage.setItem(`hrRegistrationForm_${user.id}`, JSON.stringify(formData));
     }
-  }, [formData, isRegistered]);
+  }, [formData, user?.id, isRegistered, editMode]);
 
   const fetchCompanyData = async () => {
     try {
@@ -101,7 +103,7 @@ export default function CompanySetup() {
       if (data.success) {
         setIsRegistered(true);
         setEditMode(false);
-        localStorage.removeItem('hrRegistrationForm');
+        if (user?.id) localStorage.removeItem(`hrRegistrationForm_${user.id}`);
         setMessage(isRegistered ? 'Company profile updated successfully!' : 'Company registered successfully!');
         
         setTimeout(() => {

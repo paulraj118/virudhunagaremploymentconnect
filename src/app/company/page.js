@@ -17,21 +17,28 @@ export default function CompanyDashboard() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('hrRegistrationForm');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed) {
-          setFormData(prev => ({ ...prev, ...parsed }));
-        }
-      } catch(e) { console.error(e) }
+    if (user?.id) {
+      const saved = localStorage.getItem(`hrRegistrationForm_${user.id}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed) {
+            setFormData(prev => ({ ...prev, ...parsed }));
+          }
+        } catch(e) { console.error(e) }
+      }
     }
+  }, [user?.id]);
+
+  useEffect(() => {
     fetchCompanyStatus();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('hrRegistrationForm', JSON.stringify(formData));
-  }, [formData]);
+    if (user?.id) {
+      localStorage.setItem(`hrRegistrationForm_${user.id}`, JSON.stringify(formData));
+    }
+  }, [formData, user?.id]);
 
   const fetchCompanyStatus = async () => {
     try {
@@ -73,7 +80,7 @@ export default function CompanyDashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.removeItem('hrRegistrationForm');
+        if (user?.id) localStorage.removeItem(`hrRegistrationForm_${user.id}`);
         setApprovalStatus(data.company);
         alert("Company profile submitted successfully. Waiting for admin approval.");
       } else {
