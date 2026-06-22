@@ -12,12 +12,78 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const syncTabSession = async () => {
+    try {
+      const token = sessionStorage.getItem('jf_token');
+      if (token) {
+        await fetch('/api/auth/restore-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to sync tab session:', error);
+    }
+  };
+
   useEffect(() => {
-    checkUserLoggedIn();
+    const initAuth = async () => {
+      // Load user from sessionStorage first for instant client hydration
+      const cachedUser = sessionStorage.getItem('jf_user');
+      if (cachedUser) {
+        try {
+          setUser(JSON.parse(cachedUser));
+        } catch (e) {
+          console.error('Error parsing cached user:', e);
+        }
+      }
+      await checkUserLoggedIn();
+    };
+
+    initAuth();
+
+    const handleFocus = () => {
+      syncTabSession();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncTabSession();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const checkUserLoggedIn = async () => {
     try {
+      // Always sync the token to cookie first if it exists in sessionStorage
+      const token = sessionStorage.getItem('jf_token');
+      if (token) {
+        const syncRes = await fetch('/api/auth/restore-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
+        const syncData = await syncRes.json();
+        if (!syncData.success) {
+          // Token is invalid/expired
+          sessionStorage.removeItem('jf_token');
+          sessionStorage.removeItem('jf_user');
+          sessionStorage.removeItem(SESSION_ROLE_KEY);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch('/api/auth/me');
       const data = await res.json();
       
@@ -26,8 +92,9 @@ export const AuthProvider = ({ children }) => {
 
         // If this tab had a previous login session, verify the role still matches
         if (expectedRole && data.user.role !== expectedRole) {
-          // Another tab logged in as a different role — the cookie was overwritten.
-          // Clear this tab's stale expected role and redirect to login.
+          // Stale expected role, redirect to login
+          sessionStorage.removeItem('jf_token');
+          sessionStorage.removeItem('jf_user');
           sessionStorage.removeItem(SESSION_ROLE_KEY);
           setUser(null);
           setLoading(false);
@@ -35,13 +102,27 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
+        sessionStorage.setItem('jf_user', JSON.stringify(data.user));
         setUser(data.user);
       } else {
+        sessionStorage.removeItem('jf_token');
+        sessionStorage.removeItem('jf_user');
         sessionStorage.removeItem(SESSION_ROLE_KEY);
         setUser(null);
       }
     } catch (error) {
-      setUser(null);
+      console.error('Auth verification error:', error);
+      // Fallback: keep cached user on network errors
+      const cachedUser = sessionStorage.getItem('jf_user');
+      if (cachedUser) {
+        try {
+          setUser(JSON.parse(cachedUser));
+        } catch (e) {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -56,6 +137,10 @@ export const AuthProvider = ({ children }) => {
     
     const data = await res.json();
     if (data.success) {
+      if (data.token) {
+        sessionStorage.setItem('jf_token', data.token);
+      }
+      sessionStorage.setItem('jf_user', JSON.stringify(data.user));
       // Store this tab's expected role so we can detect cross-tab overwrites
       sessionStorage.setItem(SESSION_ROLE_KEY, data.user.role);
       setUser(data.user);
@@ -81,6 +166,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
+    sessionStorage.removeItem('jf_token');
+    sessionStorage.removeItem('jf_user');
     sessionStorage.removeItem(SESSION_ROLE_KEY);
     setUser(null);
     router.push('/login');
