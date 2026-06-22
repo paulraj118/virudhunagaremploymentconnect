@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import JobApplication from '@/models/JobApplication';
+import Student from '@/models/Student';
+import User from '@/models/User';
+import Job from '@/models/Job';
+import Company from '@/models/Company';
 import { getCurrentUser } from '@/lib/auth';
 import nodemailer from 'nodemailer';
 

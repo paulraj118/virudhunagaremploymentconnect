@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Student from '@/models/Student';
+import User from '@/models/User';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request) {

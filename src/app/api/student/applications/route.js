@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import JobApplication from '@/models/JobApplication';
 import Student from '@/models/Student';
+import Job from '@/models/Job';
+import Company from '@/models/Company';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET() {

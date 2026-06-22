@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Job from '@/models/Job';
 import Student from '@/models/Student';
-
+import Company from '@/models/Company';
 import { getCurrentUser } from '@/lib/auth';
 import { calculateMatchScore } from '@/lib/aiMatcher';
 

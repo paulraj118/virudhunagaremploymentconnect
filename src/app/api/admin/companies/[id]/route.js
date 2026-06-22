@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Company from '@/models/Company';
+import User from '@/models/User';
 import Job from '@/models/Job';
 import { getCurrentUser } from '@/lib/auth';
 

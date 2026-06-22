@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Company from '@/models/Company';
+import User from '@/models/User';
 import { getCurrentUser } from '@/lib/auth';
 
 // Allow larger request body for certificate file uploads (base64)

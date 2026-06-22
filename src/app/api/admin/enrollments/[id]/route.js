@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Student from '@/models/Student';
+import User from '@/models/User';
 import AssessmentResult from '@/models/AssessmentResult';
 import { getCurrentUser } from '@/lib/auth';
 
