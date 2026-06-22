@@ -100,7 +100,7 @@ ${companyPhone}`;
 
       // 4. Actually send the email (prevent false success)
       const info = await transporter.sendMail({
-        from: `"${companyName}" <${process.env.SMTP_USER}>`, // using authenticated user to prevent rejection
+        from: `"Madurai Employment Connect" <${process.env.SMTP_USER}>`, // using authenticated user to prevent rejection
         replyTo: companyEmail,
         to: candidateEmail,
         subject: emailSubject,
