@@ -5,9 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [enrollmentStatus, setEnrollmentStatus] = useState(null); // null means not enrolled, else object
   const [showAssessmentsModal, setShowAssessmentsModal] = useState(false);
   const [step, setStep] = useState(1);
@@ -138,8 +138,12 @@ export default function StudentDashboard() {
   const isDomainValid = formData.preferredDomain && (formData.preferredDomain !== 'Others' || customDomain.trim().length > 0);
 
   useEffect(() => {
-    fetchEnrollmentStatus();
-  }, []);
+    if (!authLoading && user && user.role === 'student') {
+      fetchEnrollmentStatus();
+    } else if (!authLoading && !user) {
+      setProfileLoading(false);
+    }
+  }, [user, authLoading]);
 
   const fetchEnrollmentStatus = async () => {
     try {
@@ -151,13 +155,13 @@ export default function StudentDashboard() {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
   const handleEnrollmentSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setProfileLoading(true);
     try {
       // Convert comma separated skills to array
       const payload = {
@@ -180,11 +184,11 @@ export default function StudentDashboard() {
     } catch (error) {
       alert('Submission failed');
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Loading your profile...</div>;
+  if (authLoading || profileLoading) return <div className="p-8 text-center text-slate-500">Loading your profile...</div>;
 
   if (enrollmentStatus) {
     return (

@@ -5,9 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function CompanySetup() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   
@@ -33,7 +33,7 @@ export default function CompanySetup() {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (user?.id) {
+    if (!authLoading && user) {
       const saved = localStorage.getItem(`hrRegistrationForm_${user.id}`);
       if (saved) {
         try {
@@ -43,9 +43,11 @@ export default function CompanySetup() {
           }
         } catch(e) { console.error(e) }
       }
+      fetchCompanyData();
+    } else if (!authLoading && !user) {
+      setProfileLoading(false);
     }
-    fetchCompanyData();
-  }, [user?.id, isRegistered]);
+  }, [user, authLoading, isRegistered]);
 
   useEffect(() => {
     if (user?.id && !isRegistered && editMode) {
@@ -83,7 +85,7 @@ export default function CompanySetup() {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
@@ -171,7 +173,7 @@ export default function CompanySetup() {
     }
   };
 
-  if (loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>

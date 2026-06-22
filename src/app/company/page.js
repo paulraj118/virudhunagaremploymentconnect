@@ -5,9 +5,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function CompanyDashboard() {
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [approvalStatus, setApprovalStatus] = useState(null); // null means not registered
   const [stats, setStats] = useState({ activeJobs: 0, totalApplicants: 0, interviews: 0, hired: 0 });
   
@@ -31,8 +31,12 @@ export default function CompanyDashboard() {
   }, [user?.id]);
 
   useEffect(() => {
-    fetchCompanyStatus();
-  }, []);
+    if (!authLoading && user && user.role === 'hr_company') {
+      fetchCompanyStatus();
+    } else if (!authLoading && !user) {
+      setProfileLoading(false);
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
     if (user?.id) {
@@ -53,7 +57,7 @@ export default function CompanyDashboard() {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
@@ -71,7 +75,7 @@ export default function CompanyDashboard() {
 
   const handleRegistrationSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setProfileLoading(true);
     try {
       const res = await fetch('/api/company/profile', {
         method: 'POST',
@@ -89,11 +93,11 @@ export default function CompanyDashboard() {
     } catch (error) {
       alert('Submission failed');
     } finally {
-      setLoading(false);
+      setProfileLoading(false);
     }
   };
 
-  if (loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FAFAFF]">
         <div className="flex flex-col items-center gap-4">
