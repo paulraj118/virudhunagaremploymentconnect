@@ -86,16 +86,16 @@ export default function CompanyLayout({ children }) {
       )}
 
       {/* Sidebar */}
-      <aside className={`w-64 bg-white text-slate-700 flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-lg border-r border-slate-200`}>
-        <div className="p-6 flex items-center justify-between border-b border-slate-100">
+      <aside className={`w-64 bg-[linear-gradient(180deg,#0F172A_0%,#1E3A8A_100%)] text-white flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-xl`}>
+        <div className="p-6 flex items-center justify-between border-b border-white/10">
           <div>
-            <h2 className="text-lg font-bold text-[#0B1E40]">HR Workspace</h2>
-            <p className="text-xs text-slate-400 mt-1">{user?.email}</p>
+            <h2 className="text-lg font-bold text-white">HR Workspace</h2>
+            <p className="text-xs text-slate-300 mt-1">{user?.email}</p>
           </div>
           {/* Close button for mobile sidebar */}
           <button 
             onClick={() => setIsSidebarOpen(false)}
-            className="p-1 text-slate-400 hover:text-slate-700 rounded-lg md:hidden"
+            className="p-1 text-slate-300 hover:text-white rounded-lg md:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
@@ -108,8 +108,8 @@ export default function CompanyLayout({ children }) {
                 key={link.name} 
                 href={link.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium ${
-                  isActive ? 'bg-[#0B1E40] text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm font-medium ${
+                  isActive ? 'bg-[#2563EB] text-white shadow-md' : 'text-slate-200 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {link.icon}
@@ -118,8 +118,8 @@ export default function CompanyLayout({ children }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-slate-100 mt-auto">
-          <button onClick={logout} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-lg text-sm font-semibold transition-colors">
+        <div className="p-4 border-t border-white/10 mt-auto">
+          <button onClick={logout} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             Log Out
           </button>
@@ -150,7 +150,7 @@ export default function CompanyLayout({ children }) {
             </Link>
             
             {approvalStatus === 'approved' && (
-              <Link href="/company/jobs" className="bg-[#0B1E40] text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-[#152d54] transition-colors ml-1 md:ml-2">
+              <Link href="/company/jobs" className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg shadow-md hover:shadow-lg transition-all ml-1 md:ml-2">
                 + Post Job
               </Link>
             )}

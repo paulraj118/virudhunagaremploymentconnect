@@ -121,7 +121,7 @@ export default function CompanyDashboard() {
               <p className="text-slate-500 font-medium text-sm">Real-time metrics and hiring pipeline for <span className="text-[#0B1E40] font-semibold">{approvalStatus.companyName}</span></p>
             </div>
             {approvalStatus.approvalStatus === 'approved' && (
-              <button onClick={() => router.push('/company/jobs')} className="bg-[#0B1E40] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#152d54] transition-colors flex items-center gap-2 text-sm">
+              <button onClick={() => router.push('/company/jobs')} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 text-sm">
                 <span className="text-lg leading-none">+</span> Create Job Listing
               </button>
             )}
