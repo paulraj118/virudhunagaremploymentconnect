@@ -270,33 +270,73 @@ export default function CompanyDashboard() {
                     </select>
                   </div>
                   
-                  {/* Custom CSS Bar Chart */}
-                  <div className="h-64 flex items-end justify-between gap-2 pt-4 relative">
+                  {/* Line Chart */}
+                  <div className="h-64 relative pt-4 pb-6 sm:pb-8">
                     {/* Horizontal grid lines */}
-                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6 sm:pb-8">
                       {[...Array(5)].map((_, i) => (
                         <div key={i} className="w-full border-t border-slate-100/80 h-0 flex items-center justify-start">
-                           <span className="text-xs text-slate-400 font-medium -translate-y-3">{100 - i*25}</span>
+                           <span className="text-xs text-slate-400 font-medium -translate-y-3 w-8 text-left">{100 - i*25}</span>
                         </div>
                       ))}
                     </div>
                     
-                    {/* Bars */}
-                    <div className="w-full flex justify-around items-end h-full z-10 pl-8">
+                    {/* SVG Line and Area */}
+                    <div className="absolute inset-0 pb-6 sm:pb-8 pl-8">
+                      <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.2" />
+                            <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                        {/* Area Fill */}
+                        <polygon 
+                          points={`0,100 ${trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / Math.max(100, maxTrendsCount)) * 100}`).join(' ')} 100,100`} 
+                          fill="url(#lineGradient)"
+                        />
+                        {/* Line */}
+                        <polyline 
+                          points={trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / Math.max(100, maxTrendsCount)) * 100}`).join(' ')}
+                          fill="none" 
+                          stroke="#4F46E5" 
+                          strokeWidth="3" 
+                          vectorEffect="non-scaling-stroke"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+
+                    {/* Data Points and Tooltips */}
+                    <div className="absolute inset-0 pb-6 sm:pb-8 pl-8 z-10">
                       {last7DaysLabels.map((day, i) => {
                         const count = trendsData[i];
-                        const heightPercent = Math.max((count / maxTrendsCount) * 100, 5); // min 5% height
+                        const xPercent = (i / 6) * 100;
+                        const yPercent = 100 - (count / Math.max(100, maxTrendsCount)) * 100;
                         const isToday = i === 6;
                         return (
-                          <div key={i} className="flex flex-col items-center gap-3 group w-full px-1 sm:px-2 relative">
-                            <div style={{ height: `${heightPercent}%` }} className={`w-full max-w-[3rem] rounded-t-lg transition-all duration-500 relative group-hover:opacity-80 ${isToday ? 'bg-gradient-to-t from-indigo-600 to-purple-500 shadow-lg shadow-indigo-500/30' : 'bg-indigo-100'}`}>
-                              {/* Tooltip on hover */}
-                              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
-                                {count} {count === 1 ? 'Applicant' : 'Applicants'}
-                              </div>
+                          <div key={i} className="absolute group cursor-pointer" style={{ left: `${xPercent}%`, top: `${yPercent}%`, transform: 'translate(-50%, -50%)' }}>
+                            {/* Circle Marker */}
+                            <div className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full border-[2.5px] bg-white transition-transform duration-300 group-hover:scale-150 ${isToday ? 'border-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'border-indigo-500 hover:border-indigo-600'}`}></div>
+                            
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold py-1.5 px-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-20">
+                              {count} {count === 1 ? 'Applicant' : 'Applicants'}
                             </div>
-                            <span className={`text-xs font-bold ${isToday ? 'text-indigo-600' : 'text-slate-400'}`}>{day}</span>
                           </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* X-Axis Labels */}
+                    <div className="absolute bottom-0 left-0 w-full pl-8 h-6">
+                      {last7DaysLabels.map((day, i) => {
+                        const isToday = i === 6;
+                        return (
+                          <span key={i} className={`text-xs font-bold absolute ${isToday ? 'text-indigo-600' : 'text-slate-400'}`} style={{ left: `${(i / 6) * 100}%`, transform: 'translateX(-50%)' }}>
+                            {day}
+                          </span>
                         );
                       })}
                     </div>
