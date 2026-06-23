@@ -156,7 +156,7 @@ export default function CompanyLayout({ children }) {
             )}
           </div>
         </div>
-        <div className="p-4 md:p-5 flex-1">
+        <div className="p-4 md:p-8 flex-1">
           {(() => {
             if (profileLoading) {
               return (

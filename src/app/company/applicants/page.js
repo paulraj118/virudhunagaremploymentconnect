@@ -120,7 +120,7 @@ export default function PlacementTracking() {
   });
 
   return (
-    <div className="min-w-0">
+    <div className="w-full min-w-0">
       <h1 className="text-2xl font-bold text-slate-800 mb-4">Candidate Tracker</h1>
 
       {/* Filters Section */}
@@ -209,36 +209,36 @@ export default function PlacementTracking() {
           <table className="w-full text-left text-xs text-slate-600 table-fixed">
             <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
               <tr>
-                <th className="px-3 py-2.5 w-[5%]">Rank</th>
-                <th className="px-3 py-2.5 w-[19%]">Candidate</th>
-                <th className="px-3 py-2.5 w-[13%]">Applied Job</th>
-                <th className="px-3 py-2.5 w-[11%]">Applied Date</th>
-                <th className="px-3 py-2.5 w-[16%]">Skill Match</th>
-                <th className="px-3 py-2.5 w-[12%]">Assessment Status</th>
-                <th className="px-3 py-2.5 w-[14%]">Current Stage</th>
-                <th className="px-3 py-2.5 text-right w-[10%]">Actions</th>
+                <th className="px-2 py-2.5 w-[5%]">Rank</th>
+                <th className="px-2 py-2.5 w-[18%]">Candidate</th>
+                <th className="px-2 py-2.5 w-[12%]">Applied Job</th>
+                <th className="px-2 py-2.5 w-[11%]">Applied Date</th>
+                <th className="px-2 py-2.5 w-[16%]">Skill Match</th>
+                <th className="px-2 py-2.5 w-[12%]">Assessment</th>
+                <th className="px-2 py-2.5 w-[15%]">Current Stage</th>
+                <th className="px-2 py-2.5 text-right w-[11%]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredApps.map((app) => (
                 <tr key={app._id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <div className={`font-black text-sm ${app.rankValue <= 3 ? 'text-indigo-600' : 'text-slate-400'}`}>
                       {app.rankString || '-'}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <div className="font-bold text-slate-800 text-xs truncate">{app.studentId?.userId?.name}</div>
                     <div className="text-[10px] text-slate-500 truncate">{app.studentId?.userId?.email}</div>
                     <div className="text-[10px] text-indigo-600 hover:underline mt-0.5 font-medium">
                       <a href={app.studentId?.resumeUrl} target="_blank" rel="noreferrer">View Resume</a>
                     </div>
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <div className="font-semibold text-slate-700 text-xs truncate">{app.jobId?.title}</div>
                     <div className="text-[10px] text-slate-500 truncate">{app.jobId?.department}</div>
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <div className="text-slate-700 font-medium text-xs">
                       {new Date(app.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </div>
@@ -246,7 +246,7 @@ export default function PlacementTracking() {
                       {new Date(app.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <div className="flex items-center gap-1.5">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                         {app.aiResumeScore || 0}%
@@ -257,7 +257,7 @@ export default function PlacementTracking() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     {app.assessmentResult ? (
                       <div>
                         <div className={`font-bold text-base ${app.assessmentResult.percentage >= 70 ? 'text-emerald-600' : 'text-red-500'}`}>
@@ -274,7 +274,7 @@ export default function PlacementTracking() {
                       <div className="text-slate-400 text-xs">Not Taken</div>
                     )}
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-2 py-2.5">
                     <select 
                       value={app.stage}
                       onChange={(e) => updateStage(app._id, e.target.value)}
@@ -287,7 +287,7 @@ export default function PlacementTracking() {
                       {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
-                  <td className="px-3 py-2.5 text-right">
+                  <td className="px-2 py-2.5 text-right">
                     <button 
                       onClick={() => handleSendEmail(app._id)}
                       disabled={sendingEmailId === app._id}
@@ -301,7 +301,7 @@ export default function PlacementTracking() {
               
               {filteredApps.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-3 py-12 text-center text-slate-500">
+                  <td colSpan="8" className="px-2 py-12 text-center text-slate-500">
                     No applications match your filters.
                   </td>
                 </tr>
