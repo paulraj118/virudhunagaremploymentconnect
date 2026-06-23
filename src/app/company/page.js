@@ -152,7 +152,11 @@ export default function CompanyDashboard() {
       d.setDate(d.getDate() - (6 - i));
       return d.toLocaleDateString('en-US', { weekday: 'short' });
     });
+    
+    // Dynamic chart scaling based on actual data
     const maxTrendsCount = Math.max(...trendsData, 1);
+    // Ensure chartMax is at least 4 and divisible by 4 for clean Y-axis grid lines (4 intervals)
+    const chartMax = Math.max(Math.ceil(maxTrendsCount / 4) * 4, 4);
 
     return (
       <div className="w-full">
@@ -274,11 +278,14 @@ export default function CompanyDashboard() {
                   <div className="h-64 relative pt-4 pb-6 sm:pb-8">
                     {/* Horizontal grid lines */}
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6 sm:pb-8">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="w-full border-t border-slate-100/80 h-0 flex items-center justify-start">
-                           <span className="text-xs text-slate-400 font-medium -translate-y-3 w-8 text-left">{100 - i*25}</span>
-                        </div>
-                      ))}
+                      {[...Array(5)].map((_, i) => {
+                        const yValue = chartMax - (i * (chartMax / 4));
+                        return (
+                          <div key={i} className="w-full border-t border-slate-100/80 h-0 flex items-center justify-start">
+                             <span className="text-xs text-slate-400 font-medium -translate-y-3 w-8 text-left">{yValue}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                     
                     {/* SVG Line and Area */}
@@ -292,12 +299,12 @@ export default function CompanyDashboard() {
                         </defs>
                         {/* Area Fill */}
                         <polygon 
-                          points={`0,100 ${trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / Math.max(100, maxTrendsCount)) * 100}`).join(' ')} 100,100`} 
+                          points={`0,100 ${trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / chartMax) * 100}`).join(' ')} 100,100`} 
                           fill="url(#lineGradient)"
                         />
                         {/* Line */}
                         <polyline 
-                          points={trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / Math.max(100, maxTrendsCount)) * 100}`).join(' ')}
+                          points={trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / chartMax) * 100}`).join(' ')}
                           fill="none" 
                           stroke="#4F46E5" 
                           strokeWidth="3" 
@@ -313,7 +320,7 @@ export default function CompanyDashboard() {
                       {last7DaysLabels.map((day, i) => {
                         const count = trendsData[i];
                         const xPercent = (i / 6) * 100;
-                        const yPercent = 100 - (count / Math.max(100, maxTrendsCount)) * 100;
+                        const yPercent = 100 - (count / chartMax) * 100;
                         const isToday = i === 6;
                         return (
                           <div key={i} className="absolute group cursor-pointer" style={{ left: `${xPercent}%`, top: `${yPercent}%`, transform: 'translate(-50%, -50%)' }}>
