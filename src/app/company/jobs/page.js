@@ -77,7 +77,7 @@ export default function JobManagement() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-slate-800">Job Postings</h1>
-        <button onClick={() => setShowModal(true)} className="bg-[#0B1E40] hover:bg-[#152d54] text-white font-semibold py-2 px-6 rounded-lg transition-colors text-sm">
+        <button onClick={() => setShowModal(true)} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold py-2 px-6 rounded-lg transition-all shadow-md hover:shadow-lg text-sm">
           + Create New Job
         </button>
       </div>
@@ -86,7 +86,7 @@ export default function JobManagement() {
         {jobs.map(job => (
           <div key={job._id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col relative overflow-hidden">
             {!job.isActive && <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>}
-            {job.isActive && <div className="absolute top-0 left-0 w-full h-1 bg-[#0B1E40]"></div>}
+            {job.isActive && <div className="absolute top-0 left-0 w-full h-1 bg-[#2563EB]"></div>}
             
             <div className="flex justify-between items-start mb-4">
               <div>
