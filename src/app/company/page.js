@@ -76,26 +76,38 @@ export default function CompanyDashboard() {
       }
       
       if (dataApps.success && dataApps.applications) {
+        console.log("Total applications returned by API:", dataApps.applications.length);
+        
         // Calculate trends for the last 7 days
         const counts = Array(7).fill(0);
         const today = new Date();
-        today.setHours(0,0,0,0);
+        const utcToday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
         
         dataApps.applications.forEach(app => {
-          const appDate = new Date(app.createdAt);
-          appDate.setHours(0,0,0,0);
-          const diffTime = today - appDate;
-          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          // Safely fallback to updatedAt or current date
+          const dateString = app.createdAt || app.updatedAt || new Date().toISOString();
+          const appDate = new Date(dateString);
+          
+          const utcApp = Date.UTC(appDate.getFullYear(), appDate.getMonth(), appDate.getDate());
+          const diffDays = Math.floor((utcToday - utcApp) / (1000 * 60 * 60 * 24));
           
           if (diffDays >= 0 && diffDays < 7) {
             // Index 6 is today, 0 is 6 days ago
             counts[6 - diffDays]++;
+          } else if (diffDays < 0) {
+            // Future dates fall into today
+            counts[6]++;
+          } else {
+            // Older dates fall into oldest bucket (6 days ago) to ensure sum equals total
+            counts[0]++;
           }
         });
+        
+        console.log("Chart buckets:", counts, "Sum:", counts.reduce((a,b)=>a+b,0));
         setTrendsData(counts);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching stats or applications:', error);
     }
   };
 
