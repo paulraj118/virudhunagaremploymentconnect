@@ -11,6 +11,7 @@ export default function CompanyDashboard() {
   const [approvalStatus, setApprovalStatus] = useState(null); // null means not registered
   const [stats, setStats] = useState({ activeJobs: 0, totalApplicants: 0, interviews: 0, hired: 0 });
   const [trendsData, setTrendsData] = useState(Array(7).fill(0));
+  const [trendsLabels, setTrendsLabels] = useState(Array(7).fill(''));
   
   const [formData, setFormData] = useState({
     companyName: '', hrName: '', website: '', address: '',
@@ -76,34 +77,44 @@ export default function CompanyDashboard() {
       }
       
       if (dataApps.success && dataApps.applications) {
-        console.log("Total applications returned by API:", dataApps.applications.length);
-        
-        // Calculate trends for the last 7 days
-        const counts = Array(7).fill(0);
-        const today = new Date();
-        const utcToday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-        
-        dataApps.applications.forEach(app => {
-          // Safely fallback to updatedAt or current date
-          const dateString = app.createdAt || app.updatedAt || new Date().toISOString();
-          const appDate = new Date(dateString);
+        let labels = [];
+        let counts = [];
+
+        if (dataApps.applications.length > 0) {
+          const dateMap = new Map();
           
-          const utcApp = Date.UTC(appDate.getFullYear(), appDate.getMonth(), appDate.getDate());
-          const diffDays = Math.floor((utcToday - utcApp) / (1000 * 60 * 60 * 24));
+          dataApps.applications.forEach(app => {
+            const dateString = app.createdAt || app.updatedAt || new Date().toISOString();
+            const appDate = new Date(dateString);
+            appDate.setHours(0,0,0,0);
+            const time = appDate.getTime();
+            dateMap.set(time, (dateMap.get(time) || 0) + 1);
+          });
           
-          if (diffDays >= 0 && diffDays < 7) {
-            // Index 6 is today, 0 is 6 days ago
-            counts[6 - diffDays]++;
-          } else if (diffDays < 0) {
-            // Future dates fall into today
-            counts[6]++;
-          } else {
-            // Older dates fall into oldest bucket (6 days ago) to ensure sum equals total
-            counts[0]++;
+          const sortedTimes = Array.from(dateMap.keys()).sort((a,b) => a - b);
+          const recentTimes = sortedTimes.slice(-7);
+          
+          // Pad to ensure 7 data points for a full chart look
+          while (recentTimes.length < 7) {
+            const firstTime = recentTimes[0];
+            const prevDay = new Date(firstTime);
+            prevDay.setDate(prevDay.getDate() - 1);
+            recentTimes.unshift(prevDay.getTime());
           }
-        });
+          
+          labels = recentTimes.map(t => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+          counts = recentTimes.map(t => dateMap.get(t) || 0);
+        } else {
+           const today = new Date();
+           for(let i=6; i>=0; i--) {
+             const d = new Date(today);
+             d.setDate(today.getDate() - i);
+             labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+             counts.push(0);
+           }
+        }
         
-        console.log("Chart buckets:", counts, "Sum:", counts.reduce((a,b)=>a+b,0));
+        setTrendsLabels(labels);
         setTrendsData(counts);
       }
     } catch (error) {
@@ -147,16 +158,24 @@ export default function CompanyDashboard() {
   }
 
   if (approvalStatus) {
-    const last7DaysLabels = [...Array(7)].map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return d.toLocaleDateString('en-US', { weekday: 'short' });
-    });
-    
-    // Dynamic chart scaling based on actual data
     const maxTrendsCount = Math.max(...trendsData, 1);
-    // Ensure chartMax is at least 4 and divisible by 4 for clean Y-axis grid lines (4 intervals)
-    const chartMax = Math.max(Math.ceil(maxTrendsCount / 4) * 4, 4);
+    let yAxisLabels = [];
+    let chartMax = 4;
+    
+    if (maxTrendsCount <= 4) {
+      chartMax = 4;
+      yAxisLabels = [4, 3, 2, 1, 0];
+    } else if (maxTrendsCount <= 10) {
+      chartMax = 10;
+      yAxisLabels = [10, 8, 6, 4, 2, 0];
+    } else if (maxTrendsCount <= 25) {
+      chartMax = 25;
+      yAxisLabels = [25, 20, 15, 10, 5, 0];
+    } else {
+      const step = Math.ceil(maxTrendsCount / 5);
+      chartMax = step * 5;
+      yAxisLabels = [chartMax, chartMax - step, chartMax - step*2, chartMax - step*3, chartMax - step*4, 0];
+    }
 
     return (
       <div className="w-full">
@@ -278,8 +297,7 @@ export default function CompanyDashboard() {
                   <div className="h-64 relative pt-4 pb-6 sm:pb-8">
                     {/* Horizontal grid lines */}
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6 sm:pb-8">
-                      {[...Array(5)].map((_, i) => {
-                        const yValue = chartMax - (i * (chartMax / 4));
+                      {yAxisLabels.map((yValue, i) => {
                         return (
                           <div key={i} className="w-full border-t border-slate-100/80 h-0 flex items-center justify-start">
                              <span className="text-xs text-slate-400 font-medium -translate-y-3 w-8 text-left">{yValue}</span>
@@ -299,12 +317,12 @@ export default function CompanyDashboard() {
                         </defs>
                         {/* Area Fill */}
                         <polygon 
-                          points={`0,100 ${trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / chartMax) * 100}`).join(' ')} 100,100`} 
+                          points={`0,100 ${trendsData.map((count, i) => `${(i / (trendsData.length - 1)) * 100},${100 - (count / chartMax) * 100}`).join(' ')} 100,100`} 
                           fill="url(#lineGradient)"
                         />
                         {/* Line */}
                         <polyline 
-                          points={trendsData.map((count, i) => `${(i / 6) * 100},${100 - (count / chartMax) * 100}`).join(' ')}
+                          points={trendsData.map((count, i) => `${(i / (trendsData.length - 1)) * 100},${100 - (count / chartMax) * 100}`).join(' ')}
                           fill="none" 
                           stroke="#4F46E5" 
                           strokeWidth="3" 
@@ -317,11 +335,11 @@ export default function CompanyDashboard() {
 
                     {/* Data Points and Tooltips */}
                     <div className="absolute inset-0 pb-6 sm:pb-8 pl-8 z-10">
-                      {last7DaysLabels.map((day, i) => {
+                      {trendsLabels.map((day, i) => {
                         const count = trendsData[i];
-                        const xPercent = (i / 6) * 100;
+                        const xPercent = (i / (trendsData.length - 1)) * 100;
                         const yPercent = 100 - (count / chartMax) * 100;
-                        const isToday = i === 6;
+                        const isToday = i === trendsLabels.length - 1;
                         return (
                           <div key={i} className="absolute group cursor-pointer" style={{ left: `${xPercent}%`, top: `${yPercent}%`, transform: 'translate(-50%, -50%)' }}>
                             {/* Circle Marker */}
@@ -338,10 +356,10 @@ export default function CompanyDashboard() {
 
                     {/* X-Axis Labels */}
                     <div className="absolute bottom-0 left-0 w-full pl-8 h-6">
-                      {last7DaysLabels.map((day, i) => {
-                        const isToday = i === 6;
+                      {trendsLabels.map((day, i) => {
+                        const isToday = i === trendsLabels.length - 1;
                         return (
-                          <span key={i} className={`text-xs font-bold absolute ${isToday ? 'text-indigo-600' : 'text-slate-400'}`} style={{ left: `${(i / 6) * 100}%`, transform: 'translateX(-50%)' }}>
+                          <span key={i} className={`text-xs font-bold absolute whitespace-nowrap ${isToday ? 'text-indigo-600' : 'text-slate-400'}`} style={{ left: `${(i / (trendsLabels.length - 1)) * 100}%`, transform: 'translateX(-50%)' }}>
                             {day}
                           </span>
                         );
