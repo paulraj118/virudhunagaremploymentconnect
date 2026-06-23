@@ -10,6 +10,7 @@ export default function CompanyDashboard() {
   const [profileLoading, setProfileLoading] = useState(true);
   const [approvalStatus, setApprovalStatus] = useState(null); // null means not registered
   const [stats, setStats] = useState({ activeJobs: 0, totalApplicants: 0, interviews: 0, hired: 0 });
+  const [trendsData, setTrendsData] = useState(Array(7).fill(0));
   
   const [formData, setFormData] = useState({
     companyName: '', hrName: '', website: '', address: '',
@@ -63,10 +64,35 @@ export default function CompanyDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/company/dashboard', { cache: 'no-store' });
-      const data = await res.json();
-      if (data.success) {
-        setStats(data.stats);
+      const [resStats, resApps] = await Promise.all([
+        fetch('/api/company/dashboard', { cache: 'no-store' }),
+        fetch('/api/company/applications', { cache: 'no-store' })
+      ]);
+      const dataStats = await resStats.json();
+      const dataApps = await resApps.json();
+
+      if (dataStats.success) {
+        setStats(dataStats.stats);
+      }
+      
+      if (dataApps.success && dataApps.applications) {
+        // Calculate trends for the last 7 days
+        const counts = Array(7).fill(0);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        dataApps.applications.forEach(app => {
+          const appDate = new Date(app.createdAt);
+          appDate.setHours(0,0,0,0);
+          const diffTime = today - appDate;
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays >= 0 && diffDays < 7) {
+            // Index 6 is today, 0 is 6 days ago
+            counts[6 - diffDays]++;
+          }
+        });
+        setTrendsData(counts);
       }
     } catch (error) {
       console.error(error);
@@ -109,10 +135,17 @@ export default function CompanyDashboard() {
   }
 
   if (approvalStatus) {
-    return (
-      <div className="min-h-screen bg-white font-sans">
+    const last7DaysLabels = [...Array(7)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return d.toLocaleDateString('en-US', { weekday: 'short' });
+    });
+    const maxTrendsCount = Math.max(...trendsData, 1);
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
+    return (
+      <div className="w-full">
+
+        <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">
@@ -238,16 +271,16 @@ export default function CompanyDashboard() {
                     
                     {/* Bars */}
                     <div className="w-full flex justify-around items-end h-full z-10 pl-8">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                        // Dummy heights for demonstration
-                        const heights = ['h-[20%]', 'h-[40%]', 'h-[30%]', 'h-[60%]', 'h-[80%]', 'h-[50%]', 'h-[90%]'];
+                      {last7DaysLabels.map((day, i) => {
+                        const count = trendsData[i];
+                        const heightPercent = Math.max((count / maxTrendsCount) * 100, 5); // min 5% height
                         const isToday = i === 6;
                         return (
-                          <div key={day} className="flex flex-col items-center gap-3 group w-full px-1 sm:px-2 relative">
-                            <div className={`w-full max-w-[3rem] ${heights[i]} rounded-t-lg transition-all duration-500 relative group-hover:opacity-80 ${isToday ? 'bg-gradient-to-t from-indigo-600 to-purple-500 shadow-lg shadow-indigo-500/30' : 'bg-indigo-100'}`}>
+                          <div key={i} className="flex flex-col items-center gap-3 group w-full px-1 sm:px-2 relative">
+                            <div style={{ height: `${heightPercent}%` }} className={`w-full max-w-[3rem] rounded-t-lg transition-all duration-500 relative group-hover:opacity-80 ${isToday ? 'bg-gradient-to-t from-indigo-600 to-purple-500 shadow-lg shadow-indigo-500/30' : 'bg-indigo-100'}`}>
                               {/* Tooltip on hover */}
                               <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
-                                0 Applicants
+                                {count} {count === 1 ? 'Applicant' : 'Applicants'}
                               </div>
                             </div>
                             <span className={`text-xs font-bold ${isToday ? 'text-indigo-600' : 'text-slate-400'}`}>{day}</span>
