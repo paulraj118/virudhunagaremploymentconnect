@@ -72,48 +72,47 @@ export default function CompanyDashboard() {
       const dataStats = await resStats.json();
       const dataApps = await resApps.json();
 
+      let totalAppsCount = dataStats.success ? dataStats.stats.totalApplicants : 0;
+      if (dataApps.success && dataApps.applications) {
+        totalAppsCount = dataApps.applications.length;
+      }
+
       if (dataStats.success) {
-        setStats(dataStats.stats);
+        setStats({
+          ...dataStats.stats,
+          totalApplicants: totalAppsCount
+        });
       }
       
       if (dataApps.success && dataApps.applications) {
-        let labels = [];
-        let counts = [];
+        const today = new Date();
+        today.setHours(0,0,0,0);
 
-        if (dataApps.applications.length > 0) {
-          const dateMap = new Map();
-          
-          dataApps.applications.forEach(app => {
-            const dateString = app.createdAt || app.updatedAt || new Date().toISOString();
-            const appDate = new Date(dateString);
-            appDate.setHours(0,0,0,0);
-            const time = appDate.getTime();
-            dateMap.set(time, (dateMap.get(time) || 0) + 1);
-          });
-          
-          const sortedTimes = Array.from(dateMap.keys()).sort((a,b) => a - b);
-          const recentTimes = sortedTimes.slice(-7);
-          
-          // Pad to ensure 7 data points for a full chart look
-          while (recentTimes.length < 7) {
-            const firstTime = recentTimes[0];
-            const prevDay = new Date(firstTime);
-            prevDay.setDate(prevDay.getDate() - 1);
-            recentTimes.unshift(prevDay.getTime());
-          }
-          
-          labels = recentTimes.map(t => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-          counts = recentTimes.map(t => dateMap.get(t) || 0);
-        } else {
-           const today = new Date();
-           for(let i=6; i>=0; i--) {
-             const d = new Date(today);
-             d.setDate(today.getDate() - i);
-             labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-             counts.push(0);
-           }
+        const counts = Array(7).fill(0);
+        const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const labels = [];
+
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(today);
+          d.setDate(today.getDate() - i);
+          labels.push(weekdayNames[d.getDay()]);
         }
-        
+
+        dataApps.applications.forEach(app => {
+          const dateString = app.createdAt || app.updatedAt || new Date().toISOString();
+          const appDate = new Date(dateString);
+          appDate.setHours(0,0,0,0);
+          const diffTime = today.getTime() - appDate.getTime();
+          let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) diffDays = 0;
+          
+          if (diffDays >= 6) {
+            counts[0]++;
+          } else {
+            counts[6 - diffDays]++;
+          }
+        });
+
         setTrendsLabels(labels);
         setTrendsData(counts);
       }
@@ -293,7 +292,7 @@ export default function CompanyDashboard() {
                     </select>
                   </div>
                   
-                  {/* Line Chart */}
+                  {/* Bar Chart */}
                   <div className="h-64 relative pt-4 pb-6 sm:pb-8">
                     {/* Horizontal grid lines */}
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6 sm:pb-8">
@@ -306,48 +305,35 @@ export default function CompanyDashboard() {
                       })}
                     </div>
                     
-                    {/* SVG Line and Area */}
-                    <div className="absolute inset-0 pb-6 sm:pb-8 pl-8">
-                      <svg className="w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.2" />
-                            <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        {/* Area Fill */}
-                        <polygon 
-                          points={`0,100 ${trendsData.map((count, i) => `${(i / (trendsData.length - 1)) * 100},${100 - (count / chartMax) * 100}`).join(' ')} 100,100`} 
-                          fill="url(#lineGradient)"
-                        />
-                        {/* Line */}
-                        <polyline 
-                          points={trendsData.map((count, i) => `${(i / (trendsData.length - 1)) * 100},${100 - (count / chartMax) * 100}`).join(' ')}
-                          fill="none" 
-                          stroke="#4F46E5" 
-                          strokeWidth="3" 
-                          vectorEffect="non-scaling-stroke"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-
-                    {/* Data Points and Tooltips */}
-                    <div className="absolute inset-0 pb-6 sm:pb-8 pl-8 z-10">
-                      {trendsLabels.map((day, i) => {
-                        const count = trendsData[i];
-                        const xPercent = (i / (trendsData.length - 1)) * 100;
-                        const yPercent = 100 - (count / chartMax) * 100;
+                    {/* Bars Plotting Area */}
+                    <div className="absolute inset-y-0 left-8 right-0 pb-6 sm:pb-8 flex justify-around items-end px-2 sm:px-6 z-10">
+                      {trendsData.map((count, i) => {
+                        const day = trendsLabels[i];
                         const isToday = i === trendsLabels.length - 1;
+                        const heightPercent = count > 0 ? (count / chartMax) * 100 : 0;
+                        
                         return (
-                          <div key={i} className="absolute group cursor-pointer" style={{ left: `${xPercent}%`, top: `${yPercent}%`, transform: 'translate(-50%, -50%)' }}>
-                            {/* Circle Marker */}
-                            <div className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full border-[2.5px] bg-white transition-transform duration-300 group-hover:scale-150 ${isToday ? 'border-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'border-indigo-500 hover:border-indigo-600'}`}></div>
+                          <div 
+                            key={i} 
+                            className="flex flex-col items-center justify-end h-full w-[10%] group relative cursor-pointer animate-fade-in"
+                          >
+                            {/* Bar Visual Representation */}
+                            <div 
+                              className={`w-full max-w-[32px] sm:max-w-[40px] min-w-[12px] sm:min-w-[16px] rounded-t-md sm:rounded-t-lg transition-all duration-300 ease-out origin-bottom
+                                ${count > 0 
+                                  ? 'bg-gradient-to-t from-indigo-600 to-indigo-500 group-hover:from-indigo-500 group-hover:to-indigo-400 shadow-[0_4px_12px_rgba(79,70,229,0.15)] group-hover:shadow-[0_6px_16px_rgba(79,70,229,0.3)]' 
+                                  : 'bg-slate-100/80 hover:bg-slate-100'
+                                } 
+                                ${isToday && count > 0 ? 'ring-2 ring-indigo-400 ring-offset-1' : ''}`}
+                              style={{ 
+                                height: `${Math.max(heightPercent, count > 0 ? 4 : 0)}%`,
+                              }}
+                            >
+                            </div>
                             
                             {/* Tooltip */}
-                            <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-bold py-1.5 px-3 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-20">
-                              {count} {count === 1 ? 'Applicant' : 'Applicants'}
+                            <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] sm:text-xs font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-xl z-20 translate-y-1 group-hover:translate-y-0">
+                              <span className="font-extrabold text-indigo-300">{day}</span>: {count} {count === 1 ? 'Applicant' : 'Applicants'}
                             </div>
                           </div>
                         );
@@ -355,11 +341,14 @@ export default function CompanyDashboard() {
                     </div>
 
                     {/* X-Axis Labels */}
-                    <div className="absolute bottom-0 left-0 w-full pl-8 h-6">
+                    <div className="absolute bottom-0 left-8 right-0 h-6 flex justify-around px-2 sm:px-6">
                       {trendsLabels.map((day, i) => {
                         const isToday = i === trendsLabels.length - 1;
                         return (
-                          <span key={i} className={`text-xs font-bold absolute whitespace-nowrap ${isToday ? 'text-indigo-600' : 'text-slate-400'}`} style={{ left: `${(i / (trendsLabels.length - 1)) * 100}%`, transform: 'translateX(-50%)' }}>
+                          <span 
+                            key={i} 
+                            className={`text-xs font-extrabold text-center w-[10%] whitespace-nowrap transition-colors duration-300 ${isToday ? 'text-indigo-600' : 'text-slate-400'}`}
+                          >
                             {day}
                           </span>
                         );
