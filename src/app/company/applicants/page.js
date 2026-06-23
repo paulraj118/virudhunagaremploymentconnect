@@ -120,11 +120,11 @@ export default function PlacementTracking() {
   });
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Candidate Tracker</h1>
+    <div className="max-w-full overflow-x-hidden">
+      <h1 className="text-2xl font-bold text-slate-800 mb-4">Candidate Tracker</h1>
 
       {/* Filters Section */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 mb-5 flex flex-wrap gap-3 items-end">
+      <div className="bg-white p-3 rounded-xl border border-slate-200 mb-4 flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[200px]">
           <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Search Candidates</label>
           <input 
@@ -189,14 +189,14 @@ export default function PlacementTracking() {
           { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, iconColor: 'text-red-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
         ];
         return (
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-4">
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="bg-white rounded-xl p-3 border border-slate-200 hover:border-slate-300 transition-colors"
+                className="bg-white rounded-xl p-2.5 border border-slate-200 hover:border-slate-300 transition-colors"
               >
-                <div className={`${stat.iconColor} mb-2`}>{stat.icon}</div>
-                <div className="text-xl font-bold text-slate-800">{stat.count}</div>
+                <div className={`${stat.iconColor} mb-1`}>{stat.icon}</div>
+                <div className="text-lg font-bold text-slate-800">{stat.count}</div>
                 <div className="text-[11px] font-medium text-slate-500 mt-0.5">{stat.label}</div>
               </div>
             ))}
@@ -204,81 +204,81 @@ export default function PlacementTracking() {
         );
       })()}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 table-fixed">
             <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 w-24">Rank</th>
-                <th className="px-6 py-4">Candidate</th>
-                <th className="px-6 py-4">Applied Job</th>
-                <th className="px-6 py-4">Applied Date</th>
-                <th className="px-6 py-4">Skill Match</th>
-                <th className="px-6 py-4">Assessment Status</th>
-                <th className="px-6 py-4">Current Stage</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-3 py-2.5 w-[60px]">Rank</th>
+                <th className="px-3 py-2.5 w-[18%]">Candidate</th>
+                <th className="px-3 py-2.5 w-[12%]">Applied Job</th>
+                <th className="px-3 py-2.5 w-[10%]">Applied Date</th>
+                <th className="px-3 py-2.5 w-[15%]">Skill Match</th>
+                <th className="px-3 py-2.5 w-[11%]">Assessment Status</th>
+                <th className="px-3 py-2.5 w-[14%]">Current Stage</th>
+                <th className="px-3 py-2.5 text-right w-[10%]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredApps.map((app) => (
                 <tr key={app._id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className={`font-black text-lg ${app.rankValue <= 3 ? 'text-indigo-600' : 'text-slate-400'}`}>
+                  <td className="px-3 py-2.5">
+                    <div className={`font-black text-sm ${app.rankValue <= 3 ? 'text-indigo-600' : 'text-slate-400'}`}>
                       {app.rankString || '-'}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="font-bold text-slate-800">{app.studentId?.userId?.name}</div>
-                    <div className="text-xs text-slate-500">{app.studentId?.userId?.email}</div>
-                    <div className="text-xs text-indigo-600 hover:underline mt-1 font-medium">
+                  <td className="px-3 py-2.5">
+                    <div className="font-bold text-slate-800 text-xs truncate">{app.studentId?.userId?.name}</div>
+                    <div className="text-[10px] text-slate-500 truncate">{app.studentId?.userId?.email}</div>
+                    <div className="text-[10px] text-indigo-600 hover:underline mt-0.5 font-medium">
                       <a href={app.studentId?.resumeUrl} target="_blank" rel="noreferrer">View Resume</a>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-slate-700">{app.jobId?.title}</div>
-                    <div className="text-xs text-slate-500">{app.jobId?.department}</div>
+                  <td className="px-3 py-2.5">
+                    <div className="font-semibold text-slate-700 text-xs truncate">{app.jobId?.title}</div>
+                    <div className="text-[10px] text-slate-500 truncate">{app.jobId?.department}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-700 font-medium text-sm">
+                  <td className="px-3 py-2.5">
+                    <div className="text-slate-700 font-medium text-xs">
                       {new Date(app.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </div>
-                    <div className="text-xs text-slate-400">
+                    <div className="text-[10px] text-slate-400">
                       {new Date(app.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                         {app.aiResumeScore || 0}%
                       </div>
-                      <div className="text-xs text-slate-500">
-                        <div className="font-semibold text-slate-700 truncate max-w-[120px]">{app.assessmentResult?.domain || 'N/A'}</div>
+                      <div className="text-[10px] text-slate-500 min-w-0">
+                        <div className="font-semibold text-slate-700 truncate">{app.assessmentResult?.domain || 'N/A'}</div>
                         <div>Exp: {app.aiExperienceMatch || 0}%</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2.5">
                     {app.assessmentResult ? (
                       <div>
-                        <div className={`font-bold text-lg ${app.assessmentResult.percentage >= 70 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        <div className={`font-bold text-base ${app.assessmentResult.percentage >= 70 ? 'text-emerald-600' : 'text-red-500'}`}>
                           {app.assessmentResult.percentage}%
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded border font-semibold ${app.assessmentResult.passFail === 'Pass' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border font-semibold ${app.assessmentResult.passFail === 'Pass' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
                           {app.assessmentResult.passFail}
                         </span>
-                        <div className="text-[10px] text-slate-400 mt-1">
+                        <div className="text-[10px] text-slate-400 mt-0.5">
                           Test: {new Date(app.assessmentResult.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                         </div>
                       </div>
                     ) : (
-                      <div className="text-slate-400 text-sm">Not Taken</div>
+                      <div className="text-slate-400 text-xs">Not Taken</div>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2.5">
                     <select 
                       value={app.stage}
                       onChange={(e) => updateStage(app._id, e.target.value)}
-                      className={`text-xs font-bold rounded-lg px-3 py-1.5 border outline-none cursor-pointer
+                      className={`text-[10px] font-bold rounded-lg px-2 py-1 border outline-none cursor-pointer w-full
                         ${app.stage === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' : ''}
                         ${app.stage === 'Joined' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ''}
                         ${app.stage !== 'Rejected' && app.stage !== 'Joined' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : ''}
@@ -287,11 +287,11 @@ export default function PlacementTracking() {
                       {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-3 py-2.5 text-right">
                     <button 
                       onClick={() => handleSendEmail(app._id)}
                       disabled={sendingEmailId === app._id}
-                      className="text-xs font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-4 py-2 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {sendingEmailId === app._id ? 'Sending...' : 'Send Email'}
                     </button>
@@ -301,7 +301,7 @@ export default function PlacementTracking() {
               
               {filteredApps.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-6 py-16 text-center text-slate-500">
+                  <td colSpan="8" className="px-3 py-12 text-center text-slate-500">
                     No applications match your filters.
                   </td>
                 </tr>
