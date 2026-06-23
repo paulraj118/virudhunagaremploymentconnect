@@ -120,7 +120,7 @@ export default function PlacementTracking() {
   });
 
   return (
-    <div className="max-w-full overflow-x-hidden">
+    <div className="min-w-0">
       <h1 className="text-2xl font-bold text-slate-800 mb-4">Candidate Tracker</h1>
 
       {/* Filters Section */}
@@ -209,12 +209,12 @@ export default function PlacementTracking() {
           <table className="w-full text-left text-xs text-slate-600 table-fixed">
             <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
               <tr>
-                <th className="px-3 py-2.5 w-[60px]">Rank</th>
-                <th className="px-3 py-2.5 w-[18%]">Candidate</th>
-                <th className="px-3 py-2.5 w-[12%]">Applied Job</th>
-                <th className="px-3 py-2.5 w-[10%]">Applied Date</th>
-                <th className="px-3 py-2.5 w-[15%]">Skill Match</th>
-                <th className="px-3 py-2.5 w-[11%]">Assessment Status</th>
+                <th className="px-3 py-2.5 w-[5%]">Rank</th>
+                <th className="px-3 py-2.5 w-[19%]">Candidate</th>
+                <th className="px-3 py-2.5 w-[13%]">Applied Job</th>
+                <th className="px-3 py-2.5 w-[11%]">Applied Date</th>
+                <th className="px-3 py-2.5 w-[16%]">Skill Match</th>
+                <th className="px-3 py-2.5 w-[12%]">Assessment Status</th>
                 <th className="px-3 py-2.5 w-[14%]">Current Stage</th>
                 <th className="px-3 py-2.5 text-right w-[10%]">Actions</th>
               </tr>
