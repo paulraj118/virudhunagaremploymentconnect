@@ -155,103 +155,103 @@ export default function JobBoard() {
       </div>
 
       {/* 3-Column Responsive Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredJobs.map(job => (
           <div 
             key={job._id} 
-            className="bg-white rounded-3xl border-2 border-blue-500/80 shadow-[0_8px_30px_rgba(0,0,0,0.015)] p-6 relative overflow-hidden flex flex-col h-full min-h-[380px] group hover:shadow-md hover:border-blue-650 transition-all duration-300"
+            className="bg-white rounded-xl border border-slate-200 shadow-sm p-3.5 relative overflow-hidden flex flex-col group hover:shadow-md hover:border-blue-400 hover:-translate-y-0.5 transition-all duration-300 ease-out"
           >
-            {/* Match Score Badge on top-right */}
+            {/* Match Score Badge — top-right corner */}
             {job.aiMatchScore && (
-              <div className="absolute top-3 right-3 bg-indigo-50 border border-indigo-100 text-indigo-700 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full shadow-sm">
+              <div className={`absolute top-2.5 right-2.5 font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow-sm ${
+                job.aiMatchScore >= 80 
+                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' 
+                  : job.aiMatchScore >= 50 
+                    ? 'bg-amber-50 border border-amber-200 text-amber-700' 
+                    : 'bg-slate-50 border border-slate-200 text-slate-600'
+              }`}>
                 {job.aiMatchScore}% Match
               </div>
             )}
 
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                {/* Title */}
-                <h3 className="font-extrabold text-[1.25rem] text-slate-800 leading-snug pr-12 group-hover:text-blue-600 transition-colors">
-                  {job.title}
-                </h3>
+            {/* Card Body */}
+            <div className="flex-1 flex flex-col">
+              {/* Job Title */}
+              <h3 className="font-bold text-base text-slate-800 leading-tight pr-16 group-hover:text-blue-600 transition-colors line-clamp-2">
+                {job.title}
+              </h3>
 
-                {/* Company Name */}
-                <div className="flex items-center gap-2 text-slate-500 text-sm mt-3">
-                  <svg className="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              {/* Company + Location — single compact line */}
+              <div className="flex items-center gap-2 mt-1.5 text-xs text-slate-500">
+                <span className="flex items-center gap-1 font-semibold">
+                  <svg className="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
-                  <span className="font-bold text-slate-655">{job.companyId?.companyName}</span>
-                </div>
-
-                {/* Location */}
-                <div className="flex items-center gap-2 text-slate-550 text-xs mt-1.5">
-                  <svg className="w-4.5 h-4.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  {job.companyId?.companyName}
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="flex items-center gap-1 font-medium">
+                  <svg className="w-3.5 h-3.5 text-blue-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="font-semibold text-slate-600">{job.location}</span>
-                </div>
+                  {job.location}
+                </span>
+              </div>
 
-                {/* Required Skills Title */}
-                <h4 className="text-slate-800 font-extrabold text-sm mt-5 mb-1.5">Required Skills</h4>
-
-                {/* Description and Skills Capsule Box */}
-                <div className="bg-slate-50/70 border border-slate-100/80 p-4 rounded-xl text-slate-650 text-xs leading-relaxed flex flex-col justify-between min-h-[110px]">
-                  <p className="line-clamp-3 text-slate-500 font-medium">
-                    {job.description || 'No description available for this position.'}
-                  </p>
-                  
-                  {/* Skills Tag Pills */}
-                  {job.skills && job.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-3 pt-2 border-t border-slate-100/50">
-                      {job.skills.slice(0, 3).map((skill, i) => {
-                        const isMissing = job.aiMissingSkills?.includes(skill.toLowerCase());
-                        return (
-                          <span key={i} className={`px-2 py-0.5 rounded text-[10px] font-bold border ${isMissing ? 'bg-red-50 text-red-650 border-red-200' : 'bg-white text-slate-600 border-slate-200'}`}>
-                            {skill}
-                          </span>
-                        );
-                      })}
-                      {job.skills.length > 3 && (
-                        <span className="bg-blue-50 border border-blue-150 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded">
-                          +{job.skills.length - 3} more
+              {/* Skill Pills */}
+              <div className="flex flex-wrap items-center gap-1 mt-2.5">
+                {job.skills && job.skills.length > 0 ? (
+                  <>
+                    {job.skills.slice(0, 3).map((skill, i) => {
+                      const isMissing = job.aiMissingSkills?.includes(skill.toLowerCase());
+                      return (
+                        <span key={i} className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${isMissing ? 'bg-red-50 text-red-600 border-red-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                          {skill}
                         </span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                      );
+                    })}
+                    {job.skills.length > 3 && (
+                      <span className="bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        +{job.skills.length - 3} More
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[10px] text-slate-400 font-medium italic">No specific skills listed</span>
+                )}
               </div>
+            </div>
 
-              {/* Card Footer Actions aligned properly at the bottom */}
-              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <button 
-                  onClick={() => setSelectedJob(job)}
-                  className="text-blue-600 hover:text-blue-800 text-xs font-black flex items-center gap-1.5 transition-colors"
-                >
-                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  View Details
-                </button>
+            {/* Card Footer Actions */}
+            <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+              <button 
+                onClick={() => setSelectedJob(job)}
+                className="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center gap-1 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                View Details
+              </button>
 
-                <button 
-                  onClick={() => handleApplyClick(job)}
-                  disabled={applyingTo === job._id || job.hasApplied}
-                  className={`font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm active:translate-y-px shrink-0 ${
-                    job.hasApplied
-                      ? 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-450 text-white'
-                  }`}
-                >
-                  {applyingTo === job._id 
-                    ? 'Applying...' 
-                    : job.hasApplied
-                      ? 'Already Applied' 
-                      : 'Apply Now'
-                  }
-                </button>
-              </div>
+              <button 
+                onClick={() => handleApplyClick(job)}
+                disabled={applyingTo === job._id || job.hasApplied}
+                className={`font-bold text-xs px-3.5 py-1.5 rounded-lg transition-all shadow-sm active:translate-y-px shrink-0 ${
+                  job.hasApplied
+                    ? 'bg-slate-100 text-slate-400 border border-slate-200/60 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white'
+                }`}
+              >
+                {applyingTo === job._id 
+                  ? 'Applying...' 
+                  : job.hasApplied
+                    ? 'Already Applied' 
+                    : 'Apply Now'
+                }
+              </button>
             </div>
 
           </div>
