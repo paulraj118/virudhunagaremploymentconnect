@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_12345';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('FATAL ERROR: JWT_SECRET environment variable is not defined.');
+}
 
 export const signToken = (id, role) => {
   return jwt.sign({ id, role }, JWT_SECRET, {

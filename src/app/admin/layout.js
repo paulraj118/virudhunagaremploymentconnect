@@ -12,19 +12,33 @@ export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
+    if (pathname === '/admin/login') return;
+
     if (!loading) {
       if (!user) {
-        router.push('/login');
+        router.push('/admin/login');
       } else if (user.role !== 'super_admin') {
         // Redirect to respective portal if role is not super_admin
         if (user.role === 'student') {
           router.push('/student');
         } else if (user.role === 'hr_company') {
           router.push('/company');
+        } else {
+          router.push('/admin/login');
         }
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, pathname]);
+
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    // Force redirect to admin login after the context logout
+    window.location.href = '/admin/login';
+  };
 
   if (loading) {
     return (
@@ -101,7 +115,8 @@ export default function AdminLayout({ children }) {
           })}
         </nav>
         <div className="p-6 border-t border-white/10 bg-black/20">
-          <button onClick={logout} className="w-full bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 px-4 py-2.5 rounded-lg text-sm font-medium transition-all">
+          <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             Secure Logout
           </button>
         </div>

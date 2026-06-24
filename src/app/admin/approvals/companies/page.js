@@ -11,6 +11,19 @@ export default function CompanyApprovals() {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewCert, setPreviewCert] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredCompanies = companies.filter(company => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      company.companyName?.toLowerCase().includes(query) ||
+      company.hrName?.toLowerCase().includes(query) ||
+      company.userId?.email?.toLowerCase().includes(query) ||
+      company.industryType?.toLowerCase().includes(query) ||
+      company.gstNumber?.toLowerCase().includes(query)
+    );
+  });
 
   const viewCertificate = (dataUrl, label) => {
     if (!dataUrl) return;
@@ -185,39 +198,55 @@ export default function CompanyApprovals() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+            placeholder="Search companies, HR contacts, GST numbers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
+        <div className="w-full">
+          <table className="w-full text-left text-sm text-slate-600 table-fixed">
             <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4">Company Info</th>
-                <th className="px-6 py-4">HR Contact</th>
-                <th className="px-6 py-4">Industry & Size</th>
-                <th className="px-6 py-4">GST Number</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-2 py-3 w-[22%]">Company Info</th>
+                <th className="px-2 py-3 w-[20%]">HR Contact</th>
+                <th className="px-2 py-3 w-[18%]">Industry & Size</th>
+                <th className="px-2 py-3 w-[10%]">Status</th>
+                <th className="px-2 py-3 w-[30%] text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {companies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <tr key={company._id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-slate-800">{company.companyName}</div>
-                    <div className="text-xs text-blue-600 hover:underline">
+                  <td className="px-2 py-3 break-words align-top">
+                    <div className="font-semibold text-slate-800 break-words">{company.companyName}</div>
+                    <div className="text-[10px] sm:text-xs text-blue-600 hover:underline break-all">
                       <a href={company.website} target="_blank" rel="noreferrer">{company.website}</a>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-700">{company.hrName}</div>
-                    <div className="text-xs text-slate-500">{company.userId?.email}</div>
+                  <td className="px-2 py-3 break-words align-top">
+                    <div className="font-medium text-slate-700 break-words">{company.hrName}</div>
+                    <div className="text-[10px] sm:text-xs text-slate-500 break-all">{company.userId?.email}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-700">{company.industryType}</div>
-                    <div className="text-xs text-slate-500">{company.companySize} employees</div>
+                  <td className="px-2 py-3 break-words align-top">
+                    <div className="text-xs sm:text-sm text-slate-700 break-words">{company.industryType}</div>
+                    <div className="text-[10px] sm:text-xs text-slate-500 break-words">{company.companySize} employees</div>
                   </td>
-                  <td className="px-6 py-4 font-mono text-xs">{company.gstNumber}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                  <td className="px-2 py-3 align-top">
+                    <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium border text-center break-words
                       ${company.approvalStatus === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ''}
                       ${company.approvalStatus === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : ''}
                       ${company.approvalStatus === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' : ''}
@@ -226,21 +255,21 @@ export default function CompanyApprovals() {
                       {company.approvalStatus.charAt(0).toUpperCase() + company.approvalStatus.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap items-center justify-end gap-2">
+                  <td className="px-2 py-3 align-top">
+                    <div className="flex flex-row items-center justify-end gap-1.5 flex-nowrap whitespace-nowrap">
                       {company.approvalStatus === 'pending' && (
                         <>
                           <button 
                             onClick={() => handleAction(company._id, 'approved')}
                             disabled={actionLoading === company._id}
-                            className="text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                            className="text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md transition-colors text-xs whitespace-nowrap"
                           >
                             Approve
                           </button>
                           <button 
                             onClick={() => handleAction(company._id, 'rejected')}
                             disabled={actionLoading === company._id}
-                            className="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                            className="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md transition-colors text-xs whitespace-nowrap"
                           >
                             Reject
                           </button>
@@ -250,7 +279,7 @@ export default function CompanyApprovals() {
                         <button 
                           onClick={() => handleAction(company._id, 'suspended')}
                           disabled={actionLoading === company._id}
-                          className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                          className="text-amber-600 hover:text-amber-800 font-medium bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-md transition-colors text-xs whitespace-nowrap"
                         >
                           Suspend
                         </button>
@@ -258,14 +287,14 @@ export default function CompanyApprovals() {
                       <button 
                         onClick={() => handleView(company._id)}
                         disabled={actionLoading === company._id}
-                        className="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors text-xs"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-md transition-colors text-xs whitespace-nowrap"
                       >
                         View
                       </button>
                       <button 
                         onClick={() => handleDelete(company._id)}
                         disabled={actionLoading === company._id}
-                        className="text-slate-500 hover:text-red-600 font-medium bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors text-xs"
+                        className="text-slate-500 hover:text-red-600 font-medium bg-slate-50 hover:bg-red-50 px-2.5 py-1 rounded-md transition-colors text-xs whitespace-nowrap"
                       >
                         Delete
                       </button>
@@ -274,10 +303,10 @@ export default function CompanyApprovals() {
                 </tr>
               ))}
               
-              {companies.length === 0 && (
+              {filteredCompanies.length === 0 && (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
-                    No companies registered yet.
+                    {searchQuery ? 'No companies found matching your search.' : 'No companies registered yet.'}
                   </td>
                 </tr>
               )}
