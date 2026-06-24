@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 const heroImages = [
-  '/images/hero-1.jpg',
-  '/images/hero-2.jpg',
-  '/images/hero-3.jpg',
-  '/images/hero-4.jpg'
+  '/images/new-hero-1.jpg',
+  '/images/new-hero-2.jpg',
+  '/images/new-hero-3.jpg',
+  '/images/new-hero-4.jpg'
 ];
 
 export default function LandingPage() {
@@ -32,7 +32,7 @@ export default function LandingPage() {
       <header className="bg-white py-3 px-6 md:px-12 flex items-center justify-between shadow-sm sticky top-0 z-50">
         {/* Logo */}
         <div className="flex items-center">
-          <img src="/logo.jpg" alt="Madurai Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
+          <img src="/new-logo.png" alt="Madurai Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
         </div>
 
 
