@@ -4,6 +4,8 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     await dbConnect();
