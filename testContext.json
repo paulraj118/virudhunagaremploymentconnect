@@ -1,0 +1,12 @@
+{
+  "hrToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDM0YjBhYjA1M2MzYmRjY2Y1M2U4MSIsInJvbGUiOiJocl9jb21wYW55IiwiaWF0IjoxNzgyNzk1MDE4LCJleHAiOjE3ODI3OTg2MTh9.f9zc20ju2FwSD1tOoZPJC0bx-G8kBJcyat4ryG7YVWo",
+  "candidateToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDM0YjBhYjA1M2MzYmRjY2Y1M2U3ZiIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzgyNzk1MDE4LCJleHAiOjE3ODI3OTg2MTh9.1ABzXeNB_BVlM5fvao-A4llpQumuXvsBuSljrmw_mKM",
+  "candidateUserId": "6a434b0ab053c3bdccf53e7f",
+  "studentId": "6a434b0ab053c3bdccf53e80",
+  "companyId": "6a434b0ab053c3bdccf53e82",
+  "jobId": "6a434b0ab053c3bdccf53e83",
+  "applicationId": "6a434b0ab053c3bdccf53e85",
+  "assessmentResultId": "6a434b0ab053c3bdccf53e86",
+  "technicalAttemptId": "6a434b0ab053c3bdccf53e87",
+  "techTestId": "6a434b0ab053c3bdccf53e84"
+}

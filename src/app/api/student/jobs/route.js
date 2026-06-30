@@ -29,11 +29,6 @@ export async function GET(request) {
     const studentApplications = await JobApplication.find({ studentId: student._id }).select('jobId');
     const appliedJobIds = studentApplications.map(app => app.jobId.toString());
 
-    // Temporary logs for debugging Candidate Apply Now / Already Applied issue
-    console.log(`[DEBUG] Candidate ID (Student ID): ${student._id}`);
-    console.log(`[DEBUG] JobApplication query result size: ${studentApplications.length}`);
-    console.log(`[DEBUG] Applied Job IDs: ${JSON.stringify(appliedJobIds)}`);
-
     // AI Job Recommendation: calculate match score for each job and sort them
     const recommendedJobs = allJobs.map(job => {
       const aiScores = calculateMatchScore(
@@ -44,7 +39,6 @@ export async function GET(request) {
       );
 
       const hasApplied = appliedJobIds.includes(job._id.toString());
-      console.log(`[DEBUG] Job ID: ${job._id}, hasApplied: ${hasApplied}`);
 
       return {
         ...job._doc,

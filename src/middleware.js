@@ -68,29 +68,58 @@ async function verifyJWT(token, secret) {
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Protect all /admin routes except /admin/login
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get('token')?.value;
+  let decodedPayload = null;
+  if (token) {
+    decodedPayload = await verifyJWT(token, JWT_SECRET);
+  }
 
-    if (!token) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-
-    const decodedPayload = await verifyJWT(token, JWT_SECRET);
-
+  // Admin Protection
+  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!decodedPayload || decodedPayload.role !== 'super_admin') {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
   }
+  if (pathname === '/admin/login' && decodedPayload?.role === 'super_admin') {
+    return NextResponse.redirect(new URL('/admin', request.url));
+  }
 
-  // Optional: Redirect already authenticated super_admin away from /admin/login
-  if (pathname === '/admin/login') {
-    const token = request.cookies.get('token')?.value;
-    if (token) {
-      const decodedPayload = await verifyJWT(token, JWT_SECRET);
-      if (decodedPayload && decodedPayload.role === 'super_admin') {
-        return NextResponse.redirect(new URL('/admin', request.url));
-      }
+  // Student Protection
+  if (pathname.startsWith('/student') && !pathname.startsWith('/student/login') && !pathname.startsWith('/student/register')) {
+    if (!decodedPayload || decodedPayload.role !== 'student') {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  // Company Protection
+  if (pathname.startsWith('/company') && !pathname.startsWith('/company/login') && !pathname.startsWith('/company/register')) {
+    // Both 'company' (standalone) and 'hr_company' (unified user)
+    if (!decodedPayload || (decodedPayload.role !== 'company' && decodedPayload.role !== 'hr_company')) {
+      return NextResponse.redirect(new URL('/company/login', request.url));
+    }
+  }
+
+  // College Protection
+  if (pathname.startsWith('/college') && !pathname.startsWith('/college/login') && !pathname.startsWith('/college/register')) {
+    if (!decodedPayload || decodedPayload.role !== 'college') {
+      return NextResponse.redirect(new URL('/college/login', request.url));
+    }
+  }
+
+  // Redirect authenticated users away from unified or specific login pages
+  const isLoginPage = pathname === '/login' || pathname.endsWith('/login');
+  if (isLoginPage && decodedPayload) {
+    if (decodedPayload.role === 'super_admin' && !pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    if (decodedPayload.role === 'student' && !pathname.startsWith('/student')) {
+      return NextResponse.redirect(new URL('/student/jobs', request.url));
+    }
+    if ((decodedPayload.role === 'company' || decodedPayload.role === 'hr_company') && !pathname.startsWith('/company')) {
+      return NextResponse.redirect(new URL('/company', request.url));
+    }
+    if (decodedPayload.role === 'college' && !pathname.startsWith('/college')) {
+      return NextResponse.redirect(new URL('/college/dashboard', request.url));
     }
   }
 
@@ -98,5 +127,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: ['/admin/:path*', '/student/:path*', '/company/:path*', '/college/:path*', '/login'],
 };

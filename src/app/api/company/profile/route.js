@@ -48,6 +48,13 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Company Registration Error:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return NextResponse.json({ success: false, message: `Validation failed: ${messages.join(', ')}` }, { status: 400 });
+    }
+    if (error.code === 11000) {
+      return NextResponse.json({ success: false, message: 'A company profile already exists or duplicate code/email detected.' }, { status: 400 });
+    }
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }
@@ -138,6 +145,10 @@ export async function PUT(request) {
 
   } catch (error) {
     console.error('Update Company Error:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return NextResponse.json({ success: false, message: `Validation failed: ${messages.join(', ')}` }, { status: 400 });
+    }
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }

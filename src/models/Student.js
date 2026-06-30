@@ -24,6 +24,16 @@ const StudentSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Please provide your year of passing out'],
     },
+    // Advanced Academic Information (Optional)
+    cgpa: { type: Number },
+    currentPercentage: { type: Number },
+    tenthPercentage: { type: Number },
+    twelfthPercentage: { type: Number },
+    currentYear: { type: String },
+    currentSemester: { type: Number },
+    activeArrears: { type: Number, default: 0 },
+    clearedArrears: { type: Number, default: 0 },
+    recommendedByCollege: { type: Boolean, default: false },
     yearsOfExperience: {
       type: Number,
       default: 0,
@@ -37,7 +47,7 @@ const StudentSchema = new mongoose.Schema(
     },
     industryTrack: {
       type: String,
-      enum: ['Arts / Engineering', 'Admin / Management', 'Pharma / Medical'],
+      enum: ['IT / Engineering', 'Admin / Management', 'Medical'],
       required: [true, 'Please select your industry track'],
     },
     resumeUrl: {
@@ -70,9 +80,49 @@ const StudentSchema = new mongoose.Schema(
     activeSessionId: {
       type: String,
       default: null,
+    },
+    // New fields for the Self Assessment Profile Form
+    preferredJobRole: {
+      type: String,
+      default: '',
+    },
+    programmingLanguages: [{
+      type: String,
+    }],
+    areasOfInterest: [{
+      type: String,
+    }],
+    hasInternship: {
+      type: String,
+      enum: ['Yes', 'No', ''],
+      default: '',
+    },
+    internshipCompany: {
+      type: String,
+      default: '',
+    },
+    internshipDuration: {
+      type: String,
+      default: '',
+    },
+    numberOfProjects: {
+      type: Number,
+      default: 0,
+    },
+    projectTitles: [{
+      type: String,
+    }],
+    selfAssessmentProfileCompleted: {
+      type: Boolean,
+      default: false,
     }
   },
   { timestamps: true }
 );
+
+StudentSchema.index({ collegeName: 1 });
+StudentSchema.index({ enrollmentStatus: 1 });
+StudentSchema.index({ placementStatus: 1 });
+StudentSchema.index({ degree: 1 });
 
 export default mongoose.models.Student || mongoose.model('Student', StudentSchema);

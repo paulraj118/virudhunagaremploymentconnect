@@ -4,6 +4,7 @@ import JobApplication from '@/models/JobApplication';
 import Company from '@/models/Company';
 import Student from '@/models/Student';
 import User from '@/models/User';
+import Job from '@/models/Job';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request) {
@@ -38,7 +39,9 @@ export async function GET(request) {
 
     let enrichedApplications = applications.map(app => {
       const appObj = app.toObject();
-      const result = assessmentResults.find(r => r.studentId.toString() === appObj.studentId._id.toString());
+      const result = appObj.studentId && appObj.studentId._id
+        ? assessmentResults.find(r => r.studentId && r.studentId.toString() === appObj.studentId._id.toString())
+        : null;
       appObj.assessmentResult = result;
       return appObj;
     });

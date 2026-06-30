@@ -1,27 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-const TRACK_DOMAINS = {
-  'Arts / Engineering': [
-    'English Literature', 'Tamil Literature', 'History', 'Economics', 'Psychology',
-    'Sociology', 'Journalism & Mass Communication', 'Visual Communication', 'Fine Arts',
-    'Data Science', 'Artificial Intelligence & Machine Learning', 'Cyber Security',
-    'Cloud Computing', 'Full Stack Development', 'Mechanical Engineering',
-    'Civil Engineering', 'Electrical Engineering',
-    'Electronics & Communication Engineering (ECE)', 'Automobile Engineering', 'Others'
-  ],
-  'Admin / Management': [
-    'Human Resources (HR)', 'Marketing', 'Finance', 'Operations Management',
-    'Business Analytics', 'Supply Chain Management', 'Banking', 'Accounting',
-    'Entrepreneurship', 'Others'
-  ],
-  'Pharma / Medical': [
-    'Pharmacy', 'Clinical Research', 'Nursing', 'Physiotherapy',
-    'Medical Laboratory Technology', 'Healthcare Management', 'Biotechnology',
-    'Pharmacovigilance', 'Public Health', 'Others'
-  ],
-};
+import { TRACK_DOMAINS } from '@/lib/domainConstants';
 
 const DOMAIN_KEYWORDS = {
   'English Literature': ['Creative Writing', 'Content Writing', 'Copyediting', 'Textual Analysis', 'Literary Theory', 'Research'],
@@ -90,7 +70,15 @@ export default function Profile() {
     industryTrack: '',
     preferredDomain: '',
     customDomain: '',
-    skills: ''
+    skills: '',
+    cgpa: '',
+    currentPercentage: '',
+    tenthPercentage: '',
+    twelfthPercentage: '',
+    currentYear: '',
+    currentSemester: '',
+    activeArrears: '0',
+    clearedArrears: '0'
   });
 
   useEffect(() => {
@@ -143,7 +131,15 @@ export default function Profile() {
       industryTrack: student.industryTrack || '',
       preferredDomain: isCustom ? 'Others' : (student.preferredDomain || ''),
       customDomain: isCustom ? student.preferredDomain : '',
-      skills: student.skills ? student.skills.join(', ') : ''
+      skills: student.skills ? student.skills.join(', ') : '',
+      cgpa: student.cgpa || '',
+      currentPercentage: student.currentPercentage || '',
+      tenthPercentage: student.tenthPercentage || '',
+      twelfthPercentage: student.twelfthPercentage || '',
+      currentYear: student.currentYear || '',
+      currentSemester: student.currentSemester || '',
+      activeArrears: student.activeArrears ?? '0',
+      clearedArrears: student.clearedArrears ?? '0'
     });
     setIsEditModalOpen(true);
   };
@@ -172,7 +168,15 @@ export default function Profile() {
           yearsOfExperience: parseInt(editData.yearsOfExperience),
           industryTrack: editData.industryTrack,
           preferredDomain: finalDomain,
-          skills: editData.skills
+          skills: editData.skills,
+          cgpa: editData.cgpa ? parseFloat(editData.cgpa) : undefined,
+          currentPercentage: editData.currentPercentage ? parseFloat(editData.currentPercentage) : undefined,
+          tenthPercentage: editData.tenthPercentage ? parseFloat(editData.tenthPercentage) : undefined,
+          twelfthPercentage: editData.twelfthPercentage ? parseFloat(editData.twelfthPercentage) : undefined,
+          currentYear: editData.currentYear,
+          currentSemester: editData.currentSemester ? parseInt(editData.currentSemester) : undefined,
+          activeArrears: parseInt(editData.activeArrears),
+          clearedArrears: parseInt(editData.clearedArrears)
         })
       });
       const data = await res.json();
@@ -794,6 +798,44 @@ export default function Profile() {
                     placeholder="React, Node.js, Python, CSS..."
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800 resize-none"
                   />
+                </div>
+
+                {/* Advanced Academic Information */}
+                <div className="sm:col-span-2 mt-4">
+                  <h4 className="text-sm font-bold text-slate-700 border-b pb-2 mb-4">Advanced Academic Information (Optional)</h4>
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">CGPA</label>
+                  <input type="number" step="0.01" value={editData.cgpa} onChange={e => setEditData({...editData, cgpa: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Current %</label>
+                  <input type="number" step="0.01" value={editData.currentPercentage} onChange={e => setEditData({...editData, currentPercentage: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">10th %</label>
+                  <input type="number" step="0.01" value={editData.tenthPercentage} onChange={e => setEditData({...editData, tenthPercentage: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">12th %</label>
+                  <input type="number" step="0.01" value={editData.twelfthPercentage} onChange={e => setEditData({...editData, twelfthPercentage: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Current Year / Pass Year</label>
+                  <input type="text" value={editData.currentYear} onChange={e => setEditData({...editData, currentYear: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Current Semester</label>
+                  <input type="number" value={editData.currentSemester} onChange={e => setEditData({...editData, currentSemester: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Active Arrears</label>
+                  <input type="number" value={editData.activeArrears} onChange={e => setEditData({...editData, activeArrears: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Cleared Arrears</label>
+                  <input type="number" value={editData.clearedArrears} onChange={e => setEditData({...editData, clearedArrears: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-semibold text-slate-800" />
                 </div>
 
               </div>

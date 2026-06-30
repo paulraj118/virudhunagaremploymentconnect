@@ -64,6 +64,14 @@ export default function AdminLayout({ children }) {
     { name: 'Student Approvals', path: '/admin/approvals/students' },
     { name: 'Company Approvals', path: '/admin/approvals/companies' },
     { name: 'Assessments', path: '/admin/assessments' },
+    { name: 'Question Bank', path: '/admin/question-bank' },
+    { name: 'SA Analytics', path: '/admin/analytics' },
+    { name: 'Skill Gap Analysis', path: '/admin/skill-gap' },
+    { name: 'Candidate Ranking', path: '/admin/candidate-ranking' },
+    { name: 'Companies', path: '/admin/companies' },
+    { name: 'Campus Recruitment', path: '/admin/drives' },
+    { name: 'Interviews', path: '/admin/interviews' },
+    { name: 'Offers', path: '/admin/offers' },
     { name: 'Settings', path: '/admin/settings' },
   ];
 

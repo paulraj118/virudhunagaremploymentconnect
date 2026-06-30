@@ -312,7 +312,7 @@ export default function JobBoard() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vacancies</span>
-                  <span className="text-slate-800 font-extrabold text-sm">{selectedJob.vacancies || 'Not specified'}</span>
+                  <span className="text-slate-800 font-extrabold text-sm">{selectedJob.vacancyCount || 'Not specified'}</span>
                 </div>
               </div>
 

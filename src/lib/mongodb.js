@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import { validateEnvVars } from './envConfig';
+
+validateEnvVars();
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/jobfair_pro';
 
@@ -23,7 +26,6 @@ async function dbConnect() {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB connected successfully');
       return mongoose;
     });
   }

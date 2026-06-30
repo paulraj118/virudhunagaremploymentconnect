@@ -1,112 +1,65 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Company from '@/models/Company';
-import User from '@/models/User';
 import Job from '@/models/Job';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request, { params }) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded) {
+    if (!decoded || decoded.role !== 'super_admin') {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = await params;
     await dbConnect();
-    
-    const company = await Company.findById(id).populate('userId', 'name email mobile role');
+    const { id } = await params;
 
+    const company = await Company.findById(id).populate('userId', 'name email mobile');
     if (!company) {
       return NextResponse.json({ success: false, message: 'Company not found' }, { status: 404 });
     }
 
     // Fetch jobs posted by this company
-    const jobs = await Job.find({ companyId: company._id }).sort({ createdAt: -1 });
+    const jobs = await Job.find({ companyId: company._id }).select('title department location salary vacancyCount isActive createdAt');
 
-    // Transform data to include jobs
-    const data = company.toObject();
-    data.jobs = jobs;
+    const companyData = company.toObject();
+    companyData.jobs = jobs;
 
-    return NextResponse.json({
-      success: true,
-      data
-    });
-
+    return NextResponse.json({ success: true, data: companyData });
   } catch (error) {
-    console.error('Fetch Company Details Error:', error);
+    console.error('Get Company Details Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }
-
 export async function PUT(request, { params }) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded) {
+    if (!decoded || decoded.role !== 'super_admin') {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = await params;
-    const body = await request.json();
-    const { status, companyName, hrName } = body;
-
-    const updateData = {};
-    if (status) {
-      if (!['approved', 'rejected', 'suspended', 'pending'].includes(status)) {
-        return NextResponse.json({ success: false, message: 'Invalid status' }, { status: 400 });
-      }
-      updateData.approvalStatus = status;
-    }
-    if (companyName) updateData.companyName = companyName;
-    if (hrName) updateData.hrName = hrName;
-
     await dbConnect();
-    
-    const company = await Company.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
+    const { id } = await params;
+    const { status } = await request.json();
 
+    const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+
+    const company = await Company.findByIdAndUpdate(
+      id, 
+      { 
+        status: capitalizedStatus,
+        approvalStatus: status
+      }, 
+      { new: true }
+    ).select('-password');
+    
     if (!company) {
       return NextResponse.json({ success: false, message: 'Company not found' }, { status: 404 });
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `Company successfully updated`,
-      data: company
-    });
-
+    return NextResponse.json({ success: true, company, message: 'Company status updated' });
   } catch (error) {
     console.error('Update Company Error:', error);
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
-  }
-}
-
-export async function DELETE(request, { params }) {
-  try {
-    const decoded = await getCurrentUser();
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { id } = await params;
-    await dbConnect();
-    
-    const company = await Company.findByIdAndDelete(id);
-
-    if (!company) {
-      return NextResponse.json({ success: false, message: 'Company not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Company successfully deleted'
-    });
-
-  } catch (error) {
-    console.error('Delete Company Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }

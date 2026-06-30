@@ -13,7 +13,7 @@ export default function CompanyApprovals() {
   const [previewCert, setPreviewCert] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredCompanies = companies.filter(company => {
+  const filteredCompanies = (companies || []).filter(company => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -46,8 +46,8 @@ export default function CompanyApprovals() {
       const res = await fetch('/api/admin/companies');
       const data = await res.json();
       if (data.success) {
-        setCompanies(data.data);
-        setStats(data.stats);
+        setCompanies(data.companies || []);
+        if (data.stats) setStats(data.stats);
       }
     } catch (error) {
       console.error(error);

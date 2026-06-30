@@ -52,4 +52,8 @@ const JobSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+JobSchema.index({ companyId: 1 });
+JobSchema.index({ isActive: 1 });
+JobSchema.index({ role: 1 });
+
 export default mongoose.models.Job || mongoose.model('Job', JobSchema);

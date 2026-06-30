@@ -277,7 +277,16 @@ export default function PlacementTracking() {
                   <td className="px-2 py-2.5">
                     <select 
                       value={app.stage}
-                      onChange={(e) => updateStage(app._id, e.target.value)}
+                      onChange={(e) => {
+                        const stage = e.target.value;
+                        if (stage === 'Interview Scheduled') {
+                          setSelectedApp(app);
+                          setInterviewData({ date: '', link: '' });
+                          setShowInterviewModal(true);
+                        } else {
+                          updateStage(app._id, stage);
+                        }
+                      }}
                       className={`text-[10px] font-bold rounded-lg px-2 py-1 border outline-none cursor-pointer w-full
                         ${app.stage === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' : ''}
                         ${app.stage === 'Joined' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ''}

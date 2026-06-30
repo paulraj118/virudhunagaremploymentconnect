@@ -43,6 +43,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    resetPasswordToken: {
+      type: String
+    },
+    resetPasswordExpire: {
+      type: Date
+    }
   },
   { timestamps: true }
 );
@@ -60,5 +66,9 @@ UserSchema.pre('save', async function () {
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// Indexes
+UserSchema.index({ role: 1 });
+UserSchema.index({ isActive: 1 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -45,6 +45,7 @@ export default function AssessmentPage() {
   const [pendingJobId, setPendingJobId] = useState(null);
   const [pendingJobTitle, setPendingJobTitle] = useState('');
   const [pendingJobCompany, setPendingJobCompany] = useState('');
+  const [alreadyTakenJob, setAlreadyTakenJob] = useState(false);
 
   // Timer and Scroll Refs
   const timerRef = useRef(null);
@@ -154,7 +155,8 @@ export default function AssessmentPage() {
         }
 
         const storedJobId = sessionStorage.getItem('pendingApplyJobId');
-        const res = await fetch(`/api/student/assessment?jobId=${storedJobId}`);
+        const assessmentParams = new URLSearchParams({ jobId: storedJobId || '' });
+        const res = await fetch(`/api/student/assessment?${assessmentParams}`);
         const data = await res.json();
         
         if (data.success) {
@@ -162,6 +164,7 @@ export default function AssessmentPage() {
             setIsFinished(true);
             setResult(data.result);
             setStudentName(data.studentName || 'Student');
+            if (data.alreadyTakenJob) setAlreadyTakenJob(true);
           } else {
             setQuestions(data.questions || []);
             setStudentName(data.studentName || 'Student');
@@ -500,7 +503,13 @@ export default function AssessmentPage() {
           
           <div className={`absolute top-0 left-0 w-full h-2.5 ${isPass ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gradient-to-r from-rose-500 to-red-600'}`}></div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 relative">
+            {alreadyTakenJob && (
+              <div className="absolute top-0 left-0 right-0 z-50 bg-indigo-50 border-b border-indigo-100 p-3 flex items-center justify-center gap-2 text-indigo-700 rounded-t-[2.5rem]">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span className="text-xs font-bold">You have already completed the assessment for this job. Displaying your existing result.</span>
+              </div>
+            )}
             
             {/* Left Column Status Panel */}
             <div className={`lg:col-span-5 p-10 md:p-14 flex flex-col items-center justify-center relative overflow-hidden ${isPass ? 'bg-gradient-to-b from-emerald-50/40 to-white' : 'bg-gradient-to-b from-rose-50/40 to-white'}`}>
@@ -964,6 +973,7 @@ export default function AssessmentPage() {
         {showSubmitModal && (
           <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] max-w-md w-full p-8 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 select-none">
+              
               <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
               </div>

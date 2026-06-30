@@ -3,9 +3,13 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { rateLimiter } from '@/lib/rateLimit';
 
 export async function POST(request) {
   try {
+    if (rateLimiter(request, 5, 60000)) {
+      return NextResponse.json({ success: false, message: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
     await dbConnect();
     const body = await request.json();
     const { email, password } = body;

@@ -4,6 +4,7 @@ import Student from '@/models/Student';
 import Question from '@/models/Question';
 import AssessmentResult from '@/models/AssessmentResult';
 import JobApplication from '@/models/JobApplication';
+import Job from '@/models/Job';
 import User from '@/models/User';
 import { getCurrentUser } from '@/lib/auth';
 import { fallbackQuestions, resolveDomain, getFallbackDomain } from '@/lib/assessmentDefaults';
@@ -89,6 +90,24 @@ export async function GET(request) {
     const isStart = searchParams.get('start') === 'true';
     const sessionId = searchParams.get('sessionId');
     const jobId = searchParams.get('jobId');
+    let jobTitle = '';
+    let jobDescription = '';
+    let jobSkills = [];
+    
+    if (jobId) {
+      try {
+        const dbJob = await Job.findById(jobId);
+        if (dbJob) {
+          jobTitle = dbJob.title;
+          jobDescription = dbJob.description;
+          jobSkills = dbJob.skills || [];
+        }
+      } catch (e) {
+        console.error("Error fetching job details for assessment:", e);
+      }
+    }
+    
+    const isJobBased = jobSkills.length > 0 && jobDescription;
 
     if (isPing) {
       if (!sessionId) {
@@ -115,12 +134,28 @@ export async function GET(request) {
 
     const existingResult = await AssessmentResult.findOne(existingResultQuery).sort({ createdAt: -1 });
     
-    // Only return the existing result (blocking a retake) if they have PASSED for this job.
-    // If they failed, we allow them to retake by serving new questions.
-    if (existingResult && existingResult.passFail === 'Pass') {
+    // Determine if we should block retake
+    let shouldBlock = false;
+    let alreadyTakenJob = false;
+    
+    if (existingResult) {
+      if (jobId && jobId !== 'null') {
+        // Job-Based Assessment: One attempt only, regardless of pass/fail
+        shouldBlock = true;
+        alreadyTakenJob = true;
+      } else {
+        // Self-Assessment: Allow retake if they failed, block if passed
+        if (existingResult.passFail === 'Pass') {
+          shouldBlock = true;
+        }
+      }
+    }
+
+    if (shouldBlock) {
       return NextResponse.json({
         success: true,
         completed: true,
+        alreadyTakenJob: alreadyTakenJob,
         result: existingResult,
         studentName: student.userId?.name || student.name || 'Student'
       });
@@ -167,7 +202,45 @@ export async function GET(request) {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         
         const domainLabel = resolvedDomain || rawDomain;
-        const prompt = `Generate exactly ${TOTAL_QUESTIONS} multiple choice questions for the domain: "${domainLabel}".
+        let prompt;
+
+        if (isJobBased) {
+          // =====================================================
+          // JOB-BASED QUESTION GENERATION (Apply Now flow)
+          // =====================================================
+          const skillsList = jobSkills.join(', ');
+          prompt = `Generate exactly ${TOTAL_QUESTIONS} multiple choice questions for a job assessment.
+
+JOB TITLE: "${jobTitle}"
+REQUIRED SKILLS: ${skillsList}
+JOB DESCRIPTION: ${jobDescription}
+
+DIFFICULTY DISTRIBUTION (STRICT):
+- ${DIFFICULTY_DISTRIBUTION.Easy} questions with difficulty "Easy" (fundamentals, basic definitions, terminology of the required skills)
+- ${DIFFICULTY_DISTRIBUTION.Medium} questions with difficulty "Medium" (practical scenarios, application of the required skills)
+- ${DIFFICULTY_DISTRIBUTION.Hard} questions with difficulty "Hard" (problem solving, advanced concepts, job-specific scenarios)
+
+RULES:
+- Questions must be generated ONLY from the Required Skills and Job Description above.
+- Cover core technical concepts of each required skill.
+- Include practical problem-solving questions.
+- Include job-specific scenario questions based on the job description.
+- Questions must be suitable for freshers and job seekers.
+- NO generic aptitude or unrelated questions.
+- NO duplicate questions.
+- Each question must have exactly 4 options with only one correct answer.
+${previouslyUsedTexts.length > 0 ? `- Do NOT use any of these question texts (already asked before): ${previouslyUsedTexts.slice(0, 10).map(t => `"${t.substring(0, 60)}"`).join(', ')}` : ''}
+
+Return ONLY a raw JSON array of objects. Each object must have exactly these fields:
+- "questionText" (string)
+- "options" (array of exactly 4 strings)
+- "correctOptionIndex" (integer 0 to 3)
+- "difficulty" (string: "Easy", "Medium", or "Hard")`;
+        } else {
+          // =====================================================
+          // DOMAIN-BASED QUESTION GENERATION (existing flow)
+          // =====================================================
+          prompt = `Generate exactly ${TOTAL_QUESTIONS} multiple choice questions for the domain: "${domainLabel}".
 
 DIFFICULTY DISTRIBUTION (STRICT):
 - ${DIFFICULTY_DISTRIBUTION.Easy} questions with difficulty "Easy" (fundamentals, basic definitions, terminology)
@@ -188,6 +261,7 @@ Return ONLY a raw JSON array of objects. Each object must have exactly these fie
 - "options" (array of exactly 4 strings)
 - "correctOptionIndex" (integer 0 to 3)
 - "difficulty" (string: "Easy", "Medium", or "Hard")`;
+        }
         
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
@@ -199,8 +273,9 @@ Return ONLY a raw JSON array of objects. Each object must have exactly these fie
         if (Array.isArray(generated) && generated.length >= TOTAL_QUESTIONS) {
           finalQuestions = generated.slice(0, TOTAL_QUESTIONS);
           // Save to DB so POST evaluation works seamlessly
+          const saveDomain = isJobBased ? (jobTitle || jobSkills.join(', ')) : domainLabel;
           await Question.insertMany(generated.map(q => ({
-            domain: domainLabel,
+            domain: saveDomain,
             difficulty: q.difficulty || 'Medium',
             questionText: q.questionText,
             options: q.options,
@@ -285,7 +360,7 @@ Return ONLY a raw JSON array of objects. Each object must have exactly these fie
       _id: q._id ? q._id.toString() : `fallback_${idx}`,
       questionText: q.questionText,
       options: q.options,
-      domain: resolvedDomain || rawDomain
+      domain: isJobBased ? (jobTitle || jobSkills.join(', ')) : (resolvedDomain || rawDomain)
     }));
 
     return NextResponse.json({
@@ -342,6 +417,7 @@ export async function POST(request) {
 
     let correctCount = 0;
     const totalQuestions = answers.length || TOTAL_QUESTIONS;
+    const evaluatedQuestions = [];
 
     for (const ans of answers) {
       let correctIndex = -1;
@@ -376,9 +452,21 @@ export async function POST(request) {
         selectedOptionText = dbOptions[ans.selectedOption];
       }
 
-      if (correctOptionText && selectedOptionText === correctOptionText) {
+      const isCorrect = correctOptionText && selectedOptionText === correctOptionText;
+      if (isCorrect) {
         correctCount++;
       }
+
+      evaluatedQuestions.push({
+        questionText: ans.questionText,
+        options: dbOptions.length > 0 ? dbOptions : (ans.options || []),
+        selectedOptionIndex: ans.selectedOption !== undefined ? ans.selectedOption : -1,
+        correctOptionIndex: correctIndex,
+        isCorrect: !!isCorrect,
+        explanation: dbQ?.explanation || '',
+        topic: dbQ?.topic || 'General',
+        difficulty: dbQ?.difficulty || 'Medium'
+      });
     }
 
     // Scoring Rules: 5 marks per question (20 questions = 100 marks total), 70% passing
@@ -389,6 +477,14 @@ export async function POST(request) {
 
     const rawDomain = mapDomain(student);
     const domain = resolveDomain(rawDomain) || rawDomain;
+
+    // Calculate time taken
+    const loginTime = loginTimestamp ? new Date(loginTimestamp) : new Date();
+    const timeTaken = Math.round((new Date() - loginTime) / 1000);
+
+    // Generate feedback
+    const feedback = generateFeedback(evaluatedQuestions, percentage, 'medium', timeTaken, totalQuestions, domain);
+
     const result = await AssessmentResult.create({
       studentId: student._id,
       jobId,
@@ -413,7 +509,16 @@ export async function POST(request) {
       fullscreenExitCount: fullscreenExitCount || 0,
       devtoolsAttemptCount: devtoolsAttemptCount || 0,
       clipboardAttemptCount: clipboardAttemptCount || 0,
-      integrityScore: integrityScore !== undefined ? integrityScore : 100
+      integrityScore: integrityScore !== undefined ? integrityScore : 100,
+      // Save report details
+      questions: evaluatedQuestions,
+      strengths: feedback.strengths,
+      weaknesses: feedback.weaknesses,
+      suggestions: feedback.suggestions,
+      interviewReadiness: feedback.interviewReadiness,
+      confidenceLevel: feedback.confidenceLevel,
+      suggestedStudyTime: feedback.suggestedStudyTime,
+      overallRecommendation: feedback.overallRecommendation
     });
 
     // Reset student active session
@@ -441,4 +546,111 @@ export async function POST(request) {
     console.error('Submit Assessment Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
+}
+
+// FEEDBACK ENGINE — Generates personalized, non-generic feedback for assessment reports
+function generateFeedback(evaluatedQuestions, percentage, level, timeTaken, totalQuestions, domain) {
+  const topicStats = {};
+  for (const q of evaluatedQuestions) {
+    if (!topicStats[q.topic]) {
+      topicStats[q.topic] = { correct: 0, total: 0, wrong: 0, skipped: 0 };
+    }
+    topicStats[q.topic].total++;
+    if (q.isCorrect) topicStats[q.topic].correct++;
+    else if (q.selectedOptionIndex === -1) topicStats[q.topic].skipped++;
+    else topicStats[q.topic].wrong++;
+  }
+
+  const topicPerformance = {};
+  for (const [topic, stats] of Object.entries(topicStats)) {
+    topicPerformance[topic] = Math.round((stats.correct / stats.total) * 100);
+  }
+
+  const strengths = [];
+  for (const [topic, pct] of Object.entries(topicPerformance)) {
+    if (pct >= 80) {
+      strengths.push(`Strong understanding of ${topic} (${pct}% accuracy)`);
+    }
+  }
+  if (strengths.length === 0 && percentage >= 50) {
+    strengths.push('Demonstrates basic understanding across multiple topics');
+  }
+  if (percentage >= 90) {
+    strengths.push('Exceptional overall performance indicating deep domain knowledge');
+  }
+  if (percentage >= 70 && timeTaken < 600) {
+    strengths.push('Excellent time management — completed efficiently with high accuracy');
+  }
+
+  const weaknesses = [];
+  for (const [topic, pct] of Object.entries(topicPerformance)) {
+    if (pct < 50) {
+      weaknesses.push(`Needs improvement in ${topic} (${pct}% accuracy)`);
+    }
+  }
+  const skippedTotal = evaluatedQuestions.filter(q => q.selectedOptionIndex === -1).length;
+  if (skippedTotal > 3) {
+    weaknesses.push(`Skipped ${skippedTotal} questions — indicates gaps in confidence or knowledge`);
+  }
+  if (percentage < 40) {
+    weaknesses.push('Fundamental concepts need significant review');
+  }
+
+  let interviewReadiness = percentage;
+  const allTopicsAbove60 = Object.values(topicPerformance).every(p => p >= 60);
+  if (allTopicsAbove60 && Object.keys(topicPerformance).length > 2) {
+    interviewReadiness = Math.min(100, interviewReadiness + 10);
+  }
+  const anyTopicZero = Object.values(topicPerformance).some(p => p === 0);
+  if (anyTopicZero) {
+    interviewReadiness = Math.max(0, interviewReadiness - 15);
+  }
+  interviewReadiness = Math.round(Math.min(100, Math.max(0, interviewReadiness)));
+
+  let confidenceLevel = 'Low';
+  if (percentage >= 90) confidenceLevel = 'Very High';
+  else if (percentage >= 75) confidenceLevel = 'High';
+  else if (percentage >= 50) confidenceLevel = 'Medium';
+
+  const weakTopicCount = Object.values(topicPerformance).filter(p => p < 60).length;
+  let suggestedStudyTime = '';
+  if (weakTopicCount === 0) {
+    suggestedStudyTime = 'Minimal revision needed — 2-3 hours for edge case review';
+  } else if (weakTopicCount <= 2) {
+    suggestedStudyTime = `Focus 8-10 hours on weak areas over the next week`;
+  } else if (weakTopicCount <= 4) {
+    suggestedStudyTime = `Dedicate 15-20 hours over the next 2 weeks for comprehensive study`;
+  } else {
+    suggestedStudyTime = `Intensive study recommended — 25-30 hours over 3 weeks with structured practice`;
+  }
+
+  const suggestions = [];
+  for (const [topic, pct] of Object.entries(topicPerformance)) {
+    if (pct < 50) {
+      suggestions.push(`Study ${topic} fundamentals in ${domain} — focus on core concepts and practice problems`);
+    } else if (pct >= 50 && pct < 80) {
+      suggestions.push(`Review advanced ${topic} concepts to strengthen your understanding`);
+    }
+  }
+
+  if (percentage < 50) {
+    suggestions.push(`Focus on building a strong foundation in ${domain} basics before attempting higher levels`);
+    suggestions.push('Use structured learning resources like video tutorials and official documentation');
+  } else if (percentage < 70) {
+    suggestions.push('Practice with hands-on projects to apply theoretical knowledge');
+    suggestions.push(`Consider taking mock interviews focused on ${domain}`);
+  } else {
+    suggestions.push(`Excellent foundation in ${domain} — explore advanced topics and real-world applications`);
+  }
+
+  return {
+    strengths,
+    weaknesses,
+    topicPerformance,
+    suggestions,
+    interviewReadiness,
+    confidenceLevel,
+    suggestedStudyTime,
+    overallRecommendation: percentage >= 70 ? 'Recommended for next stages' : 'Needs improvement before referral'
+  };
 }

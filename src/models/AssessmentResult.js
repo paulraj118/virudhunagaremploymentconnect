@@ -74,9 +74,44 @@ const AssessmentResultSchema = new mongoose.Schema(
     integrityScore: {
       type: Number,
       default: 100,
+    },
+    // New fields for viewing detailed assessment reports
+    questions: [
+      {
+        questionText: String,
+        options: [String],
+        selectedOptionIndex: { type: Number, default: -1 },
+        correctOptionIndex: Number,
+        isCorrect: { type: Boolean, default: false },
+        explanation: String,
+        topic: String,
+        difficulty: String,
+      }
+    ],
+    strengths: [String],
+    weaknesses: [String],
+    suggestions: [String],
+    interviewReadiness: {
+      type: Number,
+      default: 0,
+    },
+    confidenceLevel: {
+      type: String,
+      default: 'Low',
+    },
+    suggestedStudyTime: {
+      type: String,
+      default: '',
+    },
+    overallRecommendation: {
+      type: String,
+      default: '',
     }
   },
   { timestamps: true }
 );
+
+AssessmentResultSchema.index({ studentId: 1 });
+AssessmentResultSchema.index({ jobId: 1 });
 
 export default mongoose.models.AssessmentResult || mongoose.model('AssessmentResult', AssessmentResultSchema);

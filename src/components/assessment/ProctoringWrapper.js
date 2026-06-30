@@ -31,6 +31,19 @@ export default function ProctoringWrapper({
   const triggerWarning = useCallback((type, message) => {
     if (!isAssessmentActive) return;
 
+    // Handle Warning display message outside of the state updater
+    setWarningMessage(message);
+    setViolationType(type);
+    setShowWarningModal(true);
+
+    // Trigger auto-submit on 3rd violation
+    if (violationsTracker.totalCount + 1 >= 3) {
+      setWarningMessage('Maximum security warnings exceeded. Automatically submitting assessment.');
+      setTimeout(() => {
+        onAutoSubmit('violation');
+      }, 3000);
+    }
+
     setViolationsTracker((prev) => {
       const updated = { ...prev };
       
@@ -51,22 +64,9 @@ export default function ProctoringWrapper({
 
       updated.totalCount += 1;
 
-      // Handle Warning display message
-      setWarningMessage(message);
-      setViolationType(type);
-      setShowWarningModal(true);
-
-      // Trigger auto-submit on 3rd violation
-      if (updated.totalCount >= 3) {
-        setWarningMessage('Maximum security warnings exceeded. Automatically submitting assessment.');
-        setTimeout(() => {
-          onAutoSubmit('violation');
-        }, 3000);
-      }
-
       return updated;
     });
-  }, [isAssessmentActive, onAutoSubmit, setViolationsTracker]);
+  }, [isAssessmentActive, onAutoSubmit, setViolationsTracker, violationsTracker.totalCount]);
 
   const enforceFullscreen = () => {
     const elem = document.documentElement;

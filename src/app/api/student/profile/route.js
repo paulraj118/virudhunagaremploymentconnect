@@ -21,7 +21,15 @@ export async function PUT(request) {
       yearOfPassedOut,
       yearsOfExperience,
       industryTrack,
-      preferredDomain
+      preferredDomain,
+      cgpa,
+      currentPercentage,
+      tenthPercentage,
+      twelfthPercentage,
+      currentYear,
+      currentSemester,
+      activeArrears,
+      clearedArrears
     } = body;
 
     await dbConnect();
@@ -40,6 +48,16 @@ export async function PUT(request) {
     if (yearsOfExperience !== undefined) updateData.yearsOfExperience = parseInt(yearsOfExperience || 0);
     if (industryTrack !== undefined) updateData.industryTrack = industryTrack;
     if (preferredDomain !== undefined) updateData.preferredDomain = preferredDomain;
+    
+    // Academic fields
+    if (cgpa !== undefined) updateData.cgpa = cgpa;
+    if (currentPercentage !== undefined) updateData.currentPercentage = currentPercentage;
+    if (tenthPercentage !== undefined) updateData.tenthPercentage = tenthPercentage;
+    if (twelfthPercentage !== undefined) updateData.twelfthPercentage = twelfthPercentage;
+    if (currentYear !== undefined) updateData.currentYear = currentYear;
+    if (currentSemester !== undefined) updateData.currentSemester = currentSemester;
+    if (activeArrears !== undefined) updateData.activeArrears = activeArrears;
+    if (clearedArrears !== undefined) updateData.clearedArrears = clearedArrears;
     
     // Find the existing student first
     const existingStudent = await Student.findOne({ userId: decoded.id });

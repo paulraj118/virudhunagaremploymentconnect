@@ -8,7 +8,8 @@ const heroImages = [
   '/images/new-hero-1.jpg',
   '/images/new-hero-2.jpg',
   '/images/new-hero-3.jpg',
-  '/images/new-hero-4.jpg'
+  '/images/new-hero-4.jpg',
+  '/images/new-hero-5.jpg'
 ];
 
 export default function LandingPage() {
@@ -101,28 +102,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <div className="relative z-20 max-w-6xl mx-auto px-6 -mt-12 flex flex-wrap justify-center gap-4">
-        {[
-          { number: "10,000+", label: "Active Jobs", icon: "briefcase" },
-          { number: "25,000+", label: "Job Seekers", icon: "users" },
-          { number: "2,500+", label: "Employers", icon: "building" },
-          { number: "100+", label: "Assessments", icon: "clipboard" }
-        ].map((stat, idx) => (
-          <div key={idx} className="bg-white rounded-xl shadow-lg p-6 flex items-center gap-4 w-60 border border-slate-100/50">
-            <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-[#0B1E40]">
-              {stat.icon === 'briefcase' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>}
-              {stat.icon === 'users' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>}
-              {stat.icon === 'building' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>}
-              {stat.icon === 'clipboard' && <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>}
-            </div>
-            <div>
-              <div className="text-xl font-black text-[#0B1E40] tracking-tight">{stat.number}</div>
-              <div className="text-xs font-bold text-slate-500">{stat.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Popular Categories */}
       <section className="py-24 px-6 max-w-7xl mx-auto">

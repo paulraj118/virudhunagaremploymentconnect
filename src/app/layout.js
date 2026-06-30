@@ -2,7 +2,7 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata = {
-  title: 'Job Fair - Recruitment Platform',
+  title: 'virudhunagarempolymentconnect',
   description: 'AI-Powered Recruitment, Assessment & Placement Platform',
 };
 

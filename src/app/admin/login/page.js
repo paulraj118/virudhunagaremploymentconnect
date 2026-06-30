@@ -80,9 +80,14 @@ export default function AdminLogin() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 mt-3" htmlFor="password">
-                Password
-              </label>
+              <div className="flex justify-between items-center mb-1 mt-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="password">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300">
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   id="password"
