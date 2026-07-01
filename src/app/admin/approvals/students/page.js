@@ -10,6 +10,8 @@ export default function StudentApprovals() {
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
     fetchEnrollments();
@@ -149,6 +151,15 @@ export default function StudentApprovals() {
     document.body.removeChild(a);
   };
 
+  const filteredEnrollments = enrollments.filter(student => {
+    const searchMatch = 
+      student.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.userId?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.collegeName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const statusMatch = filterStatus === 'all' || student.enrollmentStatus === filterStatus;
+    return searchMatch && statusMatch;
+  });
+
   if (loading) return <div className="p-8">Loading enrollments...</div>;
 
   return (
@@ -197,6 +208,26 @@ export default function StudentApprovals() {
         </div>
       )}
 
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <input 
+          type="text"
+          placeholder="Search by name, email or college..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+        />
+        <select 
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm"
+        >
+          <option value="all">All Status</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-600">
@@ -210,8 +241,15 @@ export default function StudentApprovals() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {enrollments.map((student) => (
-                <tr key={student._id} className="hover:bg-slate-50 transition-colors">
+              {filteredEnrollments.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                    No students found matching your criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredEnrollments.map((student) => (
+                  <tr key={student._id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-slate-800">{student.userId?.name}</div>
                     <div className="text-xs text-slate-500">{student.userId?.email}</div>
