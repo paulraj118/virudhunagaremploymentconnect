@@ -164,39 +164,37 @@ export default function CompanyApprovals() {
         </div>
       </div>
 
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors flex items-center gap-4 shadow-sm">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Companies</div>
-              <div className="text-xl font-bold text-slate-800">{stats.totalCompanies}</div>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors flex items-center gap-4 shadow-sm">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
           </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors flex items-center gap-4 shadow-sm">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Companies</div>
-              <div className="text-xl font-bold text-slate-800">{stats.activeCompanies}</div>
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-300 transition-colors flex items-center gap-4 shadow-sm">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-50 text-amber-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Approvals</div>
-              <div className="text-xl font-bold text-slate-800">{stats.pendingApprovals}</div>
-            </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Companies</div>
+            <div className="text-xl font-bold text-slate-800">{companies.length}</div>
           </div>
         </div>
-      )}
+
+        <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-emerald-300 transition-colors flex items-center gap-4 shadow-sm">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Companies</div>
+            <div className="text-xl font-bold text-slate-800">{companies.filter(c => c.approvalStatus === 'approved').length}</div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-300 transition-colors flex items-center gap-4 shadow-sm">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-50 text-amber-600">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Approvals</div>
+            <div className="text-xl font-bold text-slate-800">{companies.filter(c => c.approvalStatus === 'pending').length}</div>
+          </div>
+        </div>
+      </div>
 
       {/* Search Bar */}
       <div className="mb-6">
