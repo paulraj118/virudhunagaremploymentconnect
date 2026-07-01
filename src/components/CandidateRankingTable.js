@@ -129,17 +129,17 @@ export default function CandidateRankingTable({ role = 'college' }) {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto min-h-[400px]">
-        <table className="w-full text-left text-sm border-collapse">
+      <div className="overflow-x-hidden min-h-[400px]">
+        <table className="w-full text-left text-sm border-collapse table-fixed">
           <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
             <tr>
-              <th className="px-4 py-3">Rank</th>
-              <th className="px-4 py-3">Candidate</th>
-              {role === 'super_admin' && <th className="px-4 py-3">College</th>}
-              <th className="px-4 py-3">Domain / Track</th>
-              <th className="px-4 py-3">Employability</th>
-              <th className="px-4 py-3">Readiness</th>
-              <th className="px-4 py-3 text-right">Action</th>
+              <th className="px-3 py-3 w-16">Rank</th>
+              <th className="px-3 py-3 w-1/5">Candidate</th>
+              {role === 'super_admin' && <th className="px-3 py-3 w-1/4">College</th>}
+              <th className="px-3 py-3 w-1/5">Domain / Track</th>
+              <th className="px-3 py-3 w-32">Employability</th>
+              <th className="px-3 py-3 w-28">Readiness</th>
+              <th className="px-3 py-3 text-right w-28">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -149,34 +149,38 @@ export default function CandidateRankingTable({ role = 'college' }) {
               <tr><td colSpan="7" className="text-center p-8 text-slate-500">No candidates found</td></tr>
             ) : (
               candidates.map((c, idx) => (
-                <tr key={c._id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                  <td className="px-4 py-3 font-bold text-slate-400">#{(page - 1) * 15 + idx + 1}</td>
-                  <td className="px-4 py-3">
-                    <div className="font-bold text-slate-800">{c.name}</div>
-                    <div className="text-xs text-slate-500">{c.email}</div>
+                <tr key={c._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td className="px-3 py-3 font-bold text-slate-400 whitespace-nowrap">#{(page - 1) * 15 + idx + 1}</td>
+                  <td className="px-3 py-3">
+                    <div className="font-bold text-slate-800 truncate">{c.name}</div>
+                    <div className="text-xs text-slate-500 truncate">{c.email}</div>
                   </td>
-                  {role === 'super_admin' && <td className="px-4 py-3 text-slate-600">{c.college}</td>}
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-700">{c.preferredDomain}</div>
-                    <div className="text-xs text-slate-500">{c.industryTrack}</div>
+                  {role === 'super_admin' && (
+                    <td className="px-3 py-3 text-xs text-slate-600">
+                      <div className="line-clamp-2 pr-2" title={c.college}>{c.college}</div>
+                    </td>
+                  )}
+                  <td className="px-3 py-3">
+                    <div className="font-medium text-slate-700 text-sm truncate">{c.preferredDomain}</div>
+                    <div className="text-xs text-slate-500 truncate">{c.industryTrack}</div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="w-12 xl:w-16 h-2 bg-slate-200 rounded-full overflow-hidden shrink-0">
                         <div className={`h-full ${c.employabilityScore > 75 ? 'bg-emerald-500' : c.employabilityScore > 50 ? 'bg-yellow-500' : 'bg-orange-500'}`} style={{ width: `${c.employabilityScore}%` }}></div>
                       </div>
                       <span className="font-black text-slate-800">{c.employabilityScore}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${getBadgeColor(c.readinessLevel)}`}>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className={`px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider ${getBadgeColor(c.readinessLevel)}`}>
                       {c.readinessLevel}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right whitespace-nowrap">
                     <button 
                       onClick={() => toggleShortlist(c._id, c.isShortlisted)}
-                      className={`px-3 py-1.5 rounded text-xs font-bold transition-colors ${c.isShortlisted ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'}`}
+                      className={`px-3 py-1.5 rounded text-xs font-bold transition-colors w-24 text-center ${c.isShortlisted ? 'bg-indigo-100 text-indigo-700 border border-indigo-200 hover:bg-indigo-200' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'}`}
                     >
                       {c.isShortlisted ? 'Shortlisted ✓' : 'Shortlist'}
                     </button>
