@@ -51,8 +51,11 @@ export default function CompanyDashboard() {
       const res = await fetch(`/api/company/profile?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.registered) {
-        setApprovalStatus(data.company);
-        if (data.company.approvalStatus === 'approved') {
+        const companyData = data.company;
+        const currentStatus = (companyData.approvalStatus || companyData.status || 'pending').toLowerCase();
+        companyData.normalizedStatus = currentStatus;
+        setApprovalStatus(companyData);
+        if (currentStatus === 'approved') {
           fetchStats();
         }
       }
@@ -187,14 +190,14 @@ export default function CompanyDashboard() {
               </h1>
               <p className="text-slate-500 font-medium text-sm">Real-time metrics and hiring pipeline for <span className="text-[#0B1E40] font-semibold">{approvalStatus.companyName}</span></p>
             </div>
-            {approvalStatus.approvalStatus === 'approved' && (
+            {approvalStatus.normalizedStatus === 'approved' && (
               <button onClick={() => router.push('/company/jobs')} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 text-sm">
                 <span className="text-lg leading-none">+</span> Create Job Listing
               </button>
             )}
           </div>
           
-          {approvalStatus.approvalStatus === 'pending' && (
+          {approvalStatus.normalizedStatus === 'pending' && (
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-800 p-8 rounded-3xl shadow-sm mb-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
               <div className="flex items-start gap-4 relative z-10">
@@ -209,7 +212,7 @@ export default function CompanyDashboard() {
             </div>
           )}
 
-          {approvalStatus.approvalStatus === 'rejected' && (
+          {approvalStatus.normalizedStatus === 'rejected' && (
             <div className="bg-red-50 border border-red-200 text-red-800 p-8 rounded-3xl shadow-sm mb-8 flex items-start gap-4">
                <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0 text-red-600 shadow-sm border border-red-200">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -221,7 +224,7 @@ export default function CompanyDashboard() {
             </div>
           )}
 
-          {approvalStatus.approvalStatus === 'approved' && (
+          {approvalStatus.normalizedStatus === 'approved' && (
             <>
               {/* Stats Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

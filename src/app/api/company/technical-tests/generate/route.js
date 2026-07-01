@@ -113,7 +113,8 @@ export async function POST(request) {
     company = await Company.findOne({ userId: decoded.id });
     dbTimeMs += Date.now() - dbStart;
 
-    if (!company || company.approvalStatus !== 'approved') {
+    const currentStatus = company ? (company.approvalStatus || company.status || '').toLowerCase() : '';
+    if (!company || currentStatus !== 'approved') {
       return NextResponse.json({ success: false, message: 'Company not approved' }, { status: 403 });
     }
 

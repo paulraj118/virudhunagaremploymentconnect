@@ -694,10 +694,10 @@ export default function AssessmentPage() {
       violationsTracker={violationsTracker}
       setViolationsTracker={setViolationsTracker}
     >
-      <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-y-auto">
+      <div className="h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
         
         {!isActive ? (
-          <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+          <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
             <div className="max-w-3xl w-full bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-200/60 animate-in fade-in zoom-in-95 duration-300 max-h-[95vh] overflow-y-auto">
               
               {/* Dynamic pending job header */}
@@ -822,7 +822,7 @@ export default function AssessmentPage() {
 
             {/* Main Content Workspace Layout */}
             <main className="flex-1 flex overflow-hidden min-h-0 bg-slate-50/50">
-              <div className="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full p-4 md:p-6 gap-6">
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full p-2 md:p-4 gap-4">
                 
                 {/* Left Side: Question Presentation Panel */}
                 <div className="flex-1 flex flex-col bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-0">
@@ -842,13 +842,13 @@ export default function AssessmentPage() {
                   </div>
 
                   {/* Question Scrollable viewport */}
-                  <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
-                    <h2 className="text-slate-800 font-extrabold text-xl md:text-2xl leading-snug">
+                  <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4">
+                    <h2 className="text-slate-800 font-extrabold text-lg md:text-xl leading-snug">
                       {currentQuestion?.questionText}
                     </h2>
 
                     {/* Radio Options Grid */}
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-3 pt-2">
                       {currentQuestion?.options.map((option, i) => {
                         const isSelected = answers[currentQuestionIndex] === i;
                         const optionLabels = ['A', 'B', 'C', 'D'];
@@ -857,7 +857,7 @@ export default function AssessmentPage() {
                           <label 
                             key={i} 
                             onClick={() => handleSelectOption(i)}
-                            className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200 select-none ${
+                            className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 select-none ${
                               isSelected 
                                 ? 'bg-indigo-50/70 border-indigo-600 shadow-sm shadow-indigo-600/5' 
                                 : 'bg-white border-slate-100 hover:border-slate-300'
@@ -880,11 +880,11 @@ export default function AssessmentPage() {
                   </div>
 
                   {/* Bottom Navigation Toolbar */}
-                  <div className="bg-slate-50 px-6 py-5 border-t border-slate-100 flex items-center justify-between shrink-0">
+                  <div className="bg-slate-50 px-4 py-3 md:px-6 md:py-4 border-t border-slate-100 flex items-center justify-between shrink-0">
                     <button 
                       onClick={handlePrevious}
                       disabled={currentQuestionIndex === 0}
-                      className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-650 disabled:opacity-40 disabled:hover:bg-white font-bold px-5 py-3 rounded-xl transition-all shadow-sm text-sm"
+                      className="inline-flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-650 disabled:opacity-40 disabled:hover:bg-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm text-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                       Previous
@@ -899,7 +899,7 @@ export default function AssessmentPage() {
 
                     <button 
                       onClick={handleSaveAndNext}
-                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-750 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:translate-y-px text-sm"
+                      className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-750 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:translate-y-px text-sm"
                     >
                       {currentQuestionIndex === questions.length - 1 ? 'Save & Submit' : 'Save & Next'}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path></svg>

@@ -47,7 +47,6 @@ const StudentSchema = new mongoose.Schema(
     },
     industryTrack: {
       type: String,
-      enum: ['IT / Engineering', 'Admin / Management', 'Medical'],
       required: [true, 'Please select your industry track'],
     },
     resumeUrl: {

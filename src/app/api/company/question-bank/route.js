@@ -41,6 +41,9 @@ export async function GET(request) {
     const type = searchParams.get('type');
     const language = searchParams.get('language');
     const status = searchParams.get('status');
+    const domain = searchParams.get('domain');
+    const source = searchParams.get('source');
+    const approved = searchParams.get('approved');
 
     if (search) {
       query.$text = { $search: search };
@@ -50,6 +53,10 @@ export async function GET(request) {
     if (type) query.type = type;
     if (language) query.language = language;
     if (status) query.status = status;
+    if (domain) query.domain = domain;
+    if (source) query.source = source;
+    if (approved === 'true') query.approved = true;
+    if (approved === 'false') query.approved = false;
 
     const questions = await QuestionBank.find(query).sort({ createdAt: -1 });
 

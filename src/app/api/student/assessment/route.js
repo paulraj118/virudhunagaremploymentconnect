@@ -372,7 +372,8 @@ Return ONLY a raw JSON array of objects. Each object must have exactly these fie
 
   } catch (error) {
     console.error('Fetch Student Assessment Error:', error);
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
+    require('fs').appendFileSync('assessment_error.log', error.stack + '\\n');
+    return NextResponse.json({ success: false, message: 'Server error: ' + error.message }, { status: 500 });
   }
 }
 
