@@ -87,23 +87,25 @@ export default function AdminLayout({ children }) {
 
       {/* Admin Sidebar - Separate Look */}
       <aside className={`w-72 bg-linear-to-b from-slate-900 to-slate-800 text-white flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shadow-2xl`}>
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-lg">A</span>
+        <div className="p-6 border-b border-slate-700 flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-white/10 rounded flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <h2 className="text-lg font-bold tracking-wider">SUPER ADMIN</h2>
             </div>
-            <h2 className="text-lg font-bold tracking-wider">SUPER ADMIN</h2>
+            {/* Close button for mobile sidebar */}
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-1 text-slate-400 hover:text-white rounded-lg md:hidden"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
           </div>
-          {/* Close button for mobile sidebar */}
-          <button 
-            onClick={() => setIsSidebarOpen(false)}
-            className="p-1 text-slate-400 hover:text-white rounded-lg md:hidden"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
+          <p className="text-xs text-slate-400 font-mono mt-1 ml-11">{user?.email}</p>
         </div>
-        <p className="text-xs text-slate-400 font-mono px-6 py-2 border-b border-white/5 bg-black/10">{user?.email}</p>
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {links.map(link => {
             const isActive = link.path === '/admin' ? pathname === '/admin' : pathname.startsWith(link.path);
             return (
@@ -122,10 +124,10 @@ export default function AdminLayout({ children }) {
             );
           })}
         </nav>
-        <div className="p-6 border-t border-white/10 bg-black/20">
-          <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            Secure Logout
+        <div className="p-6 border-t border-slate-700 bg-transparent mt-auto">
+          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-sm font-bold transition-all border border-red-500/20 shadow-sm shadow-red-500/5">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            LOG OUT
           </button>
         </div>
       </aside>
