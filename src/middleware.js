@@ -106,19 +106,28 @@ export async function middleware(request) {
     }
   }
 
-  // Redirect authenticated users away from unified or specific login pages
-  const isLoginPage = pathname === '/login' || pathname.endsWith('/login');
-  if (isLoginPage && decodedPayload) {
-    if (decodedPayload.role === 'super_admin' && !pathname.startsWith('/admin')) {
+  // Redirect authenticated users away from generic login page OR their own specific login page
+  const isGenericLogin = pathname === '/login';
+  
+  let isOwnRoleLoginPage = false;
+  if (decodedPayload) {
+    if (decodedPayload.role === 'super_admin' && pathname === '/admin/login') isOwnRoleLoginPage = true;
+    if (decodedPayload.role === 'student' && pathname === '/student/login') isOwnRoleLoginPage = true;
+    if ((decodedPayload.role === 'company' || decodedPayload.role === 'hr_company') && pathname === '/company/login') isOwnRoleLoginPage = true;
+    if (decodedPayload.role === 'college' && pathname === '/college/login') isOwnRoleLoginPage = true;
+  }
+
+  if (decodedPayload && (isGenericLogin || isOwnRoleLoginPage)) {
+    if (decodedPayload.role === 'super_admin') {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
-    if (decodedPayload.role === 'student' && !pathname.startsWith('/student')) {
+    if (decodedPayload.role === 'student') {
       return NextResponse.redirect(new URL('/student/jobs', request.url));
     }
-    if ((decodedPayload.role === 'company' || decodedPayload.role === 'hr_company') && !pathname.startsWith('/company')) {
+    if (decodedPayload.role === 'company' || decodedPayload.role === 'hr_company') {
       return NextResponse.redirect(new URL('/company', request.url));
     }
-    if (decodedPayload.role === 'college' && !pathname.startsWith('/college')) {
+    if (decodedPayload.role === 'college') {
       return NextResponse.redirect(new URL('/college/dashboard', request.url));
     }
   }

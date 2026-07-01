@@ -59,42 +59,44 @@ export default function AdminCompaniesPage() {
               <th className="p-4 font-bold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 text-sm">
             {companies.map(company => (
-              <tr key={company._id} className="hover:bg-slate-50">
-                <td className="p-4">
+              <tr key={company._id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-4 py-3">
                   <div className="font-bold text-slate-800">{company.companyName}</div>
-                  <div className="text-xs text-slate-500 font-mono">{company.companyCode}</div>
+                  <div className="text-[11px] text-slate-500 font-mono mt-0.5">{company.companyCode}</div>
                 </td>
-                <td className="p-4">
+                <td className="px-4 py-3">
                   <div className="font-bold text-slate-700">{company.hrName}</div>
-                  <div className="text-xs text-slate-500">{company.hrEmail}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{company.hrEmail}</div>
                   <div className="text-xs text-slate-500">{company.mobileNumber}</div>
                 </td>
-                <td className="p-4 text-sm text-slate-600">{company.industry}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-                    company.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
-                    company.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
-                    company.status === 'Rejected' ? 'bg-rose-100 text-rose-700' :
-                    'bg-slate-100 text-slate-700'
+                <td className="px-4 py-3 text-slate-600">{company.industry}</td>
+                <td className="px-4 py-3">
+                  <span className={`px-2.5 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full ${
+                    company.status === 'Approved' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
+                    company.status === 'Pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                    company.status === 'Rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' :
+                    'bg-slate-100 text-slate-700 border border-slate-200'
                   }`}>
                     {company.status}
                   </span>
                 </td>
-                <td className="p-4 text-right space-x-2">
-                  {company.status === 'Pending' && (
-                    <>
-                      <button onClick={() => handleStatusUpdate(company._id, 'Approved')} className="text-xs font-semibold text-emerald-600 hover:text-emerald-800">Approve</button>
-                      <button onClick={() => handleStatusUpdate(company._id, 'Rejected')} className="text-xs font-semibold text-rose-600 hover:text-rose-800">Reject</button>
-                    </>
-                  )}
-                  {company.status === 'Approved' && (
-                    <button onClick={() => handleStatusUpdate(company._id, 'Inactive')} className="text-xs font-semibold text-slate-600 hover:text-slate-800">Suspend</button>
-                  )}
-                  {company.status === 'Inactive' && (
-                    <button onClick={() => handleStatusUpdate(company._id, 'Approved')} className="text-xs font-semibold text-emerald-600 hover:text-emerald-800">Activate</button>
-                  )}
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    {company.status === 'Pending' && (
+                      <>
+                        <button onClick={() => handleStatusUpdate(company._id, 'Approved')} className="px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors">Approve</button>
+                        <button onClick={() => handleStatusUpdate(company._id, 'Rejected')} className="px-3 py-1.5 text-xs font-semibold bg-rose-50 text-rose-700 rounded-lg border border-rose-200 hover:bg-rose-100 transition-colors">Reject</button>
+                      </>
+                    )}
+                    {company.status === 'Approved' && (
+                      <button onClick={() => handleStatusUpdate(company._id, 'Inactive')} className="px-3 py-1.5 text-xs font-semibold bg-slate-50 text-slate-700 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">Suspend</button>
+                    )}
+                    {company.status === 'Inactive' && (
+                      <button onClick={() => handleStatusUpdate(company._id, 'Approved')} className="px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors">Activate</button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
