@@ -295,14 +295,7 @@ export default function StudentApprovals() {
                     </button>
                   </td>
                 </tr>
-              ))}
-              
-              {enrollments.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-                    No enrollments found.
-                  </td>
-                </tr>
+                ))
               )}
             </tbody>
           </table>
