@@ -50,7 +50,7 @@ export default function AssignTechnicalTestPage() {
           // Also only show candidates in 'Applied', 'Assessment Completed', or 'Shortlisted' stages
           const eligibleCandidates = (appData.data?.applications || []).filter(app => {
             const validStage = app.stage === 'Shortlisted';
-            const notStarted = app.technicalTestStatus === 'Not Assigned' || app.technicalTestStatus === 'Assigned';
+            const notStarted = !app.technicalTestStatus || app.technicalTestStatus === 'Not Assigned' || app.technicalTestStatus === 'Assigned';
             return validStage && notStarted;
           });
           setCandidates(eligibleCandidates);
