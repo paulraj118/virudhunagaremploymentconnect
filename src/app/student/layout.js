@@ -85,7 +85,7 @@ export default function StudentLayout({ children }) {
       <aside className={`w-64 bg-white text-slate-800 flex flex-col fixed h-full z-30 transition-transform duration-300 md:translate-x-0 border-r border-slate-200 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center ml-3">
-            <img src="/new-logo.png" alt="Virudhunagar Employment Connect" className="h-20 w-auto object-contain" />
+            <img src="/theni-logo.png" alt="Theni Employment Connect" className="h-20 w-auto object-contain" />
           </div>
           {/* Close button for mobile sidebar */}
           <button 

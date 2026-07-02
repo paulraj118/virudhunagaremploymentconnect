@@ -2,7 +2,7 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata = {
-  title: 'virudhunagarempolymentconnect',
+  title: 'Theni Employment Connect',
   description: 'AI-Powered Recruitment, Assessment & Placement Platform',
 };
 

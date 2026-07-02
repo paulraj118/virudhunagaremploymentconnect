@@ -275,8 +275,8 @@ export default function Register() {
           {/* Logo Section */}
           <div className="z-10 flex items-center mb-10">
             <img 
-              src="/new-logo.png" 
-              alt="Virudhunagar Employment Connect" 
+              src="/theni-logo.png" 
+              alt="Theni Employment Connect" 
               className="h-16 w-auto" 
               onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} 
             />
