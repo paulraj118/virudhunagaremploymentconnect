@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 const heroImages = [
-  '/images/slider-1.jpg',
-  '/images/slider-2.jpg',
-  '/images/slider-3.jpg',
-  '/images/slider-4.jpg'
+  '/images/new-hero-1.jpg',
+  '/images/new-hero-2.jpg',
+  '/images/new-hero-3.jpg',
+  '/images/new-hero-4.jpg',
+  '/images/new-hero-5.jpg'
 ];
 
 export default function LandingPage() {
