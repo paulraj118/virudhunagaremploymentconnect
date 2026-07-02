@@ -25,6 +25,11 @@ export default function AdminQuestionBank() {
   const [importResult, setImportResult] = useState(null);
   const fileInputRef = useRef(null);
 
+  // AI Bulk Generate
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiForm, setAiForm] = useState({ jobRole: '', domain: '', difficulty: 'Medium', customInstructions: '' });
+
   useEffect(() => {
     fetchStats();
     fetchQuestions();
@@ -266,6 +271,32 @@ export default function AdminQuestionBank() {
     }
   };
 
+  const handleAIGenerate = async (e) => {
+    e.preventDefault();
+    if (!aiForm.jobRole) return alert('Job Role is required');
+    setAiLoading(true);
+    try {
+      const res = await fetch('/api/admin/question-bank/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(aiForm)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        setShowAIModal(false);
+        setAiForm({ jobRole: '', domain: '', difficulty: 'Medium', customInstructions: '' });
+        // Note: Generated questions go to Company Technical QuestionBank, so they might not appear in this Self-Assessment view.
+      } else {
+        alert(data.message || 'Failed to generate');
+      }
+    } catch (err) {
+      alert('Error generating questions');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto font-sans">
       <div className="flex justify-between items-center mb-6">
@@ -274,6 +305,10 @@ export default function AdminQuestionBank() {
           <p className="text-slate-500">Manage the self-assessment database</p>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setShowAIModal(true)} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition font-medium flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            AI Bulk Generate
+          </button>
           <button onClick={() => { setShowImportModal(true); setImportResult(null); }} className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition">Import</button>
           <div className="relative group">
             <button className="px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700 transition">Export ▼</button>
@@ -549,6 +584,51 @@ export default function AdminQuestionBank() {
           </div>
         </div>
       )}
+      {/* AI Generate Modal */}
+      {showAIModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              AI Generate Technical Questions
+            </h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Generates the Fixed Test Pattern (5 MCQs, 5 Fill Blanks, 2 Programming) and stores them permanently in the Question Bank for Companies.
+            </p>
+            <form onSubmit={handleAIGenerate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Job Role *</label>
+                <input required type="text" className="w-full border rounded px-3 py-2" placeholder="e.g. React Developer" value={aiForm.jobRole} onChange={e => setAiForm({...aiForm, jobRole: e.target.value})} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Domain</label>
+                  <input type="text" className="w-full border rounded px-3 py-2" placeholder="e.g. Frontend" value={aiForm.domain} onChange={e => setAiForm({...aiForm, domain: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Difficulty</label>
+                  <select className="w-full border rounded px-3 py-2" value={aiForm.difficulty} onChange={e => setAiForm({...aiForm, difficulty: e.target.value})}>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Custom AI Instructions (Optional)</label>
+                <textarea className="w-full border rounded px-3 py-2" rows="3" placeholder="e.g. Focus on React hooks for frontend questions..." value={aiForm.customInstructions} onChange={e => setAiForm({...aiForm, customInstructions: e.target.value})}></textarea>
+              </div>
+              <div className="flex justify-end gap-2 mt-6">
+                <button type="button" onClick={() => setShowAIModal(false)} className="px-4 py-2 border rounded hover:bg-slate-50">Cancel</button>
+                <button type="submit" disabled={aiLoading} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2">
+                  {aiLoading ? 'Generating via Groq AI...' : 'Generate & Store'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
