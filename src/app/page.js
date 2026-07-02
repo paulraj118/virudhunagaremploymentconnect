@@ -8,8 +8,7 @@ const heroImages = [
   '/images/new-hero-1.jpg',
   '/images/new-hero-2.jpg',
   '/images/new-hero-3.jpg',
-  '/images/new-hero-4.jpg',
-  '/images/new-hero-5.jpg'
+  '/images/new-hero-4.jpg'
 ];
 
 export default function LandingPage() {
