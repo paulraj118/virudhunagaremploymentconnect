@@ -7,11 +7,6 @@ export default function AdminAnalytics() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // AI Bulk Generate
-  const [showAIModal, setShowAIModal] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiForm, setAiForm] = useState({ jobRole: '', domain: '', difficulty: 'Medium', customInstructions: '' });
-
   useEffect(() => {
     fetchStats();
   }, []);
@@ -81,43 +76,9 @@ export default function AdminAnalytics() {
       bg: 'bg-rose-50', 
       borderHover: 'border-slate-200 hover:border-rose-400 hover:shadow-lg hover:shadow-rose-500/5 hover:scale-[1.02]',
       icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-    },
-  ];
-
-  const handleAIGenerate = async (e) => {
-    e.preventDefault();
-    if (!aiForm.jobRole) return alert('Job Role is required');
-    setAiLoading(true);
-    try {
-      const res = await fetch('/api/admin/question-bank/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(aiForm)
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(data.message);
-        setShowAIModal(false);
-        setAiForm({ jobRole: '', domain: '', difficulty: 'Medium', customInstructions: '' });
-      } else {
-        alert(data.message || 'Failed to generate');
-      }
-    } catch (err) {
-      alert('Error generating questions');
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-800">System Analytics Overview</h1>
-        <button onClick={() => setShowAIModal(true)} className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-bold flex items-center gap-2 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
-          <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          AI Bulk Generate Questions
-        </button>
-      </div>
+      <h1 className="text-3xl font-bold text-slate-800 mb-8">System Analytics Overview</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {kpis.map((kpi, idx) => (
@@ -232,74 +193,6 @@ export default function AdminAnalytics() {
           </div>
         </div>
       </div>
-
-      {/* AI Generate Modal */}
-      {showAIModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-xl max-h-[90vh] overflow-y-auto transform transition-all">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-                <div className="bg-purple-100 p-2 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                AI Technical Questions Generator
-              </h2>
-              <button onClick={() => setShowAIModal(false)} className="text-slate-400 hover:text-slate-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
-            </div>
-            
-            <p className="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
-              Generates the Fixed Test Pattern (5 MCQs, 5 Fill Blanks, 2 Programming) via Groq AI and stores them permanently in the Company Question Bank.
-            </p>
-            
-            <form onSubmit={handleAIGenerate} className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Job Role / Designation <span className="text-red-500">*</span></label>
-                <input required type="text" className="w-full border-2 border-slate-200 focus:border-purple-500 rounded-xl px-4 py-2.5 outline-none transition-colors font-medium text-slate-700" placeholder="e.g. Full Stack Developer" value={aiForm.jobRole} onChange={e => setAiForm({...aiForm, jobRole: e.target.value})} />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Tech Domain</label>
-                  <input type="text" className="w-full border-2 border-slate-200 focus:border-purple-500 rounded-xl px-4 py-2.5 outline-none transition-colors font-medium text-slate-700" placeholder="e.g. Frontend, React" value={aiForm.domain} onChange={e => setAiForm({...aiForm, domain: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Difficulty Level</label>
-                  <select className="w-full border-2 border-slate-200 focus:border-purple-500 rounded-xl px-4 py-2.5 outline-none transition-colors font-medium text-slate-700" value={aiForm.difficulty} onChange={e => setAiForm({...aiForm, difficulty: e.target.value})}>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Custom AI Prompt (Optional)</label>
-                <textarea className="w-full border-2 border-slate-200 focus:border-purple-500 rounded-xl px-4 py-3 outline-none transition-colors font-medium text-slate-700 resize-none" rows="3" placeholder="e.g. Focus exclusively on React hooks and performance optimization..." value={aiForm.customInstructions} onChange={e => setAiForm({...aiForm, customInstructions: e.target.value})}></textarea>
-              </div>
-              
-              <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-slate-100">
-                <button type="button" onClick={() => setShowAIModal(false)} className="px-5 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
-                <button type="submit" disabled={aiLoading} className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all">
-                  {aiLoading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                      Generate & Store Database
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
