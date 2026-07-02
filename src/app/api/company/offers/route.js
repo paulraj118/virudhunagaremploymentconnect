@@ -7,11 +7,12 @@ import AuditTrail from '@/models/AuditTrail';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
 import User from '@/models/User';
+import Company from '@/models/Company';
 
 export async function GET(request) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded || decoded.role !== 'company') {
+    if (!decoded || (decoded.role !== 'company' && decoded.role !== 'hr_company')) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
@@ -32,12 +33,18 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded || decoded.role !== 'company') {
+    if (!decoded || (decoded.role !== 'company' && decoded.role !== 'hr_company')) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
     const data = await request.json();
     await dbConnect();
+
+    // Get company profile
+    const company = await Company.findOne({ userId: decoded.id });
+    if (!company) {
+      return NextResponse.json({ success: false, message: 'Company profile not found' }, { status: 404 });
+    }
 
     // Verify ownership for either DriveApplication or JobApplication
     let app = await DriveApplication.findById(data.applicationId);
@@ -47,7 +54,7 @@ export async function POST(request) {
       appType = 'job';
     }
 
-    if (!app || app.companyId.toString() !== decoded.id) {
+    if (!app || app.companyId.toString() !== company._id.toString()) {
       return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
     }
     
@@ -66,7 +73,7 @@ export async function POST(request) {
     const offerData = {
       offerId,
       applicationId: app._id,
-      companyId: decoded.id,
+      companyId: company._id,
       studentId: app.studentId,
       jobRole: data.jobRole,
       salaryPackage: data.salaryPackage,
