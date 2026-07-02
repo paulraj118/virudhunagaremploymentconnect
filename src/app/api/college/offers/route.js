@@ -14,10 +14,16 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    const { validateCollegeApproval } = await import('@/lib/collegeAuth');
+    const authCheck = await validateCollegeApproval(decoded.id);
+    if (!authCheck.success) {
+      return NextResponse.json(authCheck, { status: authCheck.status });
+    }
+
     await dbConnect();
     
     // Get the college's profile to get the exact college name
-    const college = await College.findOne({ userId: decoded.id });
+    const college = authCheck.college;
     if (!college || !college.collegeName) {
       return NextResponse.json({ success: false, message: 'College profile not found' }, { status: 404 });
     }

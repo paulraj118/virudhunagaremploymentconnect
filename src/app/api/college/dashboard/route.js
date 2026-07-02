@@ -11,8 +11,14 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    const { validateCollegeApproval } = await import('@/lib/collegeAuth');
+    const authCheck = await validateCollegeApproval(decoded.id);
+    if (!authCheck.success) {
+      return NextResponse.json(authCheck, { status: authCheck.status });
+    }
+
     await dbConnect();
-    const college = await College.findById(decoded.id);
+    const college = authCheck.college;
     
     // We can reuse the ranking logic to get all stats accurately
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || request.nextUrl.origin;

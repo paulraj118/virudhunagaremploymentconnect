@@ -179,7 +179,7 @@ export default function CollegeRegister() {
       const data = await res.json();
       
       if (data.success) {
-        setSuccessMsg('College Registration Successful.');
+        setSuccessMsg('Registration completed successfully. Your account is waiting for Admin approval.');
         setTimeout(() => router.push('/college/login'), 2000);
       } else {
         if (data.message?.toLowerCase().includes('email')) {

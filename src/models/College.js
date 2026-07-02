@@ -55,6 +55,11 @@ const CollegeSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    approvalStatus: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected'],
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );

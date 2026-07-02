@@ -11,11 +11,17 @@ export async function POST(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    const { validateCollegeApproval } = await import('@/lib/collegeAuth');
+    const authCheck = await validateCollegeApproval(decoded.id);
+    if (!authCheck.success) {
+      return NextResponse.json(authCheck, { status: authCheck.status });
+    }
+
     await dbConnect();
     const { id } = await params;
     const { studentId } = await request.json();
 
-    const college = await College.findById(decoded.id);
+    const college = authCheck.college;
 
     // Recommend a student for a drive by updating their application status or flag
     const app = await DriveApplication.findOneAndUpdate(

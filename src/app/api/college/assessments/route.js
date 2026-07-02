@@ -11,10 +11,16 @@ export async function GET(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    const { validateCollegeApproval } = await import('@/lib/collegeAuth');
+    const authCheck = await validateCollegeApproval(decoded.id);
+    if (!authCheck.success) {
+      return NextResponse.json(authCheck, { status: authCheck.status });
+    }
+
     await dbConnect();
 
     // 1. Get the logged-in college details
-    const college = await College.findById(decoded.id);
+    const college = authCheck.college;
     if (!college) {
       return NextResponse.json({ success: false, message: 'College not found' }, { status: 404 });
     }

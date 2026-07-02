@@ -63,6 +63,7 @@ export default function AdminLayout({ children }) {
     { name: 'Dashboard', path: '/admin' },
     { name: 'Student Approvals', path: '/admin/approvals/students' },
     { name: 'Company Approvals', path: '/admin/approvals/companies' },
+    { name: 'College Approvals', path: '/admin/approvals/colleges' },
     { name: 'Assessments', path: '/admin/assessments' },
     { name: 'Question Bank', path: '/admin/question-bank' },
     { name: 'SA Analytics', path: '/admin/analytics' },
