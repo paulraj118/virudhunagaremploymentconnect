@@ -364,6 +364,12 @@ export default function CreateTechnicalTestPage() {
         showToast(data.message);
         setShowAIModal(false);
         setAiForm({ jobRole: '', domain: '', difficulty: 'Medium', customInstructions: '' });
+        
+        // Show the generated questions on the page
+        if (data.sections) {
+          setGeneratedSections(data.sections);
+          setStep(2); // Move to review step
+        }
       } else {
         showToast(data.message || 'Failed to generate', 'error');
       }

@@ -16,7 +16,7 @@ function getLanguageFromRole(role) {
 export async function POST(request) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded || (decoded.role !== 'super_admin' && decoded.role !== 'admin')) {
+    if (!decoded || !['super_admin', 'admin', 'hr_company'].includes(decoded.role)) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
@@ -185,9 +185,48 @@ ${customInstructions ? `ADDITIONAL INSTRUCTIONS:\n${customInstructions}` : ''}
 
     await QuestionBank.insertMany(documentsToInsert);
 
+    const mcqs = documentsToInsert.filter(d => d.type === 'MCQ').map(q => ({
+      question: q.content.questionText,
+      options: q.content.options,
+      correctOption: q.content.correctAnswer,
+      explanation: q.content.explanation || '',
+      marks: q.marks || 1
+    }));
+
+    const fills = documentsToInsert.filter(d => d.type === 'FILL_BLANK').map(q => ({
+      question: q.content.questionText,
+      correctAnswer: q.content.correctAnswer,
+      marks: q.marks || 1
+    }));
+
+    const progs = documentsToInsert.filter(d => d.type === 'PROGRAMMING').map(q => ({
+      title: q.content.title || '',
+      description: q.content.problemStatement || '',
+      inputFormat: q.content.inputFormat || '',
+      outputFormat: q.content.outputFormat || '',
+      constraints: q.content.constraints || '',
+      supportedLanguages: q.content.supportedLanguages || ['javascript', 'python', 'java', 'cpp'],
+      sampleInput: q.content.sampleInput || '',
+      sampleOutput: q.content.sampleOutput || '',
+      hiddenTestCases: (q.content.hiddenTestCases || []).map(tc => ({
+        input: tc.input,
+        expectedOutput: tc.expectedOutput
+      })),
+      starterCode: q.content.starterCode || '',
+      marks: q.marks || 5
+    }));
+
+    const sections = {
+      sectionA_MCQ: mcqs,
+      sectionB_FillBlanks: fills,
+      sectionC_Programming1: progs[0] || null,
+      sectionD_Programming2: progs[1] || null
+    };
+
     return NextResponse.json({ 
       success: true, 
-      message: `Successfully generated and saved ${documentsToInsert.length} questions to the database.` 
+      message: `Successfully generated and saved ${documentsToInsert.length} questions to the database.`,
+      sections
     });
 
   } catch (error) {
