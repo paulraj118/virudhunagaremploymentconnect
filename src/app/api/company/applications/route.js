@@ -48,9 +48,14 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const roleFilter = searchParams.get('role');
+    const jobIdFilter = searchParams.get('jobId');
 
     if (roleFilter && roleFilter !== 'All Jobs') {
       enrichedApplications = enrichedApplications.filter(app => app.jobId?.title === roleFilter);
+    }
+
+    if (jobIdFilter) {
+      enrichedApplications = enrichedApplications.filter(app => app.jobId?._id?.toString() === jobIdFilter || app.jobId === jobIdFilter);
     }
 
     // Rank applicants
