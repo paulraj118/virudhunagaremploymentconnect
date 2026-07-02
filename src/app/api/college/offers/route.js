@@ -45,6 +45,7 @@ export async function GET(request) {
       salaryPackage: offer.salaryPackage,
       joiningDate: offer.joiningDate,
       status: offer.status,
+      offerLetterUrl: offer.offerLetterUrl,
       createdAt: offer.createdAt
     }));
 

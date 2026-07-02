@@ -40,32 +40,10 @@ export default function StudentOffers() {
   };
 
   const handleDownloadPDF = async (offer) => {
-    try {
-      // Fetch student's own profile to get the exact name matching the session
-      const res = await fetch('/api/student/profile');
-      const data = await res.json();
-      
-      let studentName = 'Candidate';
-      if (data.success && data.student && data.student.userId) {
-        studentName = data.student.userId.name;
-      }
-
-      // Format data for PDF generator
-      const pdfData = {
-        companyName: offer.companyId?.companyName || 'Unknown Company',
-        jobRole: offer.jobRole,
-        salaryPackage: offer.salaryPackage,
-        location: offer.location,
-        joiningDate: offer.joiningDate,
-        expiryDate: offer.expiryDate,
-        offerId: offer.offerId,
-        notes: offer.notes
-      };
-
-      generateOfferPDF(pdfData, { name: studentName });
-    } catch (err) {
-      console.error('PDF Generation Error:', err);
-      alert('Failed to generate PDF.');
+    if (offer.offerLetterUrl) {
+      window.open(offer.offerLetterUrl, '_blank');
+    } else {
+      alert('Official offer letter PDF is not uploaded by the company yet.');
     }
   };
 
@@ -124,13 +102,15 @@ export default function StudentOffers() {
             </div>
             
             <div className="shrink-0 flex flex-col gap-3 w-full md:w-auto">
-              <button 
-                onClick={() => handleDownloadPDF(offer)}
-                className="w-full text-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Download PDF
-              </button>
+              {offer.offerLetterUrl && (
+                <button 
+                  onClick={() => handleDownloadPDF(offer)}
+                  className="w-full text-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  Download PDF
+                </button>
+              )}
               
               {offer.status === 'Released' && (
                 <>

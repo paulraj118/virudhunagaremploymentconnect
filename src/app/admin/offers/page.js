@@ -63,6 +63,7 @@ export default function AdminOffers() {
               <th className="p-4 font-bold">Company & Role</th>
               <th className="p-4 font-bold">Package</th>
               <th className="p-4 font-bold">Status</th>
+              <th className="p-4 font-bold text-center">Offer Letter</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -88,11 +89,26 @@ export default function AdminOffers() {
                     {offer.status}
                   </span>
                 </td>
+                <td className="p-4 text-center">
+                  {offer.offerLetterUrl ? (
+                    <a 
+                      href={offer.offerLetterUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                      View
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">N/A</span>
+                  )}
+                </td>
               </tr>
             ))}
             {offers.length === 0 && (
               <tr>
-                <td colSpan="5" className="p-8 text-center text-slate-500">No offers have been generated yet.</td>
+                <td colSpan="6" className="p-8 text-center text-slate-500">No offers have been generated yet.</td>
               </tr>
             )}
           </tbody>
