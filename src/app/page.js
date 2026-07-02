@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 const heroImages = [
-  '/images/theni-hero-1.jpg',
-  '/images/theni-hero-2.jpg',
-  '/images/theni-hero-3.jpg',
-  '/images/theni-hero-4.jpg'
+  '/images/new-hero-1.jpg',
+  '/images/new-hero-2.jpg',
+  '/images/new-hero-3.jpg',
+  '/images/new-hero-4.jpg',
+  '/images/new-hero-5.jpg'
 ];
 
 export default function LandingPage() {
@@ -32,7 +33,7 @@ export default function LandingPage() {
       <header className="bg-white py-3 px-6 md:px-12 flex items-center justify-between shadow-sm sticky top-0 z-50">
         {/* Logo */}
         <div className="flex items-center">
-          <img src="/theni-logo.png" alt="Theni Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
+          <img src="/logo.png" alt="Theni Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
         </div>
 
 
