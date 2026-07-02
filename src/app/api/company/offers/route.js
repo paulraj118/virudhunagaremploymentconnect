@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Offer from '@/models/Offer';
 import DriveApplication from '@/models/DriveApplication';
+import JobApplication from '@/models/JobApplication';
 import AuditTrail from '@/models/AuditTrail';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
@@ -38,15 +39,23 @@ export async function POST(request) {
     const data = await request.json();
     await dbConnect();
 
-    // Verify ownership
-    const app = await DriveApplication.findById(data.applicationId);
+    // Verify ownership for either DriveApplication or JobApplication
+    let app = await DriveApplication.findById(data.applicationId);
+    let appType = 'drive';
+    if (!app) {
+      app = await JobApplication.findById(data.applicationId);
+      appType = 'job';
+    }
+
     if (!app || app.companyId.toString() !== decoded.id) {
       return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
     }
     
-    if (app.status !== 'Selected') {
-       // Automatically mark selected if not already
+    if (appType === 'drive' && app.status !== 'Selected') {
        app.status = 'Selected';
+       await app.save();
+    } else if (appType === 'job' && app.stage !== 'Offer Released') {
+       app.stage = 'Offer Released';
        await app.save();
     }
 
@@ -54,10 +63,9 @@ export async function POST(request) {
     const offerCount = await Offer.countDocuments();
     const offerId = `OFF-${new Date().getFullYear()}-${String(offerCount + 1).padStart(4, '0')}`;
 
-    const offer = await Offer.create({
+    const offerData = {
       offerId,
       applicationId: app._id,
-      driveId: app.driveId,
       companyId: decoded.id,
       studentId: app.studentId,
       jobRole: data.jobRole,
@@ -66,7 +74,12 @@ export async function POST(request) {
       joiningDate: data.joiningDate,
       expiryDate: data.expiryDate,
       notes: data.notes
-    });
+    };
+
+    if (appType === 'drive') offerData.driveId = app.driveId;
+    if (appType === 'job') offerData.jobId = app.jobId;
+
+    const offer = await Offer.create(offerData);
 
     await AuditTrail.create({
       applicationId: app._id,

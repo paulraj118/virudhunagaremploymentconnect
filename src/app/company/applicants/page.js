@@ -17,6 +17,10 @@ export default function PlacementTracking() {
   const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [interviewData, setInterviewData] = useState({ date: '', link: '' });
 
+  // Offer Modal state
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerData, setOfferData] = useState({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '' });
+
   const STAGES = [
     'Applied', 'Assessment Completed', 'Shortlisted', 'Interview Scheduled', 
     'Interview Cleared', 'Offer Released', 'Joined', 'Rejected'
@@ -107,6 +111,35 @@ export default function PlacementTracking() {
       interviewDate: interviewData.date,
       meetingLink: interviewData.link
     });
+  };
+
+  const handleGenerateOffer = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/company/offers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId: selectedApp._id,
+          jobRole: selectedApp.jobId?.title || 'Unknown Role',
+          salaryPackage: offerData.salaryPackage,
+          location: offerData.location,
+          joiningDate: offerData.joiningDate,
+          expiryDate: offerData.expiryDate,
+          notes: offerData.notes
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Offer Generated Successfully!');
+        setShowOfferModal(false);
+        fetchApplications(); // This will pull the updated stage which is now 'Offer Released'
+      } else {
+        alert(data.message || 'Failed to generate offer');
+      }
+    } catch (error) {
+      alert('Error generating offer');
+    }
   };
 
   if (loading) return <div>Loading applicants...</div>;
@@ -283,6 +316,10 @@ export default function PlacementTracking() {
                           setSelectedApp(app);
                           setInterviewData({ date: '', link: '' });
                           setShowInterviewModal(true);
+                        } else if (stage === 'Offer Released') {
+                          setSelectedApp(app);
+                          setOfferData({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '' });
+                          setShowOfferModal(true);
                         } else {
                           updateStage(app._id, stage);
                         }
@@ -353,6 +390,62 @@ export default function PlacementTracking() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Offer Generation Modal */}
+      {showOfferModal && selectedApp && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 shrink-0">
+              <h2 className="text-lg font-bold text-slate-800">Generate Job Offer</h2>
+              <button onClick={() => setShowOfferModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            
+            <div className="overflow-y-auto p-6">
+              <form onSubmit={handleGenerateOffer} className="space-y-4">
+                <div className="mb-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-emerald-900 text-sm">
+                  Generating offer for <strong>{selectedApp.studentId?.userId?.name}</strong> for the role of <strong>{selectedApp.jobId?.title}</strong>.
+                  <br/>
+                  <span className="text-xs opacity-75 mt-1 block">Once generated, the offer will be available in the student dashboard and matched college portal.</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Salary Package</label>
+                    <input required placeholder="e.g., 5 LPA" type="text" value={offerData.salaryPackage} onChange={e => setOfferData({...offerData, salaryPackage: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Location</label>
+                    <input required placeholder="e.g., Chennai" type="text" value={offerData.location} onChange={e => setOfferData({...offerData, location: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Joining Date</label>
+                    <input required type="date" value={offerData.joiningDate} onChange={e => setOfferData({...offerData, joiningDate: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Offer Expiry Date</label>
+                    <input required type="date" value={offerData.expiryDate} onChange={e => setOfferData({...offerData, expiryDate: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Additional Notes</label>
+                  <textarea rows="3" placeholder="Any terms, conditions, or instructions..." value={offerData.notes} onChange={e => setOfferData({...offerData, notes: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></textarea>
+                </div>
+
+                <div className="pt-4 mt-2 flex gap-3">
+                  <button type="button" onClick={() => setShowOfferModal(false)} className="flex-1 px-4 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors">
+                    Generate Offer
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

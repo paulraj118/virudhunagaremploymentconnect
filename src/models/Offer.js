@@ -3,8 +3,9 @@ import mongoose from 'mongoose';
 const OfferSchema = new mongoose.Schema(
   {
     offerId: { type: String, required: true, unique: true }, // e.g., OFF-2026-0001
-    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'DriveApplication', required: true },
-    driveId: { type: mongoose.Schema.Types.ObjectId, ref: 'RecruitmentDrive', required: true },
+    applicationId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    driveId: { type: mongoose.Schema.Types.ObjectId, ref: 'RecruitmentDrive' },
+    jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
     jobRole: { type: String, required: true },
