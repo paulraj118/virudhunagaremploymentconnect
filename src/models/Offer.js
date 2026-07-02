@@ -14,6 +14,7 @@ const OfferSchema = new mongoose.Schema(
     joiningDate: { type: Date, required: true },
     expiryDate: { type: Date, required: true },
     notes: { type: String },
+    offerLetterUrl: { type: String },
     status: { 
       type: String, 
       enum: ['Released', 'Accepted', 'Rejected', 'Withdrawn'],

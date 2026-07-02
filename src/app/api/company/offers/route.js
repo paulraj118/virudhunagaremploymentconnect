@@ -37,8 +37,18 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const formData = await request.formData();
     await dbConnect();
+
+    const data = {
+      applicationId: formData.get('applicationId'),
+      jobRole: formData.get('jobRole'),
+      salaryPackage: formData.get('salaryPackage'),
+      location: formData.get('location'),
+      joiningDate: formData.get('joiningDate'),
+      expiryDate: formData.get('expiryDate'),
+      notes: formData.get('notes'),
+    };
 
     // Get company profile
     const company = await Company.findOne({ userId: decoded.id });
@@ -70,6 +80,22 @@ export async function POST(request) {
     const offerCount = await Offer.countDocuments();
     const offerId = `OFF-${new Date().getFullYear()}-${String(offerCount + 1).padStart(4, '0')}`;
 
+    // Handle file upload if present
+    const file = formData.get('offerLetter');
+    let offerLetterUrl = '';
+    
+    if (file && file.size > 0) {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const { default: FileStore } = await import('@/models/FileStore');
+      const newFile = await FileStore.create({
+        buffer,
+        contentType: file.type || 'application/pdf',
+        filename: `offer_${offerId}.pdf`
+      });
+      offerLetterUrl = `/api/file/${newFile._id}`;
+    }
+
     const offerData = {
       offerId,
       applicationId: app._id,
@@ -80,7 +106,8 @@ export async function POST(request) {
       location: data.location,
       joiningDate: data.joiningDate,
       expiryDate: data.expiryDate,
-      notes: data.notes
+      notes: data.notes,
+      offerLetterUrl
     };
 
     if (appType === 'drive') offerData.driveId = app.driveId;

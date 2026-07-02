@@ -19,7 +19,7 @@ export default function PlacementTracking() {
 
   // Offer Modal state
   const [showOfferModal, setShowOfferModal] = useState(false);
-  const [offerData, setOfferData] = useState({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '' });
+  const [offerData, setOfferData] = useState({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '', offerLetter: null });
 
   const STAGES = [
     'Applied', 'Assessment Completed', 'Shortlisted', 'Interview Scheduled', 
@@ -116,18 +116,22 @@ export default function PlacementTracking() {
   const handleGenerateOffer = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('applicationId', selectedApp._id);
+      formData.append('jobRole', selectedApp.jobId?.title || 'Unknown Role');
+      formData.append('salaryPackage', offerData.salaryPackage);
+      formData.append('location', offerData.location);
+      formData.append('joiningDate', offerData.joiningDate);
+      formData.append('expiryDate', offerData.expiryDate);
+      formData.append('notes', offerData.notes);
+      
+      if (offerData.offerLetter) {
+        formData.append('offerLetter', offerData.offerLetter);
+      }
+
       const res = await fetch('/api/company/offers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          applicationId: selectedApp._id,
-          jobRole: selectedApp.jobId?.title || 'Unknown Role',
-          salaryPackage: offerData.salaryPackage,
-          location: offerData.location,
-          joiningDate: offerData.joiningDate,
-          expiryDate: offerData.expiryDate,
-          notes: offerData.notes
-        })
+        body: formData
       });
       const data = await res.json();
       if (data.success) {
@@ -318,7 +322,7 @@ export default function PlacementTracking() {
                           setShowInterviewModal(true);
                         } else if (stage === 'Offer Released') {
                           setSelectedApp(app);
-                          setOfferData({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '' });
+                          setOfferData({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '', offerLetter: null });
                           setShowOfferModal(true);
                         } else {
                           updateStage(app._id, stage);
@@ -434,8 +438,13 @@ export default function PlacementTracking() {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Upload Offer Letter (PDF)</label>
+                  <input type="file" accept=".pdf" onChange={e => setOfferData({...offerData, offerLetter: e.target.files[0]})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                </div>
+
+                <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">Additional Notes</label>
-                  <textarea rows="3" placeholder="Any terms, conditions, or instructions..." value={offerData.notes} onChange={e => setOfferData({...offerData, notes: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></textarea>
+                  <textarea rows="2" placeholder="Any terms, conditions, or instructions..." value={offerData.notes} onChange={e => setOfferData({...offerData, notes: e.target.value})} className="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:border-indigo-500"></textarea>
                 </div>
 
                 <div className="pt-4 mt-2 flex gap-3">
