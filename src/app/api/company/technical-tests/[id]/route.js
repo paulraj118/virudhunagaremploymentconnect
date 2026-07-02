@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import TechnicalTest from '@/models/TechnicalTest';
 import Company from '@/models/Company';
+import Job from '@/models/Job';
 import { getCurrentUser } from '@/lib/auth';
 
 // GET - Get a single Technical Test by ID

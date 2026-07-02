@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import TechnicalTest from '@/models/TechnicalTest';
 import TechnicalAttempt from '@/models/TechnicalAttempt';
 import Company from '@/models/Company';
+import Job from '@/models/Job';
 import { getCurrentUser } from '@/lib/auth';
 
 // GET - View all candidate results for a specific Technical Test
