@@ -1,0 +1,107 @@
+{
+  "passed": 15,
+  "failed": 5,
+  "total": 20,
+  "results": [
+    {
+      "test": "Authentication",
+      "passed": true,
+      "details": "Token obtained (User + Company created)"
+    },
+    {
+      "test": "Bulk Generate API",
+      "passed": true,
+      "details": "Generated=0, Saved=0, Dups=0, Failed=0"
+    },
+    {
+      "test": "Summary has requested field",
+      "passed": true,
+      "details": "requested=20"
+    },
+    {
+      "test": "Summary has generated field",
+      "passed": false,
+      "details": "generated=0"
+    },
+    {
+      "test": "Summary has saved field",
+      "passed": true,
+      "details": "saved=0"
+    },
+    {
+      "test": "Questions increased in DB",
+      "passed": false,
+      "details": "Before=11, After=11"
+    },
+    {
+      "test": "Fetch generated questions",
+      "passed": false,
+      "details": "No Python AI questions found"
+    },
+    {
+      "test": "Duplicate detection works",
+      "passed": true,
+      "details": "Saved=0, Dups=0"
+    },
+    {
+      "test": "Search works",
+      "passed": false,
+      "details": "Found 0 results for \"Python\""
+    },
+    {
+      "test": "Domain filter works",
+      "passed": true,
+      "details": "Found 0 Python questions"
+    },
+    {
+      "test": "Source filter (AI) works",
+      "passed": true,
+      "details": "Found 0 AI questions"
+    },
+    {
+      "test": "Stats total > 0",
+      "passed": true,
+      "details": "total=11"
+    },
+    {
+      "test": "Stats has pending",
+      "passed": true,
+      "details": "pending=0"
+    },
+    {
+      "test": "Stats has aiGenerated",
+      "passed": true,
+      "details": "aiGenerated=0"
+    },
+    {
+      "test": "Technical Test generated",
+      "passed": false,
+      "details": "Company not approved"
+    },
+    {
+      "test": "Export JSON",
+      "passed": true,
+      "details": "status=200"
+    },
+    {
+      "test": "Export CSV",
+      "passed": true,
+      "details": "status=200, rows=12"
+    },
+    {
+      "test": "Export PDF/HTML",
+      "passed": true,
+      "details": "status=200"
+    },
+    {
+      "test": "Import JSON",
+      "passed": true,
+      "details": "imported=1"
+    },
+    {
+      "test": "Import duplicate detection",
+      "passed": true,
+      "details": "dups=1"
+    }
+  ]
+}

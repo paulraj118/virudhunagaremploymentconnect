@@ -83,7 +83,7 @@ export default function LandingPage() {
       <header className="bg-white py-3 px-6 md:px-12 flex items-center justify-between shadow-sm sticky top-0 z-50">
         {/* Logo */}
         <div className="flex items-center">
-          <img src="/logo.png" alt="Theni Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
+          <img src="/new-logo.png" alt="Virudhunagar Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
         </div>
 
 
@@ -145,7 +145,7 @@ export default function LandingPage() {
             <span className="text-[#0B1E40]">Opportunity</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-700 font-medium mb-10">
-            Find the right job. Build your career. <br />Grow with Theni.
+            Find the right job. Build your career. <br />Grow with Virudhunagar.
           </p>
 
 
@@ -244,7 +244,7 @@ export default function LandingPage() {
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
               </div>
               <h3 className="text-2xl font-extrabold text-[#0B1E40] mb-4">For Employers</h3>
-              <p className="text-slate-500 text-sm font-medium mb-6">Hire the best talent from Theni district efficiently.</p>
+              <p className="text-slate-500 text-sm font-medium mb-6">Hire the best talent from Virudhunagar district efficiently.</p>
               <ul className="space-y-3 mb-8">
                 {['Post jobs and reach qualified candidates', 'Access AI-ranked candidate profiles', 'Conduct structured interviews', 'Manage your complete hiring pipeline', 'Extend offer letters digitally'].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -301,7 +301,7 @@ export default function LandingPage() {
 
       {/* Footer / Why Choose */}
       <footer className="bg-[#0B1E40] text-white pt-20 pb-16 relative overflow-hidden mt-10">
-        <h2 className="text-center text-3xl font-extrabold mb-16 tracking-tight">Why Choose Theni Employment Connect?</h2>
+        <h2 className="text-center text-3xl font-extrabold mb-16 tracking-tight">Why Choose Virudhunagar Employment Connect?</h2>
         
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center relative z-10">
           <div className="flex flex-col items-center">
@@ -309,7 +309,7 @@ export default function LandingPage() {
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
             <h3 className="font-extrabold text-sm mb-2">Local Opportunities</h3>
-            <p className="text-white/60 text-xs font-medium">Find jobs in and around Theni</p>
+            <p className="text-white/60 text-xs font-medium">Find jobs in and around Virudhunagar</p>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-5 border border-white/10">

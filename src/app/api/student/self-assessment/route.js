@@ -231,14 +231,14 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid answers' }, { status: 400 });
     }
 
-    // Retrieve the original questions with correct answers (from DB or question bank)
-    const SelfAssessmentQuestion = (await import('@/models/SelfAssessmentQuestion')).default;
+    // Retrieve the original questions with correct answers
+    const Question = (await import('@/models/Question')).default;
     
     let questions = [];
     if (questionIds && questionIds.length > 0) {
-      // Fetch questions by IDs
+      // Fetch questions by IDs from the unified Question collection
       const mongoose = (await import('mongoose')).default;
-      questions = await SelfAssessmentQuestion.find({
+      questions = await Question.find({
         _id: { $in: questionIds.map(id => new mongoose.Types.ObjectId(id)) },
       }).lean();
     }
@@ -257,7 +257,14 @@ export async function POST(request) {
       const question = questions[i];
       const answer = answers[i];
       const selectedOptionIndex = answer?.selectedOptionIndex ?? -1;
-      const isCorrect = selectedOptionIndex === question.correctOptionIndex;
+      let isCorrect = false;
+      if (question.correctOptionIndex !== undefined && question.correctOptionIndex !== null) {
+        isCorrect = selectedOptionIndex === question.correctOptionIndex;
+      } else if (question.correctAnswer) {
+        const selectedText = question.options[selectedOptionIndex];
+        isCorrect = selectedText === question.correctAnswer;
+      }
+      
       const isSkipped = selectedOptionIndex === -1;
 
       if (isSkipped) {
@@ -268,12 +275,17 @@ export async function POST(request) {
         wrongCount++;
       }
 
+      let finalCorrectIndex = question.correctOptionIndex;
+      if ((finalCorrectIndex === undefined || finalCorrectIndex === null) && question.correctAnswer) {
+        finalCorrectIndex = question.options.indexOf(question.correctAnswer);
+      }
+
       evaluatedQuestions.push({
         questionId: question._id.toString(),
-        questionText: question.questionText,
+        questionText: question.questionText || question.question,
         options: question.options,
         selectedOptionIndex,
-        correctOptionIndex: question.correctOptionIndex,
+        correctOptionIndex: finalCorrectIndex,
         isCorrect: !isSkipped && isCorrect,
         explanation: question.explanation,
         topic: question.topic,

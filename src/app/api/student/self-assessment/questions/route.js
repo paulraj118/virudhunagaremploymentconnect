@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Student from '@/models/Student';
-import SelfAssessmentQuestion from '@/models/SelfAssessmentQuestion';
 import SelfAssessmentResult from '@/models/SelfAssessmentResult';
 import { getCurrentUser } from '@/lib/auth';
-import selfAssessmentQuestionBank from '@/lib/selfAssessmentQuestionBank';
+import { fetchQuestions } from '@/services/questionApi';
 
 const QUESTIONS_PER_LEVEL = 20;
+
+const DIFFICULTY_MAP = {
+  low: 'Easy',
+  medium: 'Medium',
+  high: 'Hard'
+};
 
 // Fisher-Yates shuffle
 function shuffleArray(arr) {
@@ -19,7 +24,7 @@ function shuffleArray(arr) {
 }
 
 // ============================================================================
-// GET: Fetch questions for a specific level
+// GET: Fetch questions for a specific level via Question Bank API
 // Query: ?level=low|medium|high
 // Returns 20 MCQs for the student's preferredDomain at the specified level
 // Correct answers are NOT sent to the client
@@ -79,43 +84,28 @@ export async function GET(request) {
 
     const domain = requestedDomain || student.preferredDomain;
 
-    // Try to find questions from MongoDB first
-    let questions = await SelfAssessmentQuestion.find({
-      domain: domain,
-      level: level,
-    }).lean();
-
-    // If not enough questions in DB, seed from question bank
-    if (questions.length < QUESTIONS_PER_LEVEL) {
-      await seedQuestionsForDomain(domain, level);
-      questions = await SelfAssessmentQuestion.find({
-        domain: domain,
-        level: level,
-      }).lean();
-    }
-
-    // If still no questions, try case-insensitive match
-    if (questions.length === 0) {
-      questions = await SelfAssessmentQuestion.find({
-        domain: { $regex: new RegExp(`^${escapeRegex(domain)}$`, 'i') },
-        level: level,
-      }).lean();
-    }
-
-    // If still no questions, try partial match
-    if (questions.length === 0) {
-      // Try matching with domain words
-      const domainWords = domain.split(/[\s&,/]+/).filter(w => w.length > 2);
-      for (const word of domainWords) {
-        questions = await SelfAssessmentQuestion.find({
-          domain: { $regex: new RegExp(escapeRegex(word), 'i') },
-          level: level,
-        }).lean();
-        if (questions.length > 0) break;
+    // Fetch questions from the centralized Question Bank API
+    let apiQuestions = [];
+    try {
+      const response = await fetchQuestions({
+        category: domain,
+        difficulty: DIFFICULTY_MAP[level],
+        random: true,
+        limit: 50 // Fetch more to allow for deduplication of seen questions
+      });
+      
+      if (response && response.questions) {
+        apiQuestions = response.questions;
       }
+    } catch (apiError) {
+      console.error('Question Bank API Fetch Error:', apiError);
+      return NextResponse.json(
+        { error: apiError.message || 'Question Bank API is currently unavailable. Please try again later.' },
+        { status: apiError.status || 503 }
+      );
     }
 
-    if (questions.length === 0) {
+    if (!apiQuestions || apiQuestions.length === 0) {
       return NextResponse.json(
         { error: `No questions available for "${domain}" at ${level} level. Please contact the administrator.` },
         { status: 404 }
@@ -129,8 +119,14 @@ export async function GET(request) {
     const usedQuestionTexts = new Set(previousQuestions);
 
     // Prioritize unseen questions
-    const unseenQuestions = questions.filter(q => !usedQuestionTexts.has(q.questionText));
-    const seenQuestions = questions.filter(q => usedQuestionTexts.has(q.questionText));
+    const unseenQuestions = apiQuestions.filter(q => {
+      const text = q.questionText || q.question;
+      return !usedQuestionTexts.has(text);
+    });
+    const seenQuestions = apiQuestions.filter(q => {
+      const text = q.questionText || q.question;
+      return usedQuestionTexts.has(text);
+    });
 
     // Shuffle and select
     const shuffledUnseen = shuffleArray(unseenQuestions);
@@ -144,12 +140,19 @@ export async function GET(request) {
     // Return questions WITHOUT correct answers (security)
     const clientQuestions = finalQuestions.map((q) => ({
       _id: q._id,
-      questionText: q.questionText,
+      questionText: q.questionText || q.question, // Support backward compatibility
       options: q.options,
       topic: q.topic,
       difficulty: q.difficulty,
       // NOTE: correctOptionIndex and explanation are NOT sent to the client
     }));
+
+    if (clientQuestions.length === 0) {
+      return NextResponse.json(
+        { error: `Insufficient questions available for "${domain}" at ${level} level.` },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       questions: clientQuestions,
@@ -162,58 +165,4 @@ export async function GET(request) {
     console.error('Self Assessment Questions GET Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
-
-// ============================================================================
-// Seed questions from the question bank into MongoDB
-// ============================================================================
-async function seedQuestionsForDomain(domain, level) {
-  try {
-    // 1. Find matching questions from the static question bank
-    const bankQuestions = selfAssessmentQuestionBank.filter(
-      (q) => q.domain.toLowerCase() === domain.toLowerCase() && q.level === level
-    );
-
-    if (bankQuestions.length > 0) {
-      await bulkInsertQuestions(bankQuestions);
-      return;
-    }
-
-    // 2. Try partial match from static bank
-    const domainLower = domain.toLowerCase();
-    const partialMatch = selfAssessmentQuestionBank.filter(
-      (q) =>
-        q.level === level &&
-        (q.domain.toLowerCase().includes(domainLower) ||
-          domainLower.includes(q.domain.toLowerCase()))
-    );
-    if (partialMatch.length > 0) {
-      const questionsToInsert = partialMatch.map((q) => ({
-        ...q,
-        domain: domain,
-      }));
-      await bulkInsertQuestions(questionsToInsert);
-      return;
-    }
-  } catch (error) {
-    console.error('Seed questions error:', error);
-  }
-}
-
-async function bulkInsertQuestions(questions) {
-  const operations = questions.map((q) => ({
-    updateOne: {
-      filter: { domain: q.domain, level: q.level, questionText: q.questionText },
-      update: { $setOnInsert: q },
-      upsert: true,
-    },
-  }));
-
-  if (operations.length > 0) {
-    await SelfAssessmentQuestion.bulkWrite(operations, { ordered: false });
-  }
-}
-
-function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
