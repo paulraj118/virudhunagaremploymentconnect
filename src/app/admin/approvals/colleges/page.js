@@ -54,7 +54,7 @@ export default function CollegeApprovalsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setColleges(prev => prev.filter(c => c._id !== id));
+        setColleges(prev => prev.map(c => c._id === id ? { ...c, approvalStatus: action === 'approve' ? 'Approved' : 'Rejected' } : c));
       } else {
         alert(data.message || `Failed to ${action} college`);
       }
@@ -74,8 +74,8 @@ export default function CollegeApprovalsPage() {
     <div className="p-6 max-w-7xl mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Pending College Approvals</h1>
-          <p className="text-slate-500 mt-1">Review and approve new college registrations</p>
+          <h1 className="text-2xl font-bold text-slate-800">College Approvals</h1>
+          <p className="text-slate-500 mt-1">Review and manage college registrations</p>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export default function CollegeApprovalsPage() {
             />
           </div>
           <div className="text-sm text-slate-500 font-medium">
-            {filteredColleges.length} pending
+            {filteredColleges.length} colleges
           </div>
         </div>
 
@@ -147,29 +147,37 @@ export default function CollegeApprovalsPage() {
                           day: 'numeric', month: 'short', year: 'numeric'
                         })}
                       </div>
-                      <div className="text-xs text-amber-600 font-medium mt-1 px-2 py-0.5 bg-amber-50 rounded-full inline-block">
-                        Pending
+                      <div className={`text-xs font-medium mt-1 px-2 py-0.5 rounded-full inline-block ${
+                        college.approvalStatus === 'Approved' ? 'text-green-600 bg-green-50' :
+                        college.approvalStatus === 'Rejected' ? 'text-red-600 bg-red-50' :
+                        'text-amber-600 bg-amber-50'
+                      }`}>
+                        {college.approvalStatus || 'Pending'}
                       </div>
                     </td>
                     <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleAction(college._id, 'approve')}
-                          disabled={actionLoading === college._id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
-                        >
-                          <CheckIcon className="w-4 h-4" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleAction(college._id, 'reject')}
-                          disabled={actionLoading === college._id}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
-                        >
-                          <CrossIcon className="w-4 h-4" />
-                          Reject
-                        </button>
-                      </div>
+                      {college.approvalStatus === 'Pending' ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleAction(college._id, 'approve')}
+                            disabled={actionLoading === college._id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                          >
+                            <CheckIcon className="w-4 h-4" />
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleAction(college._id, 'reject')}
+                            disabled={actionLoading === college._id}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                          >
+                            <CrossIcon className="w-4 h-4" />
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-sm font-medium text-slate-400">Processed</span>
+                      )}
                     </td>
                   </tr>
                 ))

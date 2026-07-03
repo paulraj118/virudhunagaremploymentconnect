@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+import SkillGapReportButton from '@/components/SkillGapReportButton';
+
 export default function AssessmentReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -233,17 +235,20 @@ export default function AssessmentReportPage() {
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Assessment Report</h1>
         </div>
         
-        <button 
-          onClick={generatePDF}
-          disabled={generatingPdf}
-          style={{
-            padding: '12px 24px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700,
-            cursor: generatingPdf ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: generatingPdf ? 0.7 : 1,
-            boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)'
-          }}
-        >
-          {generatingPdf ? 'Generating PDF...' : '📄 Download PDF Report'}
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <SkillGapReportButton studentId={data?.candidateInfo?.studentId} />
+          <button 
+            onClick={generatePDF}
+            disabled={generatingPdf}
+            style={{
+              padding: '12px 24px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700,
+              cursor: generatingPdf ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', opacity: generatingPdf ? 0.7 : 1,
+              boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)'
+            }}
+          >
+            {generatingPdf ? 'Generating PDF...' : '📄 Download Result PDF'}
+          </button>
+        </div>
       </div>
 
       <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>

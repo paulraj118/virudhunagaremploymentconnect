@@ -59,6 +59,7 @@ export async function GET(request) {
           email: student.userId?.email || 'N/A',
           candidateId: student.candidateId,
           phone: student.phone || '',
+          studentId: student._id.toString(),
         },
         // Assessment context
         industryTrack: report.industryTrack,

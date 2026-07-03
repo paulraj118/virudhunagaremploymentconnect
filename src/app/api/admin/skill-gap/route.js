@@ -77,7 +77,8 @@ export async function GET(request) {
       email: c.studentId?.userId?.email || 'Unknown',
       domain: c.preferredDomain,
       score: c.percentage,
-      date: c.completionDate || c.createdAt
+      date: c.completionDate || c.createdAt,
+      studentId: c.studentId?._id?.toString()
     }));
 
     return NextResponse.json({

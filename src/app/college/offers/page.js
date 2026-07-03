@@ -36,6 +36,23 @@ export default function CollegeOffers() {
     router.push('/college/login');
   };
 
+  // Calculate metrics
+  const totalOffers = offers.length;
+  const acceptedOffers = offers.filter(o => o.status === 'Accepted').length;
+  const pendingOffers = offers.filter(o => o.status !== 'Accepted' && o.status !== 'Rejected' && o.status !== 'Withdrawn').length;
+
+  let maxPkg = 0;
+  offers.forEach(o => {
+    if (o.salaryPackage) {
+      const match = o.salaryPackage.match(/[\d.]+/);
+      if (match) {
+        const val = parseFloat(match[0]);
+        if (val > maxPkg) maxPkg = val;
+      }
+    }
+  });
+  const highestPackageStr = maxPkg > 0 ? `${maxPkg.toFixed(1)} LPA` : '0.0 LPA';
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -46,28 +63,53 @@ export default function CollegeOffers() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-black">C</div>
-          <h1 className="text-xl font-bold">College Portal</h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex gap-4">
-            <Link href="/college/dashboard" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Dashboard</Link>
-            <Link href="/college/offers" className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">Job Offers</Link>
-          </nav>
-          <button onClick={handleLogout} className="text-sm font-bold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors shadow-sm">
-            Logout
-          </button>
-        </div>
-      </header>
       
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-6">
+      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+        <div className="mb-2">
           <h2 className="text-2xl font-bold text-slate-800">Student Job Offers</h2>
           <p className="text-sm text-slate-500 mt-1">
             Securely synchronized offers for your students. Strictly filtered for data privacy.
           </p>
+        </div>
+
+        {/* Metrics Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Offers</p>
+              <p className="text-2xl font-black text-slate-800 mt-1.5">{totalOffers}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg">
+              📄
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Accepted Offers</p>
+              <p className="text-2xl font-black text-green-600 mt-1.5">{acceptedOffers}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold text-lg">
+              ✓
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Decisions</p>
+              <p className="text-2xl font-black text-amber-500 mt-1.5">{pendingOffers}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center font-bold text-lg">
+              ⏳
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Highest Package</p>
+              <p className="text-2xl font-black text-emerald-600 mt-1.5">{highestPackageStr}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+              💰
+            </div>
+          </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

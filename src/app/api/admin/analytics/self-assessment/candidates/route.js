@@ -123,6 +123,7 @@ export async function GET(request) {
     // Format for frontend
     const candidates = results.map(r => ({
       _id: r._id,
+      studentId: r.studentId?.toString(),
       name: r.userInfo?.name || 'Unknown',
       email: r.userInfo?.email || 'Unknown',
       collegeName: r.studentInfo?.collegeName || 'Unknown',

@@ -49,15 +49,7 @@ export default function CollegeDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-black">C</div>
-          <h1 className="text-xl font-bold">College Portal</h1>
-        </div>
-        <button onClick={handleLogout} className="text-sm font-bold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors shadow-sm">
-          Logout
-        </button>
-      </header>
+
 
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
         

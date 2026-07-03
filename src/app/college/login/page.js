@@ -53,15 +53,18 @@ export default function CollegeLogin() {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('/api/college/login', {
+      const res = await fetch('/api/college/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       const data = await res.json();
       
-      if (data.success) {
-        window.location.href = '/college/dashboard'; // Force full reload to update auth context if needed
+      if (data.otpRequired) {
+        // Redirect to OTP verification page
+        window.location.href = `/verify-otp?email=${encodeURIComponent(data.email)}&role=college&loginType=college`;
+      } else if (data.success) {
+        window.location.href = '/college/dashboard';
       } else {
         setError(data.message);
       }

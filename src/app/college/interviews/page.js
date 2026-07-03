@@ -28,16 +28,7 @@ export default function CollegeInterviews() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-slate-900 text-white p-4 flex justify-between items-center shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-black">C</div>
-          <h1 className="text-xl font-bold">College Portal - Student Interviews</h1>
-        </div>
-        <div className="flex gap-4">
-          <a href="/college/dashboard" className="text-sm font-medium text-slate-300 hover:text-white">Dashboard</a>
-          <a href="/college/drives" className="text-sm font-medium text-slate-300 hover:text-white">Drives</a>
-        </div>
-      </header>
+
 
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
         <div>

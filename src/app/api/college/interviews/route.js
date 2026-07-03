@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Interview from '@/models/Interview';
 import Student from '@/models/Student';
 import { getCurrentUser } from '@/lib/auth';
+import { validateCollegeApproval } from '@/lib/collegeAuth';
 import Company from '@/models/Company';
 import RecruitmentDrive from '@/models/RecruitmentDrive';
 import User from '@/models/User';
@@ -12,6 +13,14 @@ export async function GET(request) {
     const decoded = await getCurrentUser();
     if (!decoded || decoded.role !== 'college') {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const approvalCheck = await validateCollegeApproval(decoded.id);
+    if (!approvalCheck.success) {
+      return NextResponse.json(
+        { success: false, message: approvalCheck.message },
+        { status: approvalCheck.status }
+      );
     }
 
     await dbConnect();

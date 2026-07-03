@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SkillGapReportButton from '@/components/SkillGapReportButton';
 
 export default function AdminSkillGapAnalysis() {
   const [loading, setLoading] = useState(true);
@@ -132,11 +133,12 @@ export default function AdminSkillGapAnalysis() {
                 <th className="px-4 py-3 font-medium">Domain</th>
                 <th className="px-4 py-3 font-medium">Score</th>
                 <th className="px-4 py-3 font-medium">Assessment Date</th>
+                <th className="px-4 py-3 font-medium text-right">Action</th>
               </tr>
             </thead>
             <tbody>
               {improvementList.length === 0 ? (
-                <tr><td colSpan="4" className="px-4 py-8 text-center text-slate-500">No candidates currently need improvement!</td></tr>
+                <tr><td colSpan="5" className="px-4 py-8 text-center text-slate-500">No candidates currently need improvement!</td></tr>
               ) : (
                 improvementList.map((c, idx) => (
                   <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50">
@@ -149,6 +151,9 @@ export default function AdminSkillGapAnalysis() {
                       <span className="font-bold text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100">{c.score}%</span>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{new Date(c.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-right">
+                      <SkillGapReportButton studentId={c.studentId} />
+                    </td>
                   </tr>
                 ))
               )}

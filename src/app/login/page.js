@@ -18,17 +18,32 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const res = await login(email, password);
-    if (res.success) {
-      if (res.user?.role === 'hr_company') {
-        router.push('/company');
-      } else if (res.user?.role === 'super_admin') {
-        router.push('/admin');
+    try {
+      const res = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.directLogin) {
+        // Admin: direct login (no OTP) — cookie already set by server
+        if (data.token) {
+          sessionStorage.setItem('jf_token', data.token);
+        }
+        sessionStorage.setItem('jf_user', JSON.stringify(data.user));
+        sessionStorage.setItem('jf_expected_role', data.user.role);
+        window.location.href = '/admin';
+      } else if (data.otpRequired) {
+        // Student/HR: redirect to OTP page
+        router.push(`/verify-otp?email=${encodeURIComponent(data.email)}&role=${encodeURIComponent(data.role)}&loginType=general`);
       } else {
-        router.push('/student');
+        setError(data.message || 'Login failed');
+        setLoading(false);
       }
-    } else {
-      setError(res.message || 'Login failed');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
       setLoading(false);
     }
   };

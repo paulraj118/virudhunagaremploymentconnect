@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import DriveApplication from '@/models/DriveApplication';
 import College from '@/models/College';
+import Student from '@/models/Student';
+import RecruitmentDrive from '@/models/RecruitmentDrive';
 import { getCurrentUser } from '@/lib/auth';
+import { validateCollegeApproval } from '@/lib/collegeAuth';
 
 export async function POST(request, { params }) {
   try {
@@ -11,10 +14,12 @@ export async function POST(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { validateCollegeApproval } = await import('@/lib/collegeAuth');
-    const authCheck = await validateCollegeApproval(decoded.id);
-    if (!authCheck.success) {
-      return NextResponse.json(authCheck, { status: authCheck.status });
+    const approvalCheck = await validateCollegeApproval(decoded.id);
+    if (!approvalCheck.success) {
+      return NextResponse.json(
+        { success: false, message: approvalCheck.message },
+        { status: approvalCheck.status }
+      );
     }
 
     await dbConnect();

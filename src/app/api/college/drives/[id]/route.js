@@ -3,7 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import RecruitmentDrive from '@/models/RecruitmentDrive';
 import { getCurrentUser } from '@/lib/auth';
 
-export async function GET(request) {
+export async function PUT(request, { params }) {
   try {
     const decoded = await getCurrentUser();
     if (!decoded || decoded.role !== 'college') {
@@ -18,23 +18,30 @@ export async function GET(request) {
 
     await dbConnect();
     const college = authCheck.college;
+    const { id } = await params;
+    const { status } = await request.json();
 
-    // Fetch all drives created by this college OR any other Published drives
-    const drives = await RecruitmentDrive.find({
-      $or: [
-        { createdBy: college.collegeName },
-        { status: 'Published' }
-      ]
-    }).sort({ createdAt: -1 });
+    const drive = await RecruitmentDrive.findById(id);
+    if (!drive) {
+      return NextResponse.json({ success: false, message: 'Drive not found' }, { status: 404 });
+    }
 
-    return NextResponse.json({ success: true, drives, collegeName: college.collegeName });
+    // A college can only update its own drives
+    if (drive.createdBy !== college.collegeName) {
+      return NextResponse.json({ success: false, message: 'Forbidden. You do not own this drive.' }, { status: 403 });
+    }
+
+    drive.status = status;
+    await drive.save();
+
+    return NextResponse.json({ success: true, message: 'Drive updated successfully', drive });
   } catch (error) {
-    console.error('Fetch College Drives Error:', error);
+    console.error('Update College Drive Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }
 
-export async function POST(request) {
+export async function DELETE(request, { params }) {
   try {
     const decoded = await getCurrentUser();
     if (!decoded || decoded.role !== 'college') {
@@ -49,19 +56,22 @@ export async function POST(request) {
 
     await dbConnect();
     const college = authCheck.college;
-    const data = await request.json();
+    const { id } = await params;
 
-    // Force createdBy to be the college name
-    const payload = {
-      ...data,
-      createdBy: college.collegeName
-    };
+    const drive = await RecruitmentDrive.findById(id);
+    if (!drive) {
+      return NextResponse.json({ success: false, message: 'Drive not found' }, { status: 404 });
+    }
 
-    const drive = await RecruitmentDrive.create(payload);
+    // A college can only delete its own drives
+    if (drive.createdBy !== college.collegeName) {
+      return NextResponse.json({ success: false, message: 'Forbidden. You do not own this drive.' }, { status: 403 });
+    }
 
-    return NextResponse.json({ success: true, drive, message: 'Drive created successfully' });
+    await RecruitmentDrive.findByIdAndDelete(id);
+    return NextResponse.json({ success: true, message: 'Drive deleted successfully' });
   } catch (error) {
-    console.error('Create College Drive Error:', error);
+    console.error('Delete College Drive Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }

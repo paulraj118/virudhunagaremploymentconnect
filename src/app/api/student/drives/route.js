@@ -53,42 +53,49 @@ export async function GET(request) {
     const applications = await DriveApplication.find({ studentId: student._id }).lean();
     const appliedDriveIds = applications.map(a => a.driveId.toString());
 
-    // Filter Eligible Drives
-    const eligibleDrives = drives.filter(drive => {
-      if (drive.minAssessmentScore && assessmentScore < drive.minAssessmentScore) return false;
-      if (drive.minEmployabilityScore && employabilityScore < drive.minEmployabilityScore) return false;
-      
-      if (drive.preferredDomains && drive.preferredDomains.length > 0) {
-        if (!drive.preferredDomains.includes(student.preferredDomain)) return false;
-      }
-      if (drive.eligibleDepartments && drive.eligibleDepartments.length > 0) {
-        if (!drive.eligibleDepartments.includes(student.department)) return false;
-      }
-      if (drive.eligibleDegrees && drive.eligibleDegrees.length > 0) {
-        if (!drive.eligibleDegrees.includes(student.degree)) return false;
-      }
-      
-      if (drive.minCgpa != null) {
-        if ((student.cgpa || 0) < drive.minCgpa) return false;
-      }
-      if (drive.maxActiveArrears != null) {
-        if ((student.activeArrears || 0) > drive.maxActiveArrears) return false;
-      }
-      if (drive.passingYear != null) {
-        if (student.yearOfPassedOut !== drive.passingYear) return false;
-      }
-      
-      return true;
-    }).map(drive => {
+    // Map all drives to calculate eligibility and application status
+    const mappedDrives = drives.map(drive => {
       const app = applications.find(a => a.driveId.toString() === drive._id.toString());
+      
+      // Calculate eligibility based on existing logic
+      let isEligible = true;
+
+      // Bypass eligibility if created by student's own college
+      if (drive.createdBy !== student.collegeName) {
+        if (drive.minAssessmentScore && assessmentScore < drive.minAssessmentScore) isEligible = false;
+        if (drive.minEmployabilityScore && employabilityScore < drive.minEmployabilityScore) isEligible = false;
+        
+        if (drive.preferredDomains && drive.preferredDomains.length > 0) {
+          if (!drive.preferredDomains.includes(student.preferredDomain)) isEligible = false;
+        }
+        if (drive.eligibleDepartments && drive.eligibleDepartments.length > 0) {
+          if (!drive.eligibleDepartments.includes(student.department)) isEligible = false;
+        }
+        if (drive.eligibleDegrees && drive.eligibleDegrees.length > 0) {
+          if (!drive.eligibleDegrees.includes(student.degree)) isEligible = false;
+        }
+        
+        if (drive.minCgpa != null) {
+          if ((student.cgpa || 0) < drive.minCgpa) isEligible = false;
+        }
+        if (drive.maxActiveArrears != null) {
+          if ((student.activeArrears || 0) > drive.maxActiveArrears) isEligible = false;
+        }
+        if (drive.passingYear != null) {
+          if (student.yearOfPassedOut !== drive.passingYear) isEligible = false;
+        }
+      }
+
       return {
         ...drive,
+        isEligible,
         isApplied: !!app,
-        applicationStatus: app ? app.status : null
+        applicationStatus: app ? app.status : null,
+        createdByText: (drive.createdBy && drive.createdBy !== 'Admin') ? drive.createdBy : 'Admin'
       };
     });
 
-    return NextResponse.json({ success: true, eligibleDrives });
+    return NextResponse.json({ success: true, eligibleDrives: mappedDrives });
   } catch (error) {
     console.error('Fetch Student Drives Error:', error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });

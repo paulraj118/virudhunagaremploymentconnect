@@ -11,7 +11,7 @@ export async function GET(request) {
     }
 
     await dbConnect();
-    const pendingColleges = await College.find({ approvalStatus: 'Pending' })
+    const pendingColleges = await College.find({})
       .select('-password') // Ensure no password gets sent
       .sort({ createdAt: -1 });
 

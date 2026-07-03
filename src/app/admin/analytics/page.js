@@ -9,6 +9,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
+import SkillGapReportButton from '@/components/SkillGapReportButton';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
@@ -460,12 +461,15 @@ export default function AnalyticsDashboard() {
                 <h3 className="text-xl font-bold text-slate-800">Assessment Report</h3>
                 <p className="text-sm text-slate-500 mt-1">{selectedReport.userInfo?.name || 'Candidate'} - {selectedReport.preferredDomain}</p>
               </div>
-              <button 
-                onClick={() => setSelectedReport(null)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
+              <div className="flex items-center gap-3">
+                <SkillGapReportButton studentId={selectedReport.studentId || selectedReport.studentInfo?._id} />
+                <button 
+                  onClick={() => setSelectedReport(null)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
