@@ -233,6 +233,6 @@ ${customInstructions ? `ADDITIONAL INSTRUCTIONS:\n${customInstructions}` : ''}
 
   } catch (error) {
     console.error('AI Bulk Generation Error:', error);
-    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Internal server error: ' + error.message }, { status: 500 });
   }
 }
