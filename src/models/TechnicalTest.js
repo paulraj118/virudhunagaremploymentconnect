@@ -17,8 +17,8 @@ const FillBlankSchema = new mongoose.Schema({
 });
 
 const HiddenTestCaseSchema = new mongoose.Schema({
-  input: { type: String, required: true },
-  expectedOutput: { type: String, required: true }
+  input: { type: String, default: '' },
+  expectedOutput: { type: String, default: '' }
 });
 
 const ProgrammingSchema = new mongoose.Schema({
@@ -28,8 +28,8 @@ const ProgrammingSchema = new mongoose.Schema({
     type: [String],
     default: ['javascript', 'python', 'java', 'cpp']
   },
-  sampleInput: { type: String, required: true },
-  sampleOutput: { type: String, required: true },
+  sampleInput: { type: String, default: '' },
+  sampleOutput: { type: String, default: '' },
   hiddenTestCases: [HiddenTestCaseSchema],            // 5 hidden test cases for Judge0 evaluation
   marks: { type: Number, default: 5 }
 });
