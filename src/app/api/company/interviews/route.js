@@ -225,8 +225,8 @@ export async function POST(request) {
         candidateId,
         jobId,
         applicationId,
-        assessmentResultId,
-        technicalAttemptId,
+        assessmentResultId: assessmentResultId || undefined,
+        technicalAttemptId: technicalAttemptId || undefined,
         interviewType,
         interviewRound,
         interviewDate: new Date(interviewDate),
@@ -302,7 +302,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('[INTERVIEWS] Creation Error:', error);
     return NextResponse.json(
-      { success: false, message: 'Server error', errors: [error.message] },
+      { success: false, message: 'Server error: ' + error.message, errors: [error.message] },
       { status: 500 }
     );
   }
