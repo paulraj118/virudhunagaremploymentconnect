@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const generateStudentReportPDF = (reportData) => {
   const doc = new jsPDF();
@@ -78,7 +78,7 @@ export const generateStudentReportPDF = (reportData) => {
     t.performance
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: startY + 4,
     head: [['Topic', 'Total Qs', 'Correct', 'Wrong', 'Percentage', 'Performance']],
     body: tableData,
