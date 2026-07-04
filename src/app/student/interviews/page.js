@@ -110,6 +110,36 @@ export default function StudentInterviews() {
                 </div>
               )}
             </div>
+
+            {/* HR Feedback Section */}
+            {inv.feedback && (inv.feedback.totalScore > 0 || inv.feedback.remarks) && (
+              <div className="bg-slate-50 border-t border-slate-100 p-6 flex flex-col sm:flex-row gap-6">
+                <div className="sm:w-1/3">
+                  <h4 className="text-sm font-bold text-slate-800">Interview Feedback</h4>
+                  <p className="text-xs font-semibold text-slate-500 mt-1">Score: <span className="text-indigo-600 font-extrabold text-lg">{inv.feedback.totalScore}</span> <span className="text-slate-400">/ 50</span></p>
+                </div>
+                <div className="sm:w-2/3 space-y-4">
+                  {inv.feedback.strengths && (
+                    <div>
+                      <h5 className="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Strengths</h5>
+                      <p className="text-sm text-slate-700 mt-1">{inv.feedback.strengths}</p>
+                    </div>
+                  )}
+                  {inv.feedback.weaknesses && (
+                    <div>
+                      <h5 className="text-[10px] uppercase font-bold text-rose-600 tracking-wider">Areas for Improvement</h5>
+                      <p className="text-sm text-slate-700 mt-1">{inv.feedback.weaknesses}</p>
+                    </div>
+                  )}
+                  {inv.feedback.remarks && (
+                    <div>
+                      <h5 className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Remarks</h5>
+                      <p className="text-sm text-slate-700 mt-1 italic">"{inv.feedback.remarks}"</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         ))}
 
