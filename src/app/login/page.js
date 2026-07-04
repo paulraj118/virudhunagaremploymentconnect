@@ -68,8 +68,8 @@ export default function Login() {
           {/* Logo Section */}
           <div className="z-10 flex items-center mb-10 mr-8">
             <img 
-              src="/theni-logo.png" 
-              alt="Theni Employment Connect" 
+              src="/logo.png" 
+              alt="Virudhunagar Employment Connect" 
               className="h-16 w-auto" 
                
             />
