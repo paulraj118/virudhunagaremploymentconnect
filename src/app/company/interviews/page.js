@@ -933,9 +933,9 @@ export default function CompanyInterviewsDashboard() {
                           setSortOrder('asc');
                         }
                       }}
-                      className={`p-4 text-xs font-bold text-slate-500 uppercase tracking-wider ${h.field ? 'cursor-pointer hover:bg-slate-100/50' : ''}`}
+                      className={`px-2 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider ${h.field ? 'cursor-pointer hover:bg-slate-100/50' : ''}`}
                     >
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         {h.label}
                         {sortField === h.field && (sortOrder === 'asc' ? '▲' : '▼')}
                       </div>
@@ -946,46 +946,47 @@ export default function CompanyInterviewsDashboard() {
               <tbody>
                 {currentRecords.map(inv => (
                   <tr key={inv._id} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors">
-                    <td className="p-4 font-bold text-slate-800 text-sm">
+                    <td className="px-2 py-3 font-bold text-slate-800 text-sm">
                       {inv.candidateId?.name || inv.studentId?.userId?.name || 'N/A'}
                     </td>
-                    <td className="p-4 font-medium text-slate-600 text-sm">
+                    <td className="px-2 py-3 font-medium text-slate-600 text-xs">
                       {inv.jobId?.title || inv.driveId?.jobRole || 'N/A'}
                     </td>
-                    <td className="p-4 font-semibold text-indigo-600 text-xs">
+                    <td className="px-2 py-3 font-semibold text-indigo-600 text-xs">
                       {inv.interviewRound}
                     </td>
-                    <td className="p-4 text-xs text-slate-600 space-y-0.5">
+                    <td className="px-2 py-3 text-[11px] text-slate-600 space-y-0.5">
                       <div className="font-semibold">{new Date(inv.interviewDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                      <div className="text-slate-400">{inv.interviewTime} | {inv.duration} mins</div>
+                      <div className="text-slate-400 whitespace-nowrap">{inv.interviewTime} | {inv.duration}m</div>
                     </td>
-                    <td className="p-4 text-xs font-semibold text-slate-700">
+                    <td className="px-2 py-3 text-xs font-semibold text-slate-700">
                       {inv.interviewMode}
                     </td>
-                    <td className="p-4">
-                      <span className={`px-2.5 py-0.75 rounded-full text-[10px] font-bold border ${getStatusColor(inv.status)}`}>
+                    <td className="px-2 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusColor(inv.status)}`}>
                         {inv.status}
                       </span>
                     </td>
-                    <td className="p-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                    <td className="px-2 py-3">
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold ${
                         inv.confirmationStatus === 'Accepted' ? 'bg-emerald-100 text-emerald-800' :
                         inv.confirmationStatus === 'Declined' ? 'bg-red-100 text-red-800' :
                         inv.confirmationStatus === 'Reschedule Requested' ? 'bg-amber-100 text-amber-800' :
                         'bg-slate-100 text-slate-600'
                       }`}>
-                        {inv.confirmationStatus}
+                        {inv.confirmationStatus === 'Reschedule Requested' ? 'Resched Req' : inv.confirmationStatus}
                       </span>
                     </td>
-                    <td className="p-4 font-bold text-slate-700 text-sm">
+                    <td className="px-2 py-3 font-bold text-slate-700 text-xs">
                       {inv.feedback?.totalScore ? `${inv.feedback.totalScore}/50` : '—'}
                     </td>
-                    <td className="p-4 flex gap-2">
+                    <td className="px-2 py-3 flex gap-1.5 flex-wrap w-44">
                       <button 
                         onClick={() => openDetailsDrawer(inv)}
-                        className="text-[10px] font-bold uppercase bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200"
+                        className="text-[9px] font-bold uppercase bg-slate-50 hover:bg-slate-100 text-slate-600 px-2 py-1.5 rounded border border-slate-200"
+                        title="Details"
                       >
-                        🔍 Details
+                        🔍
                       </button>
                       
                       {/* Sub-actions based on HR Authorization checks */}
@@ -993,21 +994,24 @@ export default function CompanyInterviewsDashboard() {
                         <>
                           <button 
                             onClick={() => openFeedbackForm(inv)}
-                            className="text-[10px] font-bold uppercase bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg"
+                            className="text-[9px] font-bold uppercase bg-teal-600 hover:bg-teal-700 text-white px-2 py-1.5 rounded"
+                            title="Feedback"
                           >
-                            📝 Feedback
+                            📝
                           </button>
                           <button 
                             onClick={() => openRescheduleForm(inv)}
-                            className="text-[10px] font-bold uppercase bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-200"
+                            className="text-[9px] font-bold uppercase bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1.5 rounded border border-indigo-200"
+                            title="Reschedule"
                           >
-                            🕒 Reschedule
+                            🕒
                           </button>
                           <button 
                             onClick={() => openCancelForm(inv)}
-                            className="text-[10px] font-bold uppercase bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-lg border border-rose-200"
+                            className="text-[9px] font-bold uppercase bg-rose-50 hover:bg-rose-100 text-rose-700 px-2 py-1.5 rounded border border-rose-200"
+                            title="Cancel"
                           >
-                            ❌ Cancel
+                            ❌
                           </button>
                         </>
                       )}
