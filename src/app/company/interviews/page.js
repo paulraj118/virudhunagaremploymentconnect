@@ -1401,7 +1401,7 @@ export default function CompanyInterviewsDashboard() {
                 >
                   <option value="">-- Choose Candidate --</option>
                   {applications
-                    .filter(app => app.stage === 'Shortlisted' || app.stage === 'Applied')
+                    .filter(app => !['Rejected', 'Joined', 'Offer Released'].includes(app.stage))
                     .map(app => (
                       <option key={app._id} value={app._id}>
                         {app.studentId?.userId?.name || 'Unknown'} - {app.jobId?.title} (Assessment Score: {app.assessmentScore || app.assessmentResult?.score || 0}%)
