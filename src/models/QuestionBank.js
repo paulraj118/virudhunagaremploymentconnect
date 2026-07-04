@@ -153,6 +153,8 @@ questionBankSchema.index({
   'content.questionText': 'text', 
   'content.problemStatement': 'text',
   'tags': 'text' 
+}, {
+  language_override: 'dummy_language_override' // Prevents conflict with our 'language' field (e.g. 'java', 'python')
 });
 
 // B-Tree indexes for fast filtering
