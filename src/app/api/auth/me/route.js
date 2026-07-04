@@ -14,7 +14,9 @@ export async function GET(request) {
     const user = await User.findById(decoded.id).select('-password');
     
     if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+      const response = NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+      response.cookies.delete('token');
+      return response;
     }
 
     return NextResponse.json({
