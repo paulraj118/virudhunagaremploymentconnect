@@ -278,7 +278,7 @@ export default function Register() {
               src="/theni-logo.png" 
               alt="Theni Employment Connect" 
               className="h-16 w-auto" 
-              onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} 
+               
             />
           </div>
 

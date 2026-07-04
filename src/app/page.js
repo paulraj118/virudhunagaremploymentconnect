@@ -83,7 +83,7 @@ export default function LandingPage() {
       <header className="bg-white py-3 px-6 md:px-12 flex items-center justify-between shadow-sm sticky top-0 z-50">
         {/* Logo */}
         <div className="flex items-center">
-          <img src="/new-logo.png" alt="Virudhunagar Employment Connect" className="h-16 w-auto" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/200x80?text=Logo" }} />
+          <img src="/new-logo.png" alt="Virudhunagar Employment Connect" className="h-16 w-auto"  />
         </div>
 
 
