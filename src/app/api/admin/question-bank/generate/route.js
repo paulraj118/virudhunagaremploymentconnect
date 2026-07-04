@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongodb';
 import QuestionBank from '@/models/QuestionBank';
 import { getCurrentUser } from '@/lib/auth';
 
+export const maxDuration = 60; // 60 seconds timeout for AI generation
+
 function getLanguageFromRole(role) {
   if (!role) return null;
   const r = role.toLowerCase();
