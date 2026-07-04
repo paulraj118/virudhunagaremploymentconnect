@@ -222,11 +222,11 @@ export async function POST(request) {
     let aiFill = [];
     let aiProg = [];
 
-    // 2. AI Fallback (Gemini call)
+    // 2. AI Fallback (Groq call)
     if (mcqShortage > 0 || fillShortage > 0 || progShortage > 0) {
-      const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-      if (!GEMINI_API_KEY) {
-        return NextResponse.json({ success: false, message: 'AI service not configured. Set GEMINI_API_KEY in .env' }, { status: 500 });
+      const GROQ_API_KEY = process.env.GROQ_API_KEY;
+      if (!GROQ_API_KEY) {
+        return NextResponse.json({ success: false, message: 'AI service not configured. Set GROQ_API_KEY in .env' }, { status: 500 });
       }
 
       const prompt = `You are an expert technical recruiter. Generate a partial Technical Assessment for the job role: "${jobRole}".
@@ -301,17 +301,17 @@ ${customInstructions ? `\nADDITIONAL INSTRUCTIONS FROM HR:\n${customInstructions
 
         try {
           const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+            'https://api.groq.com/openai/v1/chat/completions',
             {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`
+              },
               body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                  temperature: 0.7,
-                  maxOutputTokens: 8192,
-                  responseMimeType: 'application/json'
-                }
+                model: 'llama-3.3-70b-versatile',
+                messages: [{ role: 'user', content: prompt }],
+                response_format: { type: 'json_object' }
               })
             }
           );
@@ -336,7 +336,7 @@ ${customInstructions ? `\nADDITIONAL INSTRUCTIONS FROM HR:\n${customInstructions
           }
 
           const data = await response.json();
-          let generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          let generatedText = data.choices?.[0]?.message?.content;
           
           if (!generatedText) {
             retryReason = 'Empty Response';
