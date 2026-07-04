@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import College from '@/models/College';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request) {
@@ -11,6 +12,32 @@ export async function GET(request) {
     }
 
     await dbConnect();
+    
+    // Handle College users (they are stored in College collection, not User collection)
+    if (decoded.role === 'college') {
+      const college = await College.findById(decoded.id);
+      
+      if (!college) {
+        const response = NextResponse.json({ success: false, message: 'College not found' }, { status: 404 });
+        response.cookies.delete('token');
+        return response;
+      }
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: college._id,
+          name: college.collegeName,
+          email: college.email,
+          role: 'college',
+          // Colleges use separate verification system (approvalStatus)
+          isEmailVerified: true,
+          isMobileVerified: true,
+        }
+      });
+    }
+
+    // Handle standard Users (students, HR, super_admin)
     const user = await User.findById(decoded.id).select('-password');
     
     if (!user) {
