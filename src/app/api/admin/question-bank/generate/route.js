@@ -171,9 +171,12 @@ ${customInstructions ? `ADDITIONAL INSTRUCTIONS:\n${customInstructions}` : ''}
             inputFormat: q.inputFormat || '',
             outputFormat: q.outputFormat || '',
             constraints: q.constraints || '',
-            sampleInput: q.sampleInput || '',
-            sampleOutput: q.sampleOutput || '',
-            hiddenTestCases: q.hiddenTestCases || [],
+            sampleInput: typeof q.sampleInput === 'object' ? JSON.stringify(q.sampleInput) : String(q.sampleInput || ''),
+            sampleOutput: typeof q.sampleOutput === 'object' ? JSON.stringify(q.sampleOutput) : String(q.sampleOutput || ''),
+            hiddenTestCases: (q.hiddenTestCases || []).map(tc => ({
+              input: typeof tc.input === 'object' ? JSON.stringify(tc.input) : String(tc.input || ''),
+              expectedOutput: typeof tc.expectedOutput === 'object' ? JSON.stringify(tc.expectedOutput) : String(tc.expectedOutput || '')
+            })),
             starterCode: ''
           },
           marks: 5

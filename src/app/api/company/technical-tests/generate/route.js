@@ -563,9 +563,12 @@ ${customInstructions ? `\nADDITIONAL INSTRUCTIONS FROM HR:\n${customInstructions
           inputFormat: prog.inputFormat,
           outputFormat: prog.outputFormat,
           constraints: prog.constraints,
-          sampleInput: prog.sampleInput,
-          sampleOutput: prog.sampleOutput,
-          hiddenTestCases: prog.hiddenTestCases,
+          sampleInput: typeof prog.sampleInput === 'object' ? JSON.stringify(prog.sampleInput) : String(prog.sampleInput || ''),
+          sampleOutput: typeof prog.sampleOutput === 'object' ? JSON.stringify(prog.sampleOutput) : String(prog.sampleOutput || ''),
+          hiddenTestCases: (prog.hiddenTestCases || []).map(tc => ({
+            input: typeof tc.input === 'object' ? JSON.stringify(tc.input) : String(tc.input || ''),
+            expectedOutput: typeof tc.expectedOutput === 'object' ? JSON.stringify(tc.expectedOutput) : String(tc.expectedOutput || '')
+          })),
           starterCode: prog.starterCode || ''
         },
         marks: 5,
