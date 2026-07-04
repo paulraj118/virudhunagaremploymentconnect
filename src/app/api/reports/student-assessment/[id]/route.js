@@ -26,7 +26,7 @@ const getRecommendations = (topic) => {
 
 export async function GET(request, { params }) {
   try {
-    const { id: studentId } = params;
+    const { id: studentId } = await params;
     const decoded = await getCurrentUser();
 
     if (!decoded) {
