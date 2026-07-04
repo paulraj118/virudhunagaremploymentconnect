@@ -5,6 +5,7 @@ import Student from '@/models/Student';
 import SelfAssessmentResult from '@/models/SelfAssessmentResult';
 import SelfAssessmentQuestion from '@/models/SelfAssessmentQuestion';
 import { getCurrentUser } from '@/lib/auth';
+import { MASTER_DOMAINS } from '@/lib/domainConstants';
 
 // ============================================================================
 // GET: Fetch student enrollment data, completed levels, analytics, and history
@@ -119,12 +120,8 @@ export async function GET(request) {
       attemptNumber: r.attemptNumber,
     }));
 
-    // Fetch available domains (domains with at least one question)
-    const availableDomainsAggr = await SelfAssessmentQuestion.aggregate([
-      { $group: { _id: "$domain", count: { $sum: 1 } } },
-      { $match: { count: { $gt: 0 } } }
-    ]);
-    const availableDomains = availableDomainsAggr.map(d => d._id);
+    // Since questions are generated dynamically via API, all MASTER_DOMAINS are available
+    const availableDomains = MASTER_DOMAINS;
 
     return NextResponse.json({
       student: {
