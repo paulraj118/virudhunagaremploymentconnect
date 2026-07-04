@@ -24,7 +24,7 @@ const questionBankSchema = new mongoose.Schema({
   }],
   language: {
     type: String,
-    default: null, // Relevant mostly for programming questions
+    default: 'none', // Changed from null to 'none' to prevent MongoDB text index override errors
   },
   
   // Content based on type
