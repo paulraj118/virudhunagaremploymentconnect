@@ -58,7 +58,8 @@ export async function GET(request, { params }) {
           jobRole: test.jobRole,
           totalMarks: test.totalMarks,
           passingMarks: test.passingMarks,
-          duration: test.duration
+          duration: test.duration,
+          sections: test.sections
         },
         summary,
         attempts
