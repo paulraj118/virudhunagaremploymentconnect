@@ -360,39 +360,52 @@ export default function CompanyDashboard() {
                   </div>
                 </div>
 
-                {/* Hiring Efficiency */}
+                {/* Candidate Pipeline */}
                 <div className="bg-white p-6 rounded-xl border border-slate-200 flex flex-col justify-between">
                   
                   <div>
-                    <h3 className="text-xl font-black text-slate-800 mb-1">Hiring Efficiency</h3>
-                    <p className="text-sm font-medium text-slate-500">Candidate conversion rate</p>
+                    <h3 className="text-xl font-black text-slate-800 mb-1">Candidate Pipeline</h3>
+                    <p className="text-sm font-medium text-slate-500">Applicant status breakdown</p>
                   </div>
 
-                  {/* Circular CSS Chart */}
-                  <div className="flex justify-center items-center py-8 relative">
-                    <div className="relative w-40 h-40">
-                      {/* Background circle */}
-                      <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
-                        {/* Progress circle (dummy 0% for now) */}
-                        <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="440" strokeDashoffset="440" strokeLinecap="round" className="text-[#0B1E40] transition-all duration-1000" />
-                      </svg>
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                        <span className="text-4xl font-black text-slate-800">{stats.totalApplicants > 0 ? Math.round((stats.hired / stats.totalApplicants) * 100) : 0}%</span>
-                        <span className="block text-xs font-bold text-slate-500 uppercase mt-1">Conversion</span>
+                  <div className="flex flex-col gap-6 py-6">
+                    {/* Applicants Bar */}
+                    <div>
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-bold text-slate-700">Total Applied</span>
+                        <span className="text-sm font-black text-slate-900">{stats.totalApplicants}</span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-3">
+                        <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000" style={{ width: '100%' }}></div>
+                      </div>
+                    </div>
+
+                    {/* Interviews Bar */}
+                    <div>
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-bold text-slate-700">Interviews</span>
+                        <span className="text-sm font-black text-slate-900">{stats.interviews}</span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-3">
+                        <div className="bg-amber-500 h-3 rounded-full transition-all duration-1000" style={{ width: `${stats.totalApplicants > 0 ? (stats.interviews / stats.totalApplicants) * 100 : 0}%` }}></div>
+                      </div>
+                    </div>
+
+                    {/* Hired Bar */}
+                    <div>
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-sm font-bold text-slate-700">Hired</span>
+                        <span className="text-sm font-black text-slate-900">{stats.hired}</span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-3">
+                        <div className="bg-emerald-500 h-3 rounded-full transition-all duration-1000" style={{ width: `${stats.totalApplicants > 0 ? (stats.hired / stats.totalApplicants) * 100 : 0}%` }}></div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-2">
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                      <p className="text-slate-500 text-xs font-bold uppercase mb-1">Interviews</p>
-                      <p className="text-slate-800 text-2xl font-black">{stats.interviews}</p>
-                    </div>
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                      <p className="text-slate-500 text-xs font-bold uppercase mb-1">Offers</p>
-                      <p className="text-slate-800 text-2xl font-black">{stats.hired}</p>
-                    </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between mt-2">
+                    <span className="text-slate-500 text-xs font-bold uppercase">Conversion Rate</span>
+                    <span className="text-emerald-600 text-lg font-black">{stats.totalApplicants > 0 ? Math.round((stats.hired / stats.totalApplicants) * 100) : 0}%</span>
                   </div>
                 </div>
 
