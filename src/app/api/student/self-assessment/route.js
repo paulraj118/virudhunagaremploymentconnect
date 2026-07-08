@@ -236,9 +236,21 @@ export async function POST(request) {
     if (questionIds && questionIds.length > 0) {
       // Fetch questions by IDs from the unified Question collection
       const mongoose = (await import('mongoose')).default;
-      questions = await Question.find({
+      const fetchedQuestions = await Question.find({
         _id: { $in: questionIds.map(id => new mongoose.Types.ObjectId(id)) },
       }).lean();
+
+      // CRITICAL: MongoDB find({ $in }) does NOT guarantee return order matches
+      // the input array order. We must reorder to match the client's questionIds
+      // order, because answers[i] corresponds to questionIds[i].
+      const questionMap = new Map();
+      for (const q of fetchedQuestions) {
+        questionMap.set(q._id.toString(), q);
+      }
+      for (const id of questionIds) {
+        const q = questionMap.get(id.toString());
+        if (q) questions.push(q);
+      }
     }
 
     if (questions.length === 0) {
