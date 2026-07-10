@@ -366,7 +366,7 @@ export default function LandingPage() {
                 <img 
                   src="/footer-logo-startuptn.png" 
                   alt="StartupTN - Government of Tamil Nadu" 
-                  className="h-16 md:h-20 w-auto object-contain brightness-0 invert"
+                  className="h-16 md:h-20 w-auto object-contain"
                 />
               </div>
               <p className="text-white/50 text-sm leading-relaxed font-medium mb-6">
