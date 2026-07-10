@@ -462,7 +462,8 @@ export default function LandingPage() {
                 <span className="w-8 h-0.5 bg-gradient-to-r from-[#D4A843] to-transparent rounded-full"></span>
                 Powered By
               </h4>
-              <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 hover:border-white/15 transition-all duration-300 group">
+              <a href="https://www.sharpenedmindtechnologies.com" target="_blank" rel="noopener noreferrer" className="block">
+              <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 hover:border-white/15 transition-all duration-300 group cursor-pointer">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-xl bg-black/30 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                     <img 
@@ -483,6 +484,7 @@ export default function LandingPage() {
                   </p>
                 </div>
               </div>
+              </a>
             </div>
           </div>
         </div>
