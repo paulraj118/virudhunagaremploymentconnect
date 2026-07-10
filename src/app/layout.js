@@ -7,8 +7,8 @@ export const metadata = {
     default: 'Virudhunagar Employment Connect | Job Fair Portal',
     template: '%s | Virudhunagar Employment Connect',
   },
-  description: 'AI-Powered Recruitment, Assessment & Placement Platform for students and companies in Virudhunagar.',
-  keywords: ['Jobs', 'Recruitment', 'Virudhunagar', 'Employment', 'Job Fair', 'AI Assessment', 'Career', 'Hiring'],
+  description: 'Virudhunagar Employment Connect is an AI-powered job fair and recruitment platform connecting students, colleges, and companies in Tamil Nadu. Register for campus placements and freshers jobs.',
+  keywords: ['Virudhunagar jobs', 'Tamil Nadu employment', 'job fair 2026', 'campus placement', 'freshers jobs Tamil Nadu', 'government job fair', 'skill assessment platform', 'placement drive Virudhunagar', 'online recruitment platform', 'AI-powered hiring', 'student placement portal', 'company hiring platform', 'college placement cell', 'career opportunities Tamil Nadu', 'TN employment connect', 'job portal India', 'Virudhunagar district employment', 'StartupTN jobs', 'recruitment drive', 'talent connect platform', 'job assessment test', 'employment exchange online', 'Jobs', 'Recruitment', 'Virudhunagar', 'Employment', 'Job Fair', 'AI Assessment', 'Career', 'Hiring'],
   authors: [{ name: 'Virudhunagar Employment Connect' }],
   creator: 'Virudhunagar Employment Connect',
   openGraph: {
@@ -52,10 +52,28 @@ export const metadata = {
 export default function RootLayout({ children }) {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'Virudhunagar Employment Connect',
-    url: 'https://virudhunagaremploymentconnect.vercel.app',
-    description: 'AI-Powered Recruitment, Assessment & Placement Platform',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': 'https://virudhunagaremploymentconnect.vercel.app/#website',
+        url: 'https://virudhunagaremploymentconnect.vercel.app',
+        name: 'Virudhunagar Employment Connect',
+        description: 'AI-Powered Recruitment, Assessment & Placement Platform connecting students, colleges, and companies in Virudhunagar.',
+        publisher: {
+          '@id': 'https://virudhunagaremploymentconnect.vercel.app/#organization'
+        }
+      },
+      {
+        '@type': 'Organization',
+        '@id': 'https://virudhunagaremploymentconnect.vercel.app/#organization',
+        name: 'Virudhunagar Employment Connect',
+        url: 'https://virudhunagaremploymentconnect.vercel.app',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://virudhunagaremploymentconnect.vercel.app/icon.png'
+        }
+      }
+    ]
   };
 
   return (
