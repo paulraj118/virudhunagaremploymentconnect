@@ -342,6 +342,177 @@ export default function LandingPage() {
           </svg>
         </div>
       </footer>
+
+      {/* ========== ADVANCED FOOTER ========== */}
+      <footer id="site-footer" className="bg-gradient-to-b from-[#060e20] to-[#0a1628] text-white relative overflow-hidden">
+        {/* Decorative top border accent */}
+        <div className="h-1 w-full bg-gradient-to-r from-[#8B1538] via-[#D4A843] to-[#8B1538]"></div>
+        
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+
+        {/* Main Footer Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+            
+            {/* Column 1: Company Logo & Description */}
+            <div className="lg:col-span-1">
+              <div className="mb-6">
+                <img 
+                  src="/footer-logo-startuptn.png" 
+                  alt="StartupTN - Government of Tamil Nadu" 
+                  className="h-16 md:h-20 w-auto object-contain brightness-0 invert"
+                />
+              </div>
+              <p className="text-white/50 text-sm leading-relaxed font-medium mb-6">
+                Empowering Tamil Nadu's workforce through smart employment solutions. Connecting talent with opportunity across the state.
+              </p>
+              {/* Social-style decorative dots */}
+              <div className="flex gap-3">
+                {[
+                  'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+                  'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+                  'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
+                ].map((iconPath, idx) => (
+                  <div key={idx} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#8B1538]/30 hover:border-[#8B1538]/50 transition-all duration-300 cursor-pointer group">
+                    <svg className="w-4.5 h-4.5 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={iconPath}></path>
+                    </svg>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 2: Quick Links */}
+            <div>
+              <h4 className="text-sm font-extrabold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                <span className="w-8 h-0.5 bg-gradient-to-r from-[#D4A843] to-transparent rounded-full"></span>
+                Quick Links
+              </h4>
+              <ul className="space-y-3.5">
+                {[
+                  { label: 'Home', href: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+                  { label: 'Jobs', href: '/dashboard', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                  { label: 'About', href: '/#site-footer', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+                  { label: 'Contact', href: '/#site-footer', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' }
+                ].map((link, idx) => (
+                  <li key={idx}>
+                    <Link 
+                      href={link.href} 
+                      className="flex items-center gap-3 text-white/50 hover:text-white text-sm font-medium transition-all duration-300 group"
+                    >
+                      <svg className="w-4 h-4 text-white/30 group-hover:text-[#D4A843] transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={link.icon}></path>
+                      </svg>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">{link.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 3: Contact Us */}
+            <div>
+              <h4 className="text-sm font-extrabold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                <span className="w-8 h-0.5 bg-gradient-to-r from-[#D4A843] to-transparent rounded-full"></span>
+                Contact Us
+              </h4>
+              <div className="space-y-5">
+                {/* Email */}
+                <a 
+                  href="mailto:tnemploymentconnect@gmail.com" 
+                  id="footer-email-link"
+                  className="flex items-start gap-3 text-white/50 hover:text-white transition-all duration-300 group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#8B1538]/30 group-hover:border-[#8B1538]/50 transition-all duration-300">
+                    <svg className="w-4.5 h-4.5 text-[#D4A843]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <div className="pt-1.5">
+                    <p className="text-xs text-white/30 font-semibold uppercase tracking-wider mb-0.5">Email</p>
+                    <p className="text-sm font-medium group-hover:text-[#D4A843] transition-colors break-all">tnemploymentconnect@gmail.com</p>
+                  </div>
+                </a>
+
+                {/* Location */}
+                <div className="flex items-start gap-3 text-white/50">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <svg className="w-4.5 h-4.5 text-[#D4A843]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                  </div>
+                  <div className="pt-1.5">
+                    <p className="text-xs text-white/30 font-semibold uppercase tracking-wider mb-0.5">Location</p>
+                    <p className="text-sm font-medium">Tamil Nadu, India</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 4: Powered By */}
+            <div>
+              <h4 className="text-sm font-extrabold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                <span className="w-8 h-0.5 bg-gradient-to-r from-[#D4A843] to-transparent rounded-full"></span>
+                Powered By
+              </h4>
+              <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 hover:border-white/15 transition-all duration-300 group">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-black/30 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <img 
+                      src="/footer-logo-sharpend.png" 
+                      alt="Sharpend Mind Technologies" 
+                      className="w-12 h-12 object-contain"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-sm leading-tight">Sharpend Mind</p>
+                    <p className="text-white font-bold text-sm leading-tight">Technologies</p>
+                    <p className="text-white/30 text-xs font-semibold mt-1">Private Limited</p>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-white/[0.06]">
+                  <p className="text-white/30 text-[11px] font-medium leading-relaxed">
+                    Building innovative digital solutions for a smarter tomorrow.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="relative z-10 border-t border-white/[0.06]">
+          <div className="max-w-7xl mx-auto px-6 md:px-12 py-5">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Copyright */}
+              <p className="text-white/30 text-xs font-medium text-center md:text-left">
+                © 2026 TN Employment Connect. All Rights Reserved.
+              </p>
+              
+              {/* Bottom Right - Powered By compact */}
+              <div className="flex items-center gap-2 text-white/30 text-xs font-medium">
+                <span>Powered by</span>
+                <img 
+                  src="/footer-logo-sharpend.png" 
+                  alt="Sharpend Mind Technologies" 
+                  className="w-5 h-5 object-contain"
+                />
+                <span className="text-white/50 font-bold">Sharpend Mind Technologies Private Limited</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Decorative bottom glow */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-24 bg-[#8B1538]/10 blur-3xl rounded-full pointer-events-none"></div>
+      </footer>
     </div>
   );
 }
