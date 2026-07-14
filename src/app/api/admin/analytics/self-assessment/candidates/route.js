@@ -26,11 +26,12 @@ export async function GET(request) {
     const status = searchParams.get('status') || '';
     const scoreRange = searchParams.get('scoreRange') || '';
     const date = searchParams.get('date') || '';
+    const gender = searchParams.get('gender') || '';
     const sortBy = searchParams.get('sortBy') || 'latest';
     const isExport = searchParams.get('export') === 'true';
-
+ 
     const pipeline = [];
-
+ 
     // 1. Initial direct field matching
     let initialMatch = {};
     if (domain) initialMatch.preferredDomain = { $regex: domain, $options: 'i' };
@@ -52,11 +53,11 @@ export async function GET(request) {
         initialMatch.completionDate = { $gte: targetDate, $lt: nextDay };
       }
     }
-
+ 
     if (Object.keys(initialMatch).length > 0) {
       pipeline.push({ $match: initialMatch });
     }
-
+ 
     // 2. Lookup related documents
     pipeline.push({
       $lookup: {
@@ -67,7 +68,7 @@ export async function GET(request) {
       }
     });
     pipeline.push({ $unwind: { path: '$studentInfo', preserveNullAndEmptyArrays: true } });
-
+ 
     pipeline.push({
       $lookup: {
         from: 'users',
@@ -77,11 +78,14 @@ export async function GET(request) {
       }
     });
     pipeline.push({ $unwind: { path: '$userInfo', preserveNullAndEmptyArrays: true } });
-
-    // 3. Post-lookup matching (keyword & college)
+ 
+    // 3. Post-lookup matching (keyword & college & gender)
     let postMatch = {};
     if (collegeName) {
       postMatch['studentInfo.collegeName'] = { $regex: collegeName, $options: 'i' };
+    }
+    if (gender) {
+      postMatch['userInfo.gender'] = gender.toLowerCase();
     }
     if (keyword) {
       postMatch['$or'] = [
@@ -127,6 +131,7 @@ export async function GET(request) {
       name: r.userInfo?.name || 'Unknown',
       email: r.userInfo?.email || 'Unknown',
       collegeName: r.studentInfo?.collegeName || 'Unknown',
+      gender: r.userInfo?.gender || 'Not Specified',
       domain: r.preferredDomain || 'Unknown',
       track: r.industryTrack || 'Unknown',
       date: r.completionDate || r.createdAt,

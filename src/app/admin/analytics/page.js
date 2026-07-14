@@ -23,21 +23,21 @@ export default function AnalyticsDashboard() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({ 
-    keyword: '', domain: '', track: '', collegeName: '', status: '', scoreRange: '', date: '', sortBy: 'latest' 
+    keyword: '', domain: '', track: '', collegeName: '', status: '', scoreRange: '', date: '', sortBy: 'latest', gender: '' 
   });
   const [selectedReport, setSelectedReport] = useState(null);
-
+ 
   useEffect(() => {
     fetchGlobalData();
   }, []);
-
+ 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if(page !== 1) setPage(1);
       else fetchCandidates();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [filters.keyword, filters.domain, filters.track, filters.collegeName, filters.status, filters.scoreRange, filters.date, filters.sortBy]);
+  }, [filters.keyword, filters.domain, filters.track, filters.collegeName, filters.status, filters.scoreRange, filters.date, filters.sortBy, filters.gender]);
 
   useEffect(() => {
     fetchCandidates();
@@ -81,7 +81,7 @@ export default function AnalyticsDashboard() {
       const data = await res.json();
       if (data.success) {
         return data.candidates.map(c => ({
-          Name: c.name, Email: c.email, College: c.collegeName, Domain: c.domain,
+          Name: c.name, Email: c.email, Gender: c.gender || 'Not Specified', College: c.collegeName, Domain: c.domain,
           Track: c.track, Date: new Date(c.date).toLocaleDateString(),
           Status: c.status, Score: `${c.score}%`, Level: c.level, Result: c.result
         }));
@@ -121,12 +121,12 @@ export default function AnalyticsDashboard() {
     const doc = new jsPDF('l', 'pt', 'a4');
     doc.text('Self Assessment Candidate Analytics', 40, 40);
     
-    const tableColumn = ["Name", "Email", "College", "Domain", "Track", "Date", "Score", "Level", "Result"];
+    const tableColumn = ["Name", "Email", "Gender", "College", "Domain", "Track", "Date", "Score", "Level", "Result"];
     const tableRows = [];
 
     dataToExport.forEach(c => {
       const row = [
-        c.Name, c.Email, c.College, c.Domain, c.Track, 
+        c.Name, c.Email, c.Gender, c.College, c.Domain, c.Track, 
         c.Date, 
         c.Score, c.Level, c.Result
       ];
@@ -357,6 +357,15 @@ export default function AnalyticsDashboard() {
             <option value="">All Statuses</option>
             <option value="completed">Completed</option>
             <option value="in-progress">In Progress</option>
+          </select>
+          <select 
+            className="px-3 py-2 text-sm border rounded border-slate-300 w-36"
+            value={filters.gender} onChange={(e) => setFilters({...filters, gender: e.target.value})}
+          >
+            <option value="">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="transgender">Transgender</option>
           </select>
           <select 
             className="px-3 py-2 text-sm border rounded border-slate-300 w-36"
