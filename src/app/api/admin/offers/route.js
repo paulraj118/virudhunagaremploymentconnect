@@ -15,8 +15,17 @@ export async function GET(request) {
 
     await dbConnect();
     const offers = await Offer.find()
-      .populate({ path: 'studentId', select: 'userId collegeName', populate: { path: 'userId', model: User, select: 'name email gender' } })
-      .populate('companyId', 'companyName')
+      .populate({ 
+        path: 'studentId', 
+        model: Student,
+        select: 'userId collegeName', 
+        populate: { 
+          path: 'userId', 
+          model: User, 
+          select: 'name email gender' 
+        } 
+      })
+      .populate({ path: 'companyId', model: Company, select: 'companyName' })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -25,6 +34,7 @@ export async function GET(request) {
       studentName: off.studentId?.userId?.name || 'Unknown',
       collegeName: off.studentId?.collegeName || 'Unknown',
       gender: off.studentId?.userId?.gender || 'Not Specified',
+      email: off.studentId?.userId?.email || '',
     }));
 
     return NextResponse.json({ success: true, offers: formattedOffers });

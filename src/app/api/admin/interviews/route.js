@@ -27,11 +27,20 @@ export async function GET(request) {
     });
 
     const interviews = await Interview.find()
-      .populate({ path: 'studentId', select: 'userId collegeName', populate: { path: 'userId', model: User, select: 'name email gender' } })
-      .populate('candidateId', 'name email gender')
-      .populate('companyId', 'companyName')
-      .populate('driveId', 'jobRole')
-      .populate('jobId', 'title role')
+      .populate({ 
+        path: 'studentId', 
+        model: Student,
+        select: 'userId collegeName', 
+        populate: { 
+          path: 'userId', 
+          model: User, 
+          select: 'name email gender' 
+        } 
+      })
+      .populate({ path: 'candidateId', model: User, select: 'name email gender' })
+      .populate({ path: 'companyId', model: Company, select: 'companyName' })
+      .populate({ path: 'driveId', model: RecruitmentDrive, select: 'jobRole' })
+      .populate({ path: 'jobId', model: Job, select: 'title role' })
       .sort({ createdAt: -1 })
       .lean();
 
