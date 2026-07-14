@@ -371,6 +371,8 @@ export default function AssessmentPage() {
         const targetJobId = sessionStorage.getItem('pendingApplyJobId');
         if (targetJobId) {
           await triggerAutoApply(targetJobId);
+          router.push('/student/applications');
+          return;
         }
       } else {
         setError(data.message || 'Failed to submit proctored assessment.');
