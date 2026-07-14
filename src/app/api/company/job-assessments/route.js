@@ -11,13 +11,19 @@ import { getCurrentUser } from '@/lib/auth';
 export async function GET(request) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded || decoded.role !== 'hr_company') {
+    if (!decoded || (decoded.role !== 'company' && decoded.role !== 'hr_company')) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
     await dbConnect();
 
-    const company = await Company.findOne({ userId: decoded.id });
+    let company;
+    if (decoded.role === 'hr_company') {
+      company = await Company.findOne({ userId: decoded.id });
+    } else {
+      company = await Company.findById(decoded.id);
+    }
+    
     if (!company) {
       return NextResponse.json({ success: false, message: 'Company profile not found' }, { status: 404 });
     }

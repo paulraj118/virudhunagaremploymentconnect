@@ -11,12 +11,17 @@ import nodemailer from 'nodemailer';
 export async function POST(request, { params }) {
   try {
     const decoded = await getCurrentUser();
-    if (!decoded || decoded.role !== 'hr_company') {
+    if (!decoded || (decoded.role !== 'company' && decoded.role !== 'hr_company')) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
     const resolvedParams = await params;
     const { id } = resolvedParams;
+
+    const mongoose = (await import('mongoose')).default;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+       return NextResponse.json({ success: false, message: 'Invalid ID format' }, { status: 400 });
+    }
 
     await dbConnect();
 
@@ -30,6 +35,21 @@ export async function POST(request, { params }) {
 
     if (!application) {
       return NextResponse.json({ success: false, message: 'Application not found' }, { status: 404 });
+    }
+
+    let hrCompany;
+    if (decoded.role === 'hr_company') {
+      hrCompany = await Company.findOne({ userId: decoded.id });
+    } else {
+      hrCompany = await Company.findById(decoded.id);
+    }
+
+    if (!hrCompany) {
+      return NextResponse.json({ success: false, message: 'Company profile not found' }, { status: 404 });
+    }
+
+    if (application.companyId._id.toString() !== hrCompany._id.toString()) {
+      return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
     }
 
     // Auto Pick Details

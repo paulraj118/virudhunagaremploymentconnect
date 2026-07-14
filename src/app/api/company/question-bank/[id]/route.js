@@ -16,6 +16,11 @@ export async function PUT(request, { params }) {
     await dbConnect();
     const { id } = await params;
     const body = await request.json();
+    
+    const mongoose = (await import('mongoose')).default;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+       return NextResponse.json({ success: false, message: 'Invalid ID format' }, { status: 400 });
+    }
 
     const question = await QuestionBank.findById(id);
     if (!question) {

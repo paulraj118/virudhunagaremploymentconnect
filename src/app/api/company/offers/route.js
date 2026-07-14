@@ -17,7 +17,19 @@ export async function GET(request) {
     }
 
     await dbConnect();
-    const offers = await Offer.find({ companyId: decoded.id })
+    
+    let companyId;
+    if (decoded.role === 'hr_company') {
+      const company = await Company.findOne({ userId: decoded.id });
+      if (!company) {
+        return NextResponse.json({ success: false, message: 'Company profile not found' }, { status: 404 });
+      }
+      companyId = company._id;
+    } else {
+      companyId = decoded.id;
+    }
+
+    const offers = await Offer.find({ companyId })
       .populate({ path: 'studentId', select: 'userId', populate: { path: 'userId', model: User, select: 'name email' } })
       .populate('driveId', 'jobRole')
       .sort({ createdAt: -1 })
@@ -51,7 +63,13 @@ export async function POST(request) {
     };
 
     // Get company profile
-    const company = await Company.findOne({ userId: decoded.id });
+    let company;
+    if (decoded.role === 'hr_company') {
+      company = await Company.findOne({ userId: decoded.id });
+    } else {
+      company = await Company.findById(decoded.id);
+    }
+
     if (!company) {
       return NextResponse.json({ success: false, message: 'Company profile not found' }, { status: 404 });
     }

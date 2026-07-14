@@ -1,12 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 export default function PlacementTracking() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // Unified application state
   const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState(null);
+  const [allApplications, setAllApplications] = useState([]); // Used only for Card metrics
+  const [jobs, setJobs] = useState([]);
+  const [techTests, setTechTests] = useState([]);
   
+  // State loaders
+  const [loading, setLoading] = useState(true);
+  const [loadingApplicants, setLoadingApplicants] = useState(false);
+  
+  // Active UI views
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedApp, setSelectedApp] = useState(null);
+
   // Filtering state
   const [jobRoles, setJobRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState('All Jobs');
@@ -26,35 +41,66 @@ export default function PlacementTracking() {
     'Interview Cleared', 'Offer Released', 'Joined', 'Rejected'
   ];
 
+  // Initial mount load of Jobs, Tech Tests, and Applications (for metrics counting)
   useEffect(() => {
-    fetchJobs();
+    const initData = async () => {
+      try {
+        setLoading(true);
+        // 1. Fetch jobs
+        const jobsRes = await fetch('/api/company/jobs');
+        const jobsJson = await jobsRes.json();
+        let loadedJobs = [];
+        if (jobsJson.success) {
+          setJobs(jobsJson.jobs);
+          loadedJobs = jobsJson.jobs;
+          const uniqueRoles = [...new Set(jobsJson.jobs.map(j => j.title))].filter(Boolean);
+          setJobRoles(uniqueRoles);
+        }
+
+        // 2. Fetch technical tests (assessment configuration checks)
+        const testsRes = await fetch('/api/company/technical-tests');
+        const testsJson = await testsRes.json();
+        if (testsJson.success) {
+          setTechTests(testsJson.data?.tests || testsJson.tests || []);
+        }
+
+        // 3. Fetch all applications (for dynamically calculating Job Card stats)
+        const appsRes = await fetch('/api/company/applications');
+        const appsJson = await appsRes.json();
+        if (appsJson.success) {
+          setAllApplications(appsJson.applications);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initData();
   }, []);
 
+  // Synchronize URL search parameter changes
   useEffect(() => {
-    fetchApplications();
-  }, [selectedRole]);
-
-  const fetchJobs = async () => {
-    try {
-      const res = await fetch('/api/company/jobs');
-      const data = await res.json();
-      if (data.success) {
-        const uniqueRoles = [...new Set(data.jobs.map(job => job.title))].filter(Boolean);
-        setJobRoles(uniqueRoles);
+    const urlJobId = searchParams.get('jobId');
+    if (urlJobId && jobs.length > 0) {
+      const matchedJob = jobs.find(j => j._id === urlJobId);
+      if (matchedJob) {
+        setSelectedJob(matchedJob);
+        fetchApplicationsForJob(urlJobId);
+      } else {
+        setSelectedJob(null);
+        setApplications([]);
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      setSelectedJob(null);
+      setApplications([]);
     }
-  };
+  }, [searchParams, jobs]);
 
-  const fetchApplications = async () => {
+  const fetchApplicationsForJob = async (jobId) => {
     try {
-      setLoading(true);
-      const url = selectedRole === 'All Jobs' 
-        ? '/api/company/applications' 
-        : `/api/company/applications?role=${encodeURIComponent(selectedRole)}`;
-        
-      const res = await fetch(url);
+      setLoadingApplicants(true);
+      const res = await fetch(`/api/company/applications?jobId=${jobId}`);
       const data = await res.json();
       if (data.success) {
         setApplications(data.applications);
@@ -62,7 +108,20 @@ export default function PlacementTracking() {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setLoadingApplicants(false);
+    }
+  };
+
+  // Re-fetch all applications for metrics refresh (e.g. after stage updates)
+  const refreshAllApplications = async () => {
+    try {
+      const appsRes = await fetch('/api/company/applications');
+      const appsJson = await appsRes.json();
+      if (appsJson.success) {
+        setAllApplications(appsJson.applications);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -75,7 +134,10 @@ export default function PlacementTracking() {
       });
       const data = await res.json();
       if (data.success) {
-        fetchApplications();
+        if (selectedJob) {
+          fetchApplicationsForJob(selectedJob._id);
+        }
+        refreshAllApplications();
         if (showInterviewModal) setShowInterviewModal(false);
       } else {
         alert(data.message);
@@ -95,7 +157,10 @@ export default function PlacementTracking() {
       const data = await res.json();
       if (data.success) {
         alert('Email sent successfully.');
-        fetchApplications(); // Refresh to show updated stage
+        if (selectedJob) {
+          fetchApplicationsForJob(selectedJob._id);
+        }
+        refreshAllApplications();
       } else {
         alert(data.message || 'Unable to send email. Please try again.');
       }
@@ -137,7 +202,10 @@ export default function PlacementTracking() {
       if (data.success) {
         alert('Offer Generated Successfully!');
         setShowOfferModal(false);
-        fetchApplications(); // This will pull the updated stage which is now 'Offer Released'
+        if (selectedJob) {
+          fetchApplicationsForJob(selectedJob._id);
+        }
+        refreshAllApplications();
       } else {
         alert(data.message || 'Failed to generate offer');
       }
@@ -146,7 +214,14 @@ export default function PlacementTracking() {
     }
   };
 
-  if (loading) return <div>Loading applicants...</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+        <div className="text-slate-500 font-medium text-sm">Loading Candidate Tracker...</div>
+      </div>
+    );
+  }
 
   // Apply frontend filters for search and status
   const filteredApps = applications.filter(app => {
@@ -156,9 +231,153 @@ export default function PlacementTracking() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleBack = () => {
+    setSelectedJob(null);
+    setApplications([]);
+    router.push(pathname);
+  };
+
+  if (!selectedJob) {
+    return (
+      <div className="w-full min-w-0">
+        <h1 className="text-2xl font-bold text-slate-800 mb-6">Candidate Tracker</h1>
+        {jobs.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 font-medium shadow-sm">
+            <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            No Job Posts Found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {jobs.map(job => {
+              const jobApps = allApplications.filter(app => app.jobId?._id === job._id || app.jobId === job._id);
+              const test = techTests.find(t => t.jobId?._id === job._id || t.jobId === job._id);
+              const hasAssessment = test ? 'Yes' : 'No';
+
+              // Specific stages counting
+              const totalCount = jobApps.length;
+              const appliedCount = jobApps.filter(a => a.stage === 'Applied').length;
+              const assessmentCompletedCount = jobApps.filter(a => a.stage === 'Assessment Completed').length;
+              const shortlistedCount = jobApps.filter(a => a.stage === 'Shortlisted').length;
+              const interviewScheduledCount = jobApps.filter(a => a.stage === 'Interview Scheduled').length;
+              const selectedCount = jobApps.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released' || a.stage === 'Interview Cleared').length;
+              const rejectedCount = jobApps.filter(a => a.stage === 'Rejected').length;
+
+              return (
+                <div key={job._id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${job.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                        {job.isActive ? 'Published' : 'Closed'}
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        {new Date(job.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-extrabold text-slate-800 line-clamp-2 leading-tight" title={job.title}>
+                      {job.title}
+                    </h3>
+
+                    {/* Metadata fields */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 my-3 text-[11px] text-slate-500 font-medium">
+                      {job.location && (
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                          <span>{job.location}</span>
+                        </div>
+                      )}
+                      {job.experience && (
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                          <span>{job.experience}</span>
+                        </div>
+                      )}
+                      {job.role && (
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                          <span>{job.role}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="border-t border-slate-100 my-3.5 pt-3.5 space-y-1.5 text-xs">
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Assessment Required:</span>
+                        <span className={`font-bold ${hasAssessment === 'Yes' ? 'text-indigo-600' : 'text-slate-400'}`}>{hasAssessment}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Applied:</span>
+                        <span className="font-bold text-slate-700">{appliedCount}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Assessment Completed:</span>
+                        <span className="font-bold text-slate-700">{assessmentCompletedCount}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Shortlisted:</span>
+                        <span className="font-bold text-slate-700">{shortlistedCount}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Interview Scheduled:</span>
+                        <span className="font-bold text-slate-700">{interviewScheduledCount}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Selected:</span>
+                        <span className="font-bold text-emerald-600">{selectedCount}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Rejected:</span>
+                        <span className="font-bold text-red-500">{rejectedCount}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-4 mt-4 flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-black text-[#0B1E40]">{totalCount}</span>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Applicants</p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        router.push(`${pathname}?jobId=${job._id}`);
+                      }}
+                      className="px-4 py-2 text-xs font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] rounded-xl transition-all shadow-xs hover:shadow-md cursor-pointer"
+                    >
+                      View Candidates
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-w-0">
-      <h1 className="text-2xl font-bold text-slate-800 mb-4">Candidate Tracker</h1>
+      <button 
+        onClick={handleBack} 
+        className="text-xs font-bold text-slate-500 hover:text-indigo-600 flex items-center gap-1.5 mb-3 transition-colors cursor-pointer"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Back to Jobs
+      </button>
+
+      <div className="flex justify-between items-end mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Candidate Tracker</h1>
+          <div className="text-sm text-slate-500 mt-1 font-medium">
+            Selected Job: <strong className="text-slate-800">{selectedJob.title}</strong>
+          </div>
+        </div>
+        <div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-1.5 text-right shrink-0">
+          <span className="text-xl font-black text-indigo-700">{applications.length}</span>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Applicants</p>
+        </div>
+      </div>
 
       {/* Filters Section */}
       <div className="bg-white p-3 rounded-xl border border-slate-200 mb-4 flex flex-wrap gap-3 items-end">
@@ -174,17 +393,13 @@ export default function PlacementTracking() {
         </div>
         
         <div className="w-full md:w-56">
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Filter by Job Role</label>
-          <select 
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
-          >
-            <option value="All Jobs">All Jobs</option>
-            {jobRoles.map(role => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Selected Job</label>
+          <input 
+            type="text" 
+            readOnly 
+            value={selectedJob.title}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 outline-none text-sm font-medium"
+          />
         </div>
 
         <div className="w-full md:w-44">
@@ -205,7 +420,6 @@ export default function PlacementTracking() {
           <button 
             onClick={() => {
               setSearchQuery('');
-              setSelectedRole('All Jobs');
               setStatusFilter('All Status');
             }}
             className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
@@ -215,48 +429,55 @@ export default function PlacementTracking() {
         </div>
       </div>
 
-      {/* Pipeline Statistics Cards */}
-      {(() => {
-        const stats = [
-          { label: 'Total Applicants', count: applications.length, iconColor: 'text-slate-700', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> },
-          { label: 'Applied', count: applications.filter(a => a.stage === 'Applied').length, iconColor: 'text-blue-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> },
-          { label: 'Shortlisted', count: applications.filter(a => a.stage === 'Shortlisted').length, iconColor: 'text-amber-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg> },
-          { label: 'Interview', count: applications.filter(a => a.stage === 'Interview Scheduled').length, iconColor: 'text-purple-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> },
-          { label: 'Selected', count: applications.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released').length, iconColor: 'text-emerald-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
-          { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, iconColor: 'text-red-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
-        ];
-        return (
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-4">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="bg-white rounded-xl p-2.5 border border-slate-200 hover:border-slate-300 transition-colors"
-              >
-                <div className={`${stat.iconColor} mb-1`}>{stat.icon}</div>
-                <div className="text-lg font-bold text-slate-800">{stat.count}</div>
-                <div className="text-[11px] font-medium text-slate-500 mt-0.5">{stat.label}</div>
+      {loadingApplicants ? (
+        <div className="flex flex-col items-center justify-center bg-white rounded-xl border border-slate-200 p-12 min-h-[300px] shadow-xs">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-3"></div>
+          <div className="text-slate-500 font-medium text-sm">Fetching candidates...</div>
+        </div>
+      ) : (
+        <>
+          {/* Pipeline Statistics Cards */}
+          {(() => {
+            const stats = [
+              { label: 'Total Applicants', count: applications.length, iconColor: 'text-slate-700', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> },
+              { label: 'Applied', count: applications.filter(a => a.stage === 'Applied').length, iconColor: 'text-blue-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> },
+              { label: 'Shortlisted', count: applications.filter(a => a.stage === 'Shortlisted').length, iconColor: 'text-amber-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg> },
+              { label: 'Interview', count: applications.filter(a => a.stage === 'Interview Scheduled').length, iconColor: 'text-purple-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> },
+              { label: 'Selected', count: applications.filter(a => a.stage === 'Joined' || a.stage === 'Offer Released').length, iconColor: 'text-emerald-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
+              { label: 'Rejected', count: applications.filter(a => a.stage === 'Rejected').length, iconColor: 'text-red-500', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> },
+            ];
+            return (
+              <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-4">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white rounded-xl p-2.5 border border-slate-200 hover:border-slate-300 transition-colors"
+                  >
+                    <div className={`${stat.iconColor} mb-1`}>{stat.icon}</div>
+                    <div className="text-lg font-bold text-slate-800">{stat.count}</div>
+                    <div className="text-[11px] font-medium text-slate-500 mt-0.5">{stat.label}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        );
-      })()}
+            );
+          })()}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600 table-fixed">
-            <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
-              <tr>
-                <th className="px-2 py-2.5 w-[5%]">Rank</th>
-                <th className="px-2 py-2.5 w-[18%]">Candidate</th>
-                <th className="px-2 py-2.5 w-[12%]">Applied Job</th>
-                <th className="px-2 py-2.5 w-[11%]">Applied Date</th>
-                <th className="px-2 py-2.5 w-[16%]">Skill Match</th>
-                <th className="px-2 py-2.5 w-[12%]">Assessment</th>
-                <th className="px-2 py-2.5 w-[15%]">Current Stage</th>
-                <th className="px-2 py-2.5 text-right w-[11%]">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-600 table-fixed">
+                <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="px-2 py-2.5 w-[5%]">Rank</th>
+                    <th className="px-2 py-2.5 w-[18%]">Candidate</th>
+                    <th className="px-2 py-2.5 w-[12%]">Applied Job</th>
+                    <th className="px-2 py-2.5 w-[11%]">Applied Date</th>
+                    <th className="px-2 py-2.5 w-[16%]">Skill Match</th>
+                    <th className="px-2 py-2.5 w-[12%]">Assessment</th>
+                    <th className="px-2 py-2.5 w-[15%]">Current Stage</th>
+                    <th className="px-2 py-2.5 text-right w-[11%]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
               {filteredApps.map((app) => (
                 <tr key={app._id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-2 py-2.5">
@@ -360,6 +581,8 @@ export default function PlacementTracking() {
           </table>
         </div>
       </div>
+      </>
+      )}
 
       {/* Interview Scheduling Modal */}
       {showInterviewModal && selectedApp && (
