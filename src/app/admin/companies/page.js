@@ -1,10 +1,69 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function AdminCompaniesPage() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredCompanies = companies.filter(company => 
+    company.companyName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const exportToCSV = () => {
+    const dataToExport = filteredCompanies.map(c => ({
+      'Company Name': c.companyName,
+      'Company Code': c.companyCode,
+      'HR Contact': c.hrName,
+      'HR Email': c.hrEmail,
+      'Mobile Number': c.mobileNumber,
+      'Industry': c.industry || 'N/A',
+      'Status': c.status
+    }));
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `companies_report_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToExcel = () => {
+    const dataToExport = filteredCompanies.map(c => ({
+      'Company Name': c.companyName,
+      'Company Code': c.companyCode,
+      'HR Contact': c.hrName,
+      'HR Email': c.hrEmail,
+      'Mobile Number': c.mobileNumber,
+      'Industry': c.industry || 'N/A',
+      'Status': c.status
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Companies');
+    XLSX.writeFile(workbook, `companies_report_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('landscape');
+    doc.text('Company Management Report', 14, 15);
+    doc.autoTable({
+      head: [['Company Name', 'Company Code', 'HR Contact', 'HR Email', 'Mobile Number', 'Industry', 'Status']],
+      body: filteredCompanies.map(c => [
+        c.companyName, c.companyCode, c.hrName, c.hrEmail, c.mobileNumber, c.industry || 'N/A', c.status
+      ]),
+      startY: 20
+    });
+    doc.save(`companies_report_${new Date().toISOString().slice(0,10)}.pdf`);
+  };
 
   useEffect(() => {
     fetchCompanies();
@@ -80,6 +139,24 @@ export default function AdminCompaniesPage() {
         </div>
       </div>
 
+      {/* Search and Export Toolbar */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div className="w-full sm:w-80">
+          <input 
+            type="text"
+            placeholder="Search Company Name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          />
+        </div>
+        <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-end">
+          <button onClick={exportToCSV} className="px-3 py-1.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 border border-slate-200 transition">CSV</button>
+          <button onClick={exportToExcel} className="px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-800 rounded-lg hover:bg-emerald-100 border border-emerald-200 transition">Excel</button>
+          <button onClick={exportToPDF} className="px-3 py-1.5 text-xs font-bold bg-red-50 text-red-800 rounded-lg hover:bg-red-100 border border-red-200 transition">PDF</button>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -92,7 +169,7 @@ export default function AdminCompaniesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
-            {companies.map(company => (
+            {filteredCompanies.map(company => (
               <tr key={company._id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="font-bold text-slate-800">{company.companyName}</div>
@@ -132,7 +209,7 @@ export default function AdminCompaniesPage() {
                 </td>
               </tr>
             ))}
-            {companies.length === 0 && (
+            {filteredCompanies.length === 0 && (
               <tr>
                 <td colSpan="5" className="p-8 text-center text-slate-500">No companies found.</td>
               </tr>
