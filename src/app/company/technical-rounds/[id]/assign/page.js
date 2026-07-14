@@ -49,7 +49,7 @@ export default function AssignTechnicalTestPage() {
           // Filter to show only candidates who haven't been assigned a test yet (or have this test assigned but not started)
           // Also only show candidates in 'Applied', 'Assessment Completed', or 'Shortlisted' stages
           const eligibleCandidates = (appData.applications || []).filter(app => {
-            const validStage = app.stage === 'Shortlisted';
+            const validStage = app.stage === 'Shortlisted for next round';
             const notStarted = !app.technicalTestStatus || app.technicalTestStatus === 'Not Assigned' || app.technicalTestStatus === 'Assigned';
             return validStage && notStarted;
           });
@@ -175,7 +175,7 @@ export default function AssignTechnicalTestPage() {
               <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
             </div>
             <p className="text-slate-600 font-medium">No eligible candidates found for this job.</p>
-            <p className="text-slate-400 text-sm mt-1">Candidates must be in the 'Shortlisted' stage to receive assignments.</p>
+            <p className="text-slate-400 text-sm mt-1">Candidates must be in the 'Shortlisted for next round' stage to receive assignments.</p>
           </div>
         ) : (
           <div>
