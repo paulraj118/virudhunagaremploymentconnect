@@ -131,7 +131,8 @@ export default function StudentApplications() {
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600"              <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                 <tr>
                   <th className="px-4 py-4">Job Title</th>
                   <th className="px-4 py-4">Company</th>
