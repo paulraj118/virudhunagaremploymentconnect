@@ -104,7 +104,7 @@ export default function AdminSkillGapAnalysis() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto font-sans space-y-8">
+    <div className="p-6 max-w-7xl mx-auto font-sans space-y-8 w-full overflow-x-hidden">
       
       {/* Header */}
       <div>
@@ -260,7 +260,7 @@ export default function AdminSkillGapAnalysis() {
           </div>
         </div>
 
-        <div className="overflow-x-auto max-h-[500px]">
+        <div className="overflow-hidden w-full max-h-[500px]">
           <table className="w-full text-left border-collapse text-sm">
             <thead className="sticky top-0 bg-white shadow-xs">
               <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">
