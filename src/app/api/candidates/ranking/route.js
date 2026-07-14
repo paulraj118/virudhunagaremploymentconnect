@@ -21,6 +21,8 @@ export async function GET(request) {
     const track = searchParams.get('track') || '';
     const domain = searchParams.get('domain') || '';
     const minScore = parseInt(searchParams.get('minScore')) || 0;
+    const collegeName = searchParams.get('collegeName') || '';
+    const gender = searchParams.get('gender') || '';
 
     let matchQuery = { enrollmentStatus: 'approved' }; // Only rank approved students? Or all? Let's say all, or no filter. We'll leave it open but typically ranking is for approved students.
 
@@ -28,6 +30,8 @@ export async function GET(request) {
       const college = await College.findById(decoded.id);
       if (!college) return NextResponse.json({ success: false, message: 'College not found' }, { status: 404 });
       matchQuery.collegeName = college.collegeName;
+    } else if (collegeName) {
+      matchQuery.collegeName = { $regex: collegeName, $options: 'i' };
     }
 
     if (track) matchQuery.industryTrack = track;
@@ -45,6 +49,8 @@ export async function GET(request) {
           as: 'user'
       }},
       { $unwind: "$user" },
+
+      ...(gender ? [{ $match: { "user.gender": gender.toLowerCase() } }] : []),
 
       // Lookup latest Assessment Result
       { $lookup: {
@@ -170,6 +176,7 @@ export async function GET(request) {
         _id: c._id,
         name: c.user.name,
         email: c.user.email,
+        gender: c.user.gender || 'Not Specified',
         college: c.collegeName,
         department: c.department,
         preferredDomain: c.preferredDomain || 'N/A',

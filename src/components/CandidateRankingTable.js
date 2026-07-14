@@ -11,12 +11,12 @@ export default function CandidateRankingTable({ role = 'college' }) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState({ track: '', domain: '', minScore: 0 });
-
+  const [filters, setFilters] = useState({ track: '', domain: '', minScore: 0, collegeName: '', gender: '' });
+ 
   useEffect(() => {
     fetchCandidates();
   }, [page, filters]);
-
+ 
   const fetchCandidates = async () => {
     setLoading(true);
     try {
@@ -24,7 +24,9 @@ export default function CandidateRankingTable({ role = 'college' }) {
         page, limit: 15,
         track: filters.track,
         domain: filters.domain,
-        minScore: filters.minScore
+        minScore: filters.minScore,
+        collegeName: filters.collegeName,
+        gender: filters.gender
       });
       const res = await fetch(`/api/candidates/ranking?${query}`);
       const data = await res.json();
@@ -72,7 +74,7 @@ export default function CandidateRankingTable({ role = 'college' }) {
 
   const exportCSV = () => {
     const csv = Papa.unparse(candidates.map(c => ({
-      Name: c.name, Email: c.email, College: c.college,
+      Name: c.name, Email: c.email, Gender: c.gender || 'Not Specified', College: c.college,
       Domain: c.preferredDomain, Track: c.industryTrack,
       'Employability Score': c.employabilityScore, 'Readiness Level': c.readinessLevel,
       Shortlisted: c.isShortlisted ? 'Yes' : 'No'
@@ -85,7 +87,7 @@ export default function CandidateRankingTable({ role = 'college' }) {
 
   const exportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(candidates.map(c => ({
-      Name: c.name, Email: c.email, College: c.college,
+      Name: c.name, Email: c.email, Gender: c.gender || 'Not Specified', College: c.college,
       Domain: c.preferredDomain, Track: c.industryTrack,
       EmployabilityScore: c.employabilityScore, ReadinessLevel: c.readinessLevel,
       Shortlisted: c.isShortlisted ? 'Yes' : 'No'
@@ -99,9 +101,9 @@ export default function CandidateRankingTable({ role = 'college' }) {
     const doc = new jsPDF('landscape');
     doc.text('Candidate Ranking Report', 14, 15);
     doc.autoTable({
-      head: [['Name', 'Email', 'College', 'Domain', 'Emp Score', 'Readiness', 'Shortlisted']],
+      head: [['Name', 'Email', 'Gender', 'College', 'Domain', 'Emp Score', 'Readiness', 'Shortlisted']],
       body: candidates.map(c => [
-        c.name, c.email, c.college, c.preferredDomain, c.employabilityScore, c.readinessLevel, c.isShortlisted ? 'Yes' : 'No'
+        c.name, c.email, c.gender || 'Not Specified', c.college, c.preferredDomain, c.employabilityScore, c.readinessLevel, c.isShortlisted ? 'Yes' : 'No'
       ]),
       startY: 20
     });
@@ -112,14 +114,29 @@ export default function CandidateRankingTable({ role = 'college' }) {
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       {/* Toolbar */}
       <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex flex-wrap gap-4 w-full md:w-auto">
           <select name="track" onChange={handleFilterChange} className="p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500">
             <option value="">All Tracks</option>
             <option value="IT / Engineering">IT / Engineering</option>
             <option value="Admin / Management">Admin / Management</option>
             <option value="Medical">Medical</option>
           </select>
-          <input type="number" name="minScore" placeholder="Min Score" onChange={handleFilterChange} className="p-2 text-sm border border-slate-300 rounded w-32 focus:ring-2 focus:ring-indigo-500" />
+          <input type="number" name="minScore" placeholder="Min Score" onChange={handleFilterChange} className="p-2 text-sm border border-slate-300 rounded w-24 focus:ring-2 focus:ring-indigo-500" />
+          {role === 'super_admin' && (
+            <input 
+              type="text" 
+              name="collegeName" 
+              placeholder="Filter College" 
+              onChange={handleFilterChange} 
+              className="p-2 text-sm border border-slate-300 rounded w-40 focus:ring-2 focus:ring-indigo-500" 
+            />
+          )}
+          <select name="gender" onChange={handleFilterChange} className="p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500">
+            <option value="">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="transgender">Transgender</option>
+          </select>
         </div>
         <div className="flex gap-2">
           <button onClick={exportCSV} className="px-3 py-1.5 text-xs font-bold bg-slate-200 text-slate-700 rounded hover:bg-slate-300">CSV</button>
