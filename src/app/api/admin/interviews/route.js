@@ -16,7 +16,7 @@ export async function GET(request) {
 
     await dbConnect();
     const interviews = await Interview.find()
-      .populate({ path: 'studentId', select: 'userId collegeName', populate: { path: 'userId', model: User, select: 'name email' } })
+      .populate({ path: 'studentId', select: 'userId collegeName', populate: { path: 'userId', model: User, select: 'name email gender' } })
       .populate('companyId', 'companyName')
       .populate('driveId', 'jobRole')
       .sort({ createdAt: -1 })
@@ -26,6 +26,7 @@ export async function GET(request) {
       ...inv,
       studentName: inv.studentId?.userId?.name || 'Unknown',
       collegeName: inv.studentId?.collegeName || 'Unknown',
+      gender: inv.studentId?.userId?.gender || 'Not Specified',
     }));
 
     return NextResponse.json({ success: true, interviews: formattedInterviews });
