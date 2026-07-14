@@ -247,7 +247,7 @@ export default function PlacementTracking() {
             No Job Posts Found
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {jobs.map(job => {
               const jobApps = allApplications.filter(app => app.jobId?._id === job._id || app.jobId === job._id);
               const test = techTests.find(t => t.jobId?._id === job._id || t.jobId === job._id);
@@ -263,7 +263,7 @@ export default function PlacementTracking() {
               const rejectedCount = jobApps.filter(a => a.stage === 'Rejected').length;
 
               return (
-                <div key={job._id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between">
+                <div key={job._id} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start mb-4">
                       <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${job.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
@@ -300,7 +300,7 @@ export default function PlacementTracking() {
                       )}
                     </div>
 
-                    <div className="border-t border-slate-100 my-3.5 pt-3.5 space-y-1.5 text-xs">
+                    <div className="border-t border-slate-100 my-4 pt-4 space-y-2 text-xs">
                       <div className="flex justify-between text-slate-500 font-medium">
                         <span>Assessment Required:</span>
                         <span className={`font-bold ${hasAssessment === 'Yes' ? 'text-indigo-600' : 'text-slate-400'}`}>{hasAssessment}</span>
@@ -332,17 +332,17 @@ export default function PlacementTracking() {
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4 mt-auto flex items-center justify-between">
+                  <div className="border-t border-slate-100 pt-5 mt-5 flex items-center justify-between gap-4">
                     <div className="flex flex-col items-start">
-                      <span className="text-2xl font-black text-slate-800 leading-none">{totalCount}</span>
-                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Applicants</span>
+                      <span className="text-3xl font-black text-slate-800 leading-none">{totalCount}</span>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1.5">Applicants</span>
                     </div>
 
                     <button
                       onClick={() => {
                         router.push(`${pathname}?jobId=${job._id}`);
                       }}
-                      className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm cursor-pointer"
+                      className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap"
                     >
                       View Candidates
                     </button>
