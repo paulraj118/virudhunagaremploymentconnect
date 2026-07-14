@@ -37,7 +37,7 @@ export default function PlacementTracking() {
   const [offerData, setOfferData] = useState({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '', offerLetter: null });
 
   const STAGES = [
-    'Shortlisted for next round', 'Interview Scheduled', 
+    'Applied', 'Assessment Completed', 'Shortlisted for next round', 'Interview Scheduled', 
     'Interview Cleared', 'Offer Released', 'Joined', 'Rejected'
   ];
 
