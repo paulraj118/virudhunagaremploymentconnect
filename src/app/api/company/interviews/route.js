@@ -62,7 +62,12 @@ export async function GET(request) {
       }
 
       const interviews = await Interview.find(filter)
-        .populate('candidateId', 'name email')
+        .populate('candidateId', 'name email gender')
+        .populate({
+          path: 'applicationId',
+          select: 'studentId',
+          populate: { path: 'studentId', select: 'collegeName' }
+        })
         .populate('jobId', 'title role')
         .sort({ createdAt: -1 })
         .lean();

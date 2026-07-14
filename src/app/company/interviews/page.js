@@ -24,7 +24,8 @@ export default function CompanyInterviewsDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [modeFilter, setModeFilter] = useState('All');
-  const [roundFilter, setRoundFilter] = useState('All');
+  const [collegeFilter, setCollegeFilter] = useState('All');
+  const [genderFilter, setGenderFilter] = useState('All');
   const [roleFilter, setRoleFilter] = useState('All');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -496,8 +497,13 @@ export default function CompanyInterviewsDashboard() {
     // Mode Filter
     const matchesMode = modeFilter === 'All' || inv.interviewMode === modeFilter;
     
-    // Round Filter
-    const matchesRound = roundFilter === 'All' || inv.interviewRound === roundFilter;
+    // College Filter
+    const invCollege = inv.applicationId?.studentId?.collegeName || inv.studentId?.collegeId?.name || inv.studentId?.collegeName || 'N/A';
+    const matchesCollege = collegeFilter === 'All' || invCollege === collegeFilter;
+    
+    // Gender Filter
+    const invGender = inv.candidateId?.gender || inv.studentId?.userId?.gender || inv.studentId?.gender || 'N/A';
+    const matchesGender = genderFilter === 'All' || invGender === genderFilter;
     
     // Role Filter
     const matchesRole = roleFilter === 'All' || (inv.jobId?.title || inv.driveId?.jobRole) === roleFilter;
@@ -517,7 +523,7 @@ export default function CompanyInterviewsDashboard() {
       matchesDate = matchesDate && new Date(inv.interviewDate) <= boundaryDate;
     }
     
-    return matchesSearch && matchesStatus && matchesMode && matchesRound && matchesRole && matchesCandidate && matchesDate;
+    return matchesSearch && matchesStatus && matchesMode && matchesCollege && matchesGender && matchesRole && matchesCandidate && matchesDate;
   });
   
   // Sorting
@@ -550,7 +556,8 @@ export default function CompanyInterviewsDashboard() {
   
   // Unique Lists for Filter Dropdowns
   const uniqueRoles = [...new Set(interviews.map(inv => inv.jobId?.title || inv.driveId?.jobRole).filter(Boolean))];
-  const uniqueRounds = [...new Set(interviews.map(inv => inv.interviewRound).filter(Boolean))];
+  const uniqueColleges = [...new Set(interviews.map(inv => inv.applicationId?.studentId?.collegeName || inv.studentId?.collegeId?.name || inv.studentId?.collegeName).filter(Boolean))];
+  const uniqueGenders = [...new Set(interviews.map(inv => inv.candidateId?.gender || inv.studentId?.userId?.gender || inv.studentId?.gender).filter(Boolean))];
   
   // CSV Export utility
   const exportCSV = () => {
@@ -870,14 +877,25 @@ export default function CompanyInterviewsDashboard() {
             </select>
           </div>
           <div>
-            <label className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Interview Round</label>
+            <label className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">College Name</label>
             <select 
-              value={roundFilter} 
-              onChange={(e) => setRoundFilter(e.target.value)}
+              value={collegeFilter} 
+              onChange={(e) => setCollegeFilter(e.target.value)}
               className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 font-semibold mt-1 bg-slate-50"
             >
-              <option value="All">All Rounds</option>
-              {uniqueRounds.map(round => <option key={round} value={round}>{round}</option>)}
+              <option value="All">All Colleges</option>
+              {uniqueColleges.map(college => <option key={college} value={college}>{college}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Gender</label>
+            <select 
+              value={genderFilter} 
+              onChange={(e) => setGenderFilter(e.target.value)}
+              className="w-full text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 font-semibold mt-1 bg-slate-50"
+            >
+              <option value="All">All Genders</option>
+              {uniqueGenders.map(gender => <option key={gender} value={gender}>{gender}</option>)}
             </select>
           </div>
           <div>
@@ -937,7 +955,6 @@ export default function CompanyInterviewsDashboard() {
                   {[
                     { label: 'Candidate', field: 'candidateName' },
                     { label: 'Job Role', field: 'jobRole' },
-                    { label: 'Round', field: 'interviewRound' },
                     { label: 'Date & Time', field: 'interviewDate' },
                     { label: 'Mode', field: 'interviewMode' },
                     { label: 'Status', field: 'status' },
@@ -969,14 +986,16 @@ export default function CompanyInterviewsDashboard() {
               <tbody>
                 {currentRecords.map(inv => (
                   <tr key={inv._id} className="border-b border-slate-100 hover:bg-slate-50/30 transition-colors">
-                    <td className="px-2 py-3 font-bold text-slate-800 text-sm">
-                      {inv.candidateId?.name || inv.studentId?.userId?.name || 'N/A'}
+                    <td className="px-2 py-3">
+                      <div className="font-bold text-slate-800 text-sm">
+                        {inv.candidateId?.name || inv.studentId?.userId?.name || 'N/A'}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 font-medium truncate max-w-[150px]" title={inv.applicationId?.studentId?.collegeName || inv.studentId?.collegeId?.name || inv.studentId?.collegeName || 'N/A'}>
+                        {inv.applicationId?.studentId?.collegeName || inv.studentId?.collegeId?.name || inv.studentId?.collegeName || 'N/A'}
+                      </div>
                     </td>
                     <td className="px-2 py-3 font-medium text-slate-600 text-xs">
                       {inv.jobId?.title || inv.driveId?.jobRole || 'N/A'}
-                    </td>
-                    <td className="px-2 py-3 font-semibold text-indigo-600 text-xs">
-                      {inv.interviewRound}
                     </td>
                     <td className="px-2 py-3 text-[11px] text-slate-600 space-y-0.5">
                       <div className="font-semibold">{new Date(inv.interviewDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
