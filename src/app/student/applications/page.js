@@ -33,11 +33,10 @@ export default function StudentApplications() {
   // Fetch assessment results to match with applications (read-only, no backend changes)
   async function fetchAssessmentResults() {
     try {
-      const res = await fetch('/api/student/assessment?jobId=null');
+      const res = await fetch('/api/student/enrollment');
       const data = await res.json();
-      if (data.success && data.completed && data.result) {
-        // Single result from self-assessment
-        setAssessmentResults(prev => [...prev, data.result]);
+      if (data.success && data.assessments) {
+        setAssessmentResults(data.assessments);
       }
     } catch (error) {
       // Silently fail — report button just won't show
@@ -60,7 +59,8 @@ export default function StudentApplications() {
 
   // Check if assessment is completed for this application
   const isAssessmentCompleted = (app) => {
-    return app.stage !== 'Applied';
+    if (app.stage !== 'Applied') return true;
+    return assessmentResults.some(r => r.jobId && r.jobId.toString() === app.jobId?._id?.toString());
   };
 
   const getStatusStyle = (stage) => {
