@@ -14,7 +14,8 @@ export async function POST(request, { params }) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id: interviewDocumentId } = params;
+    const resolvedParams = await params;
+    const { id: interviewDocumentId } = resolvedParams;
 
     await dbConnect();
 
