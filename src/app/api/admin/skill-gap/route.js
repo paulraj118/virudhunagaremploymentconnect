@@ -65,7 +65,7 @@ export async function GET(request) {
     })
     .populate({
       path: 'studentId',
-      select: 'userId',
+      select: 'userId collegeName',
       populate: { path: 'userId', select: 'name email' }
     })
     .sort({ percentage: 1 })
@@ -75,6 +75,7 @@ export async function GET(request) {
     const improvementList = candidatesNeedingImprovement.map(c => ({
       name: c.studentId?.userId?.name || 'Unknown',
       email: c.studentId?.userId?.email || 'Unknown',
+      collegeName: c.studentId?.collegeName || 'Unknown',
       domain: c.preferredDomain,
       score: c.percentage,
       date: c.completionDate || c.createdAt,
