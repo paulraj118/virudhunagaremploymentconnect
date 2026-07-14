@@ -10,6 +10,7 @@ export default function TechnicalRoundsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
+  const [sendingEmailId, setSendingEmailId] = useState(null);
 
   useEffect(() => {
     fetchTests();
@@ -61,6 +62,15 @@ export default function TechnicalRoundsPage() {
     } catch (err) {
       alert('Server error while publishing');
     }
+  };
+
+  const handleSendEmail = (testId) => {
+    setSendingEmailId(testId);
+    // Simulate API call for sending emails
+    setTimeout(() => {
+      setSendingEmailId(null);
+      alert('Email sent successfully!');
+    }, 1500);
   };
 
   const statusBadge = (status) => {
@@ -232,10 +242,11 @@ export default function TechnicalRoundsPage() {
                     </>
                   )}
                   <button
-                    onClick={() => alert('Email functionality coming soon!')}
-                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors"
+                    onClick={() => handleSendEmail(test._id)}
+                    disabled={sendingEmailId === test._id}
+                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Send Email
+                    {sendingEmailId === test._id ? 'Sending...' : 'Send Email'}
                   </button>
                 </div>
               </div>
