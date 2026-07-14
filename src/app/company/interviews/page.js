@@ -985,7 +985,7 @@ export default function CompanyInterviewsDashboard() {
                     { label: 'Mode', field: 'interviewMode' },
                     { label: 'Status', field: 'status' },
                     { label: 'Confirmation', field: 'confirmationStatus' },
-                    { label: 'Score', field: 'score' },
+                    { label: 'Mails', field: null },
                     { label: 'Actions', field: null }
                   ].map(h => (
                     <th 
@@ -1045,8 +1045,14 @@ export default function CompanyInterviewsDashboard() {
                         {inv.confirmationStatus === 'Reschedule Requested' ? 'Resched Req' : inv.confirmationStatus}
                       </span>
                     </td>
-                    <td className="px-2 py-3 font-bold text-slate-700 text-xs">
-                      {inv.feedback?.totalScore ? `${inv.feedback.totalScore}/50` : '—'}
+                    <td className="px-2 py-3">
+                      <button 
+                        onClick={() => handleSendEmail(inv.applicationId)}
+                        disabled={sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId)}
+                        className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+                      >
+                        {sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId) ? 'Sending...' : 'Send Email'}
+                      </button>
                     </td>
                     <td className="px-2 py-3 flex gap-1.5 flex-wrap w-44">
                       <button 
@@ -1057,14 +1063,7 @@ export default function CompanyInterviewsDashboard() {
                         🔍
                       </button>
                       
-                      <button 
-                        onClick={() => handleSendEmail(inv.applicationId)}
-                        disabled={sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId)}
-                        className="text-[9px] font-bold uppercase bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1.5 rounded border border-blue-200 disabled:opacity-50"
-                        title="Send Email"
-                      >
-                        {sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId) ? '⏳' : '📧'}
-                      </button>
+
                       
                       {/* Sub-actions based on HR Authorization checks */}
                       {['Scheduled', 'Rescheduled', 'Draft', 'In Progress'].includes(inv.status) && (
