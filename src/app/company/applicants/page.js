@@ -538,9 +538,7 @@ export default function PlacementTracking() {
                       onChange={(e) => {
                         const stage = e.target.value;
                         if (stage === 'Interview Scheduled') {
-                          setSelectedApp(app);
-                          setInterviewData({ date: '', link: '' });
-                          setShowInterviewModal(true);
+                          router.push('/company/interviews');
                         } else if (stage === 'Offer Released') {
                           setSelectedApp(app);
                           setOfferData({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '', offerLetter: null });
