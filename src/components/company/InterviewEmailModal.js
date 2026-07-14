@@ -22,7 +22,25 @@ const defaultEmailForm = {
 };
 
 const generateEmailContent = (candidateName, role) => {
-  return `Congratulations!\n\nYou have been shortlisted for the interview for the position of ${role}.\n\nPlease find the interview details below. Kindly join the interview 10 minutes before the scheduled time.\n\nIf you have any questions, feel free to contact us.\n\nBest Regards,\nEmployment Connect\nHR Team`;
+  return `Dear ${candidateName},
+
+Congratulations!
+
+You have been shortlisted to attend the Technical Round for the position of ${role} through Virudhunagar Employment Connect.
+
+Please find your interview details below. Kindly attend the Technical Round and join the interview 10 minutes before the scheduled time.
+
+If the interview is conducted online, please use the meeting link provided below. If it is an offline interview, kindly arrive at the venue on time with the required documents.
+
+Please ensure you attend the Technical Round as scheduled. Successful completion of this round will move you forward in the recruitment process.
+
+If you have any questions or require any assistance, please feel free to contact us.
+
+We wish you all the best for your Technical Round!
+
+Best Regards,
+Virudhunagar Employment Connect
+HR Team`;
 };
 
 export default function InterviewEmailModal({
@@ -111,7 +129,7 @@ export default function InterviewEmailModal({
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setEmailForm({
           ...defaultEmailForm,
-          emailSubject: `Interview Invitation – ${jobRole || 'Position'}`,
+          emailSubject: `Technical Round Interview Invitation – ${jobRole || 'Position'} | Virudhunagar Employment Connect`,
         });
       }
     }
@@ -128,13 +146,13 @@ export default function InterviewEmailModal({
       const role = jobRole || 'Position';
       setEmailForm(prev => ({
         ...prev,
-        emailSubject: `Interview Invitation – ${role}`,
+        emailSubject: `Technical Round Interview Invitation – ${role} | Virudhunagar Employment Connect`,
         emailContent: generateEmailContent(candidateName, role),
       }));
     } else {
       setEmailForm(prev => ({
         ...prev,
-        emailSubject: `Interview Invitation – ${jobRole || 'Position'}`,
+        emailSubject: `Technical Round Interview Invitation – ${jobRole || 'Position'} | Virudhunagar Employment Connect`,
         emailContent: '',
       }));
     }
@@ -342,8 +360,8 @@ export default function InterviewEmailModal({
                   <label className={labelCls}>Select Candidate *</label>
                   {loadingCandidates ? (
                     <div className="text-xs text-slate-400 py-2">Loading candidates...</div>
-                  ) : candidates.length === 0 ? (
-                    <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">No candidates found for this job. Candidates must apply first.</div>
+                  ) : candidates.filter(c => c.stage === 'Shortlisted for next round').length === 0 ? (
+                    <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">No candidates found in "Shortlisted for next round" stage.</div>
                   ) : (
                     <select
                       value={selectedCandidate?._id || ''}
@@ -351,7 +369,7 @@ export default function InterviewEmailModal({
                       className={inputCls}
                     >
                       <option value="">-- Choose a Candidate --</option>
-                      {candidates.map(app => (
+                      {candidates.filter(c => c.stage === 'Shortlisted for next round').map(app => (
                         <option key={app._id} value={app._id}>
                           {app.studentId?.userId?.name || 'Unknown'} – {app.studentId?.userId?.email || 'No email'} ({app.stage})
                         </option>
@@ -394,12 +412,7 @@ export default function InterviewEmailModal({
                   <label className={labelCls}>Interview Type *</label>
                   <select disabled={mode === 'resend'} value={emailForm.interviewType} onChange={e => setEmailForm(p => ({...p, interviewType: e.target.value}))} className={inputCls}>
                     <option value="">-- Select --</option>
-                    <option>Technical Interview</option>
-                    <option>HR Interview</option>
-                    <option>Final Interview</option>
-                    <option>Coding Round</option>
-                    <option>Online Assessment</option>
-                    <option>Walk-in Interview</option>
+                    <option>Technical Round</option>
                   </select>
                 </div>
                 <div>
@@ -417,7 +430,7 @@ export default function InterviewEmailModal({
                 </div>
                 <div>
                   <label className={labelCls}>Interview Time *</label>
-                  <input disabled={mode === 'resend'} type="time" value={emailForm.interviewTime} onChange={e => setEmailForm(p => ({...p, interviewTime: e.target.value}))} className={inputCls} />
+                  <input disabled={mode === 'resend'} type="text" placeholder="e.g. 10:30 AM" value={emailForm.interviewTime} onChange={e => setEmailForm(p => ({...p, interviewTime: e.target.value}))} className={inputCls} />
                 </div>
                 <div>
                   <label className={labelCls}>Duration</label>

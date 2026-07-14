@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import TechnicalTest from '@/models/TechnicalTest';
 import Company from '@/models/Company';
 import Job from '@/models/Job';
+import Interview from '@/models/Interview';
 import { getCurrentUser } from '@/lib/auth';
 
 // POST - Create a new Technical Test (Draft)
@@ -110,9 +111,25 @@ export async function GET(request) {
     if (status) filter.status = status;
     if (jobId) filter.jobId = jobId;
 
-    const tests = await TechnicalTest.find(filter)
+    let tests = await TechnicalTest.find(filter)
       .populate('jobId', 'title role')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Attach the most recent meeting link for this technical round
+    for (let i = 0; i < tests.length; i++) {
+      if (tests[i].jobId) {
+        const latestInterview = await Interview.findOne({
+          jobId: tests[i].jobId._id,
+          interviewRound: { $regex: /Technical/i },
+          meetingLink: { $exists: true, $ne: '' }
+        }).sort({ createdAt: -1 }).select('meetingLink');
+        
+        tests[i].meetingLink = latestInterview ? latestInterview.meetingLink : null;
+      } else {
+        tests[i].meetingLink = null;
+      }
+    }
 
     return NextResponse.json({
       success: true,

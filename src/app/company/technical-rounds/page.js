@@ -287,12 +287,24 @@ export default function TechnicalRoundsPage() {
                       </button>
                     </>
                   )}
-                  <button
-                    onClick={() => openEmailModal(test)}
-                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors"
-                  >
-                    Send Email
-                  </button>
+                  <div className="flex gap-2 items-center">
+                    {test.meetingLink && (
+                      <a
+                        href={test.meetingLink.startsWith('http') ? test.meetingLink : `https://${test.meetingLink}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3.5 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold rounded-xl transition-colors whitespace-nowrap"
+                      >
+                        Join Meeting
+                      </a>
+                    )}
+                    <button
+                      onClick={() => openEmailModal(test)}
+                      className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors whitespace-nowrap"
+                    >
+                      Send Email
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
