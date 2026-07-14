@@ -21,7 +21,32 @@ const defaultEmailForm = {
   highPriority: false,
 };
 
-const generateEmailContent = (candidateName, role) => {
+const generateEmailContent = (candidateName, role, mode = 'create') => {
+  if (mode === 'resend') {
+    return `Dear ${candidateName},
+
+Congratulations!
+
+You have been shortlisted to attend the HR Interview for the position of ${role} through Virudhunagar Employment Connect.
+
+Please find your interview details below. Kindly attend the HR Interview Round and join the interview 10 minutes before the scheduled time.
+
+If the interview is conducted online, please use the meeting link provided below.
+If the interview is conducted offline, kindly arrive at the interview venue on time with all the required documents.
+
+Please ensure that you attend the HR Interview as scheduled. Successful completion of this round will move you forward in the recruitment process.
+
+If you are selected in the HR Interview Round, your Offer Letter will be made available in your Candidate Portal under the "My Offers" section on the Virudhunagar Employment Connect website. You can log in to your account to view and download your offer letter once it has been released by the employer.
+
+If you have any questions or require any assistance, please feel free to contact us.
+
+We wish you all the very best for your HR Interview!
+
+Best Regards,
+Virudhunagar Employment Connect
+HR Team`;
+  }
+
   return `Dear ${candidateName},
 
 Congratulations!
@@ -117,8 +142,8 @@ export default function InterviewEmailModal({
           interviewerName: existingInterview.interviewerName || '',
           interviewerEmail: existingInterview.interviewerEmail || '',
           contactNumber: existingInterview.contactNumber || '',
-          emailSubject: `Interview Invitation – ${role}`,
-          emailContent: generateEmailContent(candidateName, role),
+          emailSubject: `HR Interview Invitation – ${role} | Virudhunagar Employment Connect`,
+          emailContent: generateEmailContent(candidateName, role, 'resend'),
         });
       } else {
         // Create mode init
