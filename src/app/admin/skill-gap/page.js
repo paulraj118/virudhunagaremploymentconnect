@@ -9,6 +9,7 @@ export default function AdminSkillGapAnalysis() {
   const [collegeFilter, setCollegeFilter] = useState('');
   const [domainFilter, setDomainFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [genderFilter, setGenderFilter] = useState('');
  
   useEffect(() => {
     fetchSkillGapData();
@@ -48,6 +49,7 @@ export default function AdminSkillGapAnalysis() {
   const filteredList = improvementList.filter(c => {
     const matchesCollege = !collegeFilter || (c.collegeName || 'Unknown') === collegeFilter;
     const matchesDomain = !domainFilter || c.domain === domainFilter;
+    const matchesGender = !genderFilter || (c.gender || 'Not Specified').toLowerCase() === genderFilter.toLowerCase();
     
     let matchesDate = true;
     if (dateFilter) {
@@ -55,14 +57,15 @@ export default function AdminSkillGapAnalysis() {
       matchesDate = dateStr === dateFilter;
     }
     
-    return matchesCollege && matchesDomain && matchesDate;
+    return matchesCollege && matchesDomain && matchesGender && matchesDate;
   });
 
   const exportToCSV = () => {
-    const headers = ['Candidate Name', 'Email', 'College Name', 'Domain', 'Score', 'Assessment Date'];
+    const headers = ['Candidate Name', 'Email', 'Gender', 'College Name', 'Domain', 'Score', 'Assessment Date'];
     const rows = filteredList.map(c => [
       c.name,
       c.email,
+      c.gender || 'Not Specified',
       c.collegeName || 'Unknown',
       c.domain,
       `${c.score}%`,
@@ -81,12 +84,12 @@ export default function AdminSkillGapAnalysis() {
   };
 
   const exportToExcel = () => {
-    const headers = ['Candidate Name', 'Email', 'College Name', 'Domain', 'Score', 'Assessment Date'];
+    const headers = ['Candidate Name', 'Email', 'Gender', 'College Name', 'Domain', 'Score', 'Assessment Date'];
     let html = '<table><thead><tr>';
     headers.forEach(h => { html += `<th>${h}</th>`; });
     html += '</tr></thead><tbody>';
     filteredList.forEach(c => {
-      html += `<tr><td>${c.name}</td><td>${c.email}</td><td>${c.collegeName || 'Unknown'}</td><td>${c.domain}</td><td>${c.score}%</td><td>${new Date(c.date).toLocaleDateString()}</td></tr>`;
+      html += `<tr><td>${c.name}</td><td>${c.email}</td><td>${c.gender || 'Not Specified'}</td><td>${c.collegeName || 'Unknown'}</td><td>${c.domain}</td><td>${c.score}%</td><td>${new Date(c.date).toLocaleDateString()}</td></tr>`;
     });
     html += '</tbody></table>';
 
@@ -206,7 +209,7 @@ export default function AdminSkillGapAnalysis() {
         </div>
 
         {/* Filters Controls */}
-        <div className="p-4 bg-white border-b border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 bg-white border-b border-slate-100 grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">College Name</label>
             <select 
@@ -231,6 +234,19 @@ export default function AdminSkillGapAnalysis() {
               {uniqueDomains.map((d, i) => (
                 <option key={i} value={d}>{d}</option>
               ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Gender</label>
+            <select 
+              value={genderFilter} 
+              onChange={(e) => setGenderFilter(e.target.value)}
+              className="w-full text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="">All Genders</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="transgender">Transgender</option>
             </select>
           </div>
           <div>
