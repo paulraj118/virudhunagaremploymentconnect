@@ -1,11 +1,83 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function AdminDrivesPage() {
   const [drives, setDrives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterCompany, setFilterCompany] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+
+  const filteredDrives = drives.filter(drive => {
+    const matchesCompany = !filterCompany || drive.companyName?.toLowerCase().includes(filterCompany.toLowerCase());
+    const matchesRole = !filterRole || drive.jobRole?.toLowerCase().includes(filterRole.toLowerCase());
+    const matchesStatus = !filterStatus || drive.status === filterStatus;
+    return matchesCompany && matchesRole && matchesStatus;
+  });
+
+  const exportToCSV = () => {
+    const dataToExport = filteredDrives.map(d => ({
+      'Company Name': d.companyName,
+      'Job Role': d.jobRole,
+      'Industry': d.industry,
+      'Min Assessment Score (%)': d.minAssessmentScore,
+      'Min Employability Score': d.minEmployabilityScore,
+      'Min CGPA': d.minCgpa || 'N/A',
+      'Max Active Arrears': d.maxActiveArrears != null ? d.maxActiveArrears : 'N/A',
+      'Location': d.location,
+      'Salary Package': d.salaryPackage,
+      'Vacancies': d.vacancies || 'Open',
+      'Status': d.status
+    }));
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `campus_recruitment_drives_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToExcel = () => {
+    const dataToExport = filteredDrives.map(d => ({
+      'Company Name': d.companyName,
+      'Job Role': d.jobRole,
+      'Industry': d.industry,
+      'Min Assessment Score (%)': d.minAssessmentScore,
+      'Min Employability Score': d.minEmployabilityScore,
+      'Min CGPA': d.minCgpa || 'N/A',
+      'Max Active Arrears': d.maxActiveArrears != null ? d.maxActiveArrears : 'N/A',
+      'Location': d.location,
+      'Salary Package': d.salaryPackage,
+      'Vacancies': d.vacancies || 'Open',
+      'Status': d.status
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Drives');
+    XLSX.writeFile(workbook, `campus_recruitment_drives_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('landscape');
+    doc.text('Campus Recruitment Drives Report', 14, 15);
+    doc.autoTable({
+      head: [['Company', 'Job Role', 'Location', 'Salary Package', 'Vacancies', 'Min Score', 'Status']],
+      body: filteredDrives.map(d => [
+        d.companyName, d.jobRole, d.location, d.salaryPackage, d.vacancies || 'Open', `${d.minAssessmentScore}%`, d.status
+      ]),
+      startY: 20
+    });
+    doc.save(`campus_recruitment_drives_${new Date().toISOString().slice(0,10)}.pdf`);
+  };
   const [formData, setFormData] = useState({
     companyName: '',
     jobRole: '',
@@ -132,6 +204,40 @@ export default function AdminDrivesPage() {
         </button>
       </div>
 
+      {/* Search and Export Toolbar */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div className="flex flex-wrap gap-4 w-full md:w-auto">
+          <input 
+            type="text"
+            placeholder="Filter Company..."
+            value={filterCompany}
+            onChange={(e) => setFilterCompany(e.target.value)}
+            className="p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 w-full sm:w-40"
+          />
+          <input 
+            type="text"
+            placeholder="Filter Role..."
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 w-full sm:w-40"
+          />
+          <select 
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="p-2 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 w-full sm:w-40"
+          >
+            <option value="">All Statuses</option>
+            <option value="Published">Published</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+        <div className="flex gap-2 shrink-0 w-full md:w-auto justify-end">
+          <button onClick={exportToCSV} className="px-3 py-1.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 border border-slate-200 transition">CSV</button>
+          <button onClick={exportToExcel} className="px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-800 rounded-lg hover:bg-emerald-100 border border-emerald-200 transition">Excel</button>
+          <button onClick={exportToPDF} className="px-3 py-1.5 text-xs font-bold bg-red-50 text-red-800 rounded-lg hover:bg-red-100 border border-red-200 transition">PDF</button>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -144,7 +250,7 @@ export default function AdminDrivesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {drives.map(drive => (
+            {filteredDrives.map(drive => (
               <tr key={drive._id} className="hover:bg-slate-50">
                 <td className="p-4">
                   <div className="font-bold text-slate-800">{drive.companyName}</div>
@@ -187,7 +293,7 @@ export default function AdminDrivesPage() {
                 </td>
               </tr>
             ))}
-            {drives.length === 0 && (
+            {filteredDrives.length === 0 && (
               <tr>
                 <td colSpan="5" className="p-8 text-center text-slate-500">No recruitment drives found.</td>
               </tr>
