@@ -4,7 +4,7 @@ import College from '@/models/College';
 export async function validateCollegeApproval(collegeId) {
   try {
     await dbConnect();
-    const college = await College.findById(collegeId).select('approvalStatus');
+    const college = await College.findById(collegeId).select('approvalStatus collegeName');
     
     if (!college) {
       return { success: false, message: 'College not found', status: 404 };
