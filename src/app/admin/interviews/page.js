@@ -18,7 +18,7 @@ export default function AdminInterviews() {
     const matchesCollege = !filterCollege || inv.collegeName?.toLowerCase().includes(filterCollege.toLowerCase());
     const matchesGender = !filterGender || (inv.gender || 'Not Specified').toLowerCase() === filterGender.toLowerCase();
     const matchesCompany = !filterCompany || inv.companyId?.companyName?.toLowerCase().includes(filterCompany.toLowerCase());
-    const matchesRole = !filterRole || inv.driveId?.jobRole?.toLowerCase().includes(filterRole.toLowerCase());
+    const matchesRole = !filterRole || inv.jobRole?.toLowerCase().includes(filterRole.toLowerCase());
     return matchesCollege && matchesGender && matchesCompany && matchesRole;
   });
 
@@ -28,7 +28,7 @@ export default function AdminInterviews() {
       'Gender': inv.gender || 'Not Specified',
       'College': inv.collegeName,
       'Company Name': inv.companyId?.companyName || 'N/A',
-      'Job Role': inv.driveId?.jobRole || 'N/A',
+      'Job Role': inv.jobRole || 'N/A',
       'Type': inv.type || 'N/A',
       'Date': new Date(inv.date).toLocaleDateString(),
       'Time': `${inv.startTime} - ${inv.endTime}`,
@@ -51,7 +51,7 @@ export default function AdminInterviews() {
       'Gender': inv.gender || 'Not Specified',
       'College': inv.collegeName,
       'Company Name': inv.companyId?.companyName || 'N/A',
-      'Job Role': inv.driveId?.jobRole || 'N/A',
+      'Job Role': inv.jobRole || 'N/A',
       'Type': inv.type || 'N/A',
       'Date': new Date(inv.date).toLocaleDateString(),
       'Time': `${inv.startTime} - ${inv.endTime}`,
@@ -69,7 +69,7 @@ export default function AdminInterviews() {
     doc.autoTable({
       head: [['Candidate', 'Gender', 'College', 'Company', 'Role & Type', 'Schedule', 'Status']],
       body: filteredInterviews.map(inv => [
-        inv.studentName, inv.gender || 'Not Specified', inv.collegeName, inv.companyId?.companyName || 'N/A', `${inv.driveId?.jobRole || 'N/A'} - ${inv.type || 'N/A'}`, `${new Date(inv.date).toLocaleDateString()} (${inv.startTime}-${inv.endTime})`, inv.status
+        inv.studentName, inv.gender || 'Not Specified', inv.collegeName, inv.companyId?.companyName || 'N/A', `${inv.jobRole || 'N/A'} - ${inv.type || 'N/A'}`, `${new Date(inv.date).toLocaleDateString()} (${inv.startTime}-${inv.endTime})`, inv.status
       ]),
       startY: 20
     });
@@ -164,17 +164,17 @@ export default function AdminInterviews() {
               <tr key={inv._id} className="hover:bg-slate-50">
                 <td className="p-4">
                   <div className="font-bold text-slate-800">{inv.studentName}</div>
-                  <div className="text-xs text-slate-500">{inv.studentId?.userId?.email}</div>
+                  <div className="text-xs text-slate-500">{inv.email}</div>
                 </td>
                 <td className="p-4 text-xs font-bold text-slate-600 uppercase">{inv.gender || 'Not Specified'}</td>
                 <td className="p-4 text-slate-600">{inv.collegeName}</td>
                 <td className="p-4">
                   <div className="font-bold text-indigo-600">{inv.companyId?.companyName}</div>
-                  <div className="text-xs text-slate-500">{inv.driveId?.jobRole} - {inv.type}</div>
+                  <div className="text-xs text-slate-500">{inv.jobRole} - {inv.type}</div>
                 </td>
                 <td className="p-4 text-slate-600">
-                  <div className="font-semibold">{new Date(inv.date).toLocaleDateString()}</div>
-                  <div className="text-xs">{inv.startTime} - {inv.endTime}</div>
+                  <div className="font-semibold">{inv.date ? new Date(inv.date).toLocaleDateString() : 'N/A'}</div>
+                  <div className="text-xs">{inv.startTime}</div>
                 </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 text-xs font-bold rounded-full ${

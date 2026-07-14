@@ -183,7 +183,7 @@ export default function AdminOffers() {
                 <td className="p-4 text-xs font-mono font-bold text-slate-500">{offer.offerId}</td>
                 <td className="p-4">
                   <div className="font-bold text-slate-800">{offer.studentName}</div>
-                  <div className="text-xs text-slate-500">{offer.studentId?.userId?.email}</div>
+                  <div className="text-xs text-slate-500">{offer.email}</div>
                   <div className="text-xs text-slate-500 font-medium">{offer.collegeName}</div>
                 </td>
                 <td className="p-4 text-xs font-bold text-slate-600 uppercase">{offer.gender || 'Not Specified'}</td>
