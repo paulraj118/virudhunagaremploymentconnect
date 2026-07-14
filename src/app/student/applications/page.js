@@ -44,23 +44,28 @@ export default function StudentApplications() {
     }
   };
 
-  // Find assessment result for a given application
+  // Find the latest assessment result for a given application based on createdAt
+  const getLatestJobAssessment = (app) => {
+    const matches = assessmentResults.filter(r => r.jobId && r.jobId.toString() === app.jobId?._id?.toString());
+    if (matches.length === 0) return null;
+    return [...matches].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  };
+
+  // Find assessment result ID for a given application
   const getAssessmentResultId = (app) => {
-    // Try matching by jobId in assessment results
-    const match = assessmentResults.find(r => r.jobId && r.jobId.toString() === app.jobId?._id?.toString());
-    if (match) return match._id;
-    // For applications with completed stages, use the general assessment result
-    if (app.stage !== 'Applied') {
-      const general = assessmentResults.find(r => !r.jobId || r.jobId === null);
-      if (general) return general._id;
-    }
-    return null;
+    const match = getLatestJobAssessment(app);
+    return match ? match._id : null;
+  };
+
+  // Get specific assessment score for a given application
+  const getJobAssessmentScore = (app) => {
+    const match = getLatestJobAssessment(app);
+    return match ? match.percentage : null;
   };
 
   // Check if assessment is completed for this application
   const isAssessmentCompleted = (app) => {
-    if (app.stage !== 'Applied') return true;
-    return assessmentResults.some(r => r.jobId && r.jobId.toString() === app.jobId?._id?.toString());
+    return getLatestJobAssessment(app) !== null;
   };
 
   const getStatusStyle = (stage) => {
@@ -126,33 +131,38 @@ export default function StudentApplications() {
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+            <table className="w-full text-left text-sm text-slate-600"              <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4">Job Title</th>
-                  <th className="px-6 py-4">Company</th>
-                  <th className="px-6 py-4">HR Name</th>
-                  <th className="px-6 py-4">Applied On</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Assessment Score</th>
-                  <th className="px-6 py-4">Match Score</th>
-                  <th className="px-6 py-4">Action</th>
+                  <th className="px-4 py-4">Job Title</th>
+                  <th className="px-4 py-4">Company</th>
+                  <th className="px-4 py-4 hidden md:table-cell">HR Name</th>
+                  <th className="px-4 py-4 hidden lg:table-cell">Applied On</th>
+                  <th className="px-4 py-4">Status</th>
+                  <th className="px-4 py-4 text-center">Assmnt. Score</th>
+                  <th className="px-4 py-4 text-center hidden sm:table-cell">Match Score</th>
+                  <th className="px-4 py-4 text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {applications.map(app => (
+                {applications.map(app => {
+                  const jobScore = getJobAssessmentScore(app);
+                  return (
                   <tr key={app._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="font-bold text-slate-800">{app.jobId?.title || 'N/A'}</div>
                       <div className="text-xs text-slate-500">{app.jobId?.department}</div>
+                      <div className="lg:hidden text-xs text-slate-400 mt-1">
+                        Applied: {new Date(app.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                      </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="font-semibold text-indigo-600">{app.companyId?.companyName || 'N/A'}</div>
+                      <div className="md:hidden text-xs text-slate-500 mt-0.5">HR: {app.companyId?.hrName || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 hidden md:table-cell">
                       <div className="font-medium text-slate-700">{app.companyId?.hrName || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 hidden lg:table-cell">
                       <div className="text-slate-700 font-medium">
                         {new Date(app.createdAt).toLocaleDateString('en-IN', {
                           day: '2-digit',
@@ -167,22 +177,26 @@ export default function StudentApplications() {
                         })}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-sm font-bold ${getStatusStyle(app.stage)}`}>
+                    <td className="px-4 py-4">
+                      <span className={`text-xs md:text-sm font-bold ${getStatusStyle(app.stage)}`}>
                         {app.stage}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className={`text-lg font-black ${assessmentScore >= 70 ? 'text-emerald-600' : assessmentScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                        {assessmentScore}%
-                      </div>
+                    <td className="px-4 py-4 text-center">
+                      {jobScore !== null ? (
+                        <div className={`text-base md:text-lg font-black ${jobScore >= 70 ? 'text-emerald-600' : jobScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                          {jobScore}%
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-medium">—</span>
+                      )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                    <td className="px-4 py-4 hidden sm:table-cell text-center">
+                      <div className={`w-8 h-8 md:w-10 md:h-10 mx-auto rounded-full flex items-center justify-center text-xs font-bold ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                         {app.aiResumeScore || 0}%
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       {isAssessmentCompleted(app) ? (
                         <button
                           onClick={() => {
@@ -191,19 +205,19 @@ export default function StudentApplications() {
                               router.push(`/student/applications/report/${resultId}`);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors border border-indigo-200"
+                          className="flex items-center justify-center gap-1.5 w-full md:w-auto px-2 md:px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] md:text-xs font-bold hover:bg-indigo-100 transition-colors border border-indigo-200"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                           </svg>
-                          View Report
+                          <span className="whitespace-nowrap">View Report</span>
                         </button>
                       ) : (
-                        <span className="text-xs text-slate-400 font-medium">—</span>
+                        <div className="flex justify-center text-center w-full"><span className="text-xs text-slate-400 font-medium">—</span></div>
                       )}
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
