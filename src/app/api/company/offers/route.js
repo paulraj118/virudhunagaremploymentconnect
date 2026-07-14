@@ -34,15 +34,11 @@ export async function GET(request) {
     const offers = await Offer.find({ companyId })
       .populate({ 
         path: 'studentId', 
-        select: 'userId gender', 
+        select: 'userId collegeName', 
         populate: { 
           path: 'userId', 
           model: User, 
-          select: 'name email collegeId',
-          populate: {
-            path: 'collegeId',
-            select: 'collegeName'
-          }
+          select: 'name email gender'
         } 
       })
       .populate('driveId', 'jobRole')

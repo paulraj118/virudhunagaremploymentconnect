@@ -239,15 +239,15 @@ export default function OfferLetterDashboard() {
                     <td className="px-6 py-4">
                       <p className="font-bold text-slate-800">{offer.studentId?.userId?.name || 'Candidate'}</p>
                       <p className="text-slate-500 text-xs">{offer.studentId?.userId?.email}</p>
-                      {offer.studentId?.gender && (
-                        <span className="text-[10px] font-medium text-slate-400 mt-0.5 inline-block bg-slate-100 px-2 py-0.5 rounded">{offer.studentId.gender}</span>
+                      {offer.studentId?.userId?.gender && (
+                        <span className="text-[10px] font-medium text-slate-400 mt-0.5 inline-block bg-slate-100 px-2 py-0.5 rounded">{offer.studentId.userId.gender}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-700">
                       {offer.jobRole || '-'}
                     </td>
                     <td className="px-6 py-4 text-slate-600">
-                      {offer.studentId?.userId?.collegeId?.collegeName || 'Unknown College'}
+                      {offer.studentId?.collegeName || 'Unknown College'}
                     </td>
                     <td className="px-6 py-4 font-bold text-slate-700">
                       {offer.salaryPackage || 'Not specified'}
