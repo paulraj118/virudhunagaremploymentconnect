@@ -825,12 +825,6 @@ export default function CompanyInterviewsDashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full text-sm border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 font-medium placeholder-slate-400"
             />
-            <textarea 
-              value={cancelRemarks}
-              onChange={(e) => setCancelRemarks(e.target.value)}
-              className="w-full text-sm border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/10 min-h-[120px] resize-y"
-              placeholder="e.g., &quot;The position has been put on hold...&quot;"
-            />
           </div>
           {/* Date range inputs */}
           <div className="flex gap-2 items-center col-span-1 md:col-span-2">
@@ -1037,10 +1031,20 @@ export default function CompanyInterviewsDashboard() {
                         {inv.confirmationStatus === 'Reschedule Requested' ? 'Resched Req' : inv.confirmationStatus}
                       </span>
                     </td>
-                    <td className="px-2 py-3">
+                    <td className="px-2 py-3 flex gap-2 items-center">
+                      {inv.meetingLink && (
+                        <a
+                          href={inv.meetingLink.startsWith('http') ? inv.meetingLink : `https://${inv.meetingLink}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[10px] font-bold text-indigo-700 bg-indigo-100 hover:bg-indigo-200 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap inline-flex items-center"
+                        >
+                          Join Meeting
+                        </a>
+                      )}
                       <button 
                         onClick={() => openEmailModal(inv)}
-                        className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                        className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap inline-flex items-center"
                       >
                         Send Email
                       </button>
