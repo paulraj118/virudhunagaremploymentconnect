@@ -231,6 +231,12 @@ export default function TechnicalRoundsPage() {
                       </button>
                     </>
                   )}
+                  <button
+                    onClick={() => alert('Email functionality coming soon!')}
+                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors"
+                  >
+                    Send Email
+                  </button>
                 </div>
               </div>
             </div>
