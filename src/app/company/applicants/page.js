@@ -509,10 +509,6 @@ export default function PlacementTracking() {
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${app.aiResumeScore >= 70 ? 'bg-emerald-100 text-emerald-700' : app.aiResumeScore >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
                         {app.aiResumeScore || 0}%
                       </div>
-                      <div className="text-[10px] text-slate-500 min-w-0">
-                        <div className="font-semibold text-slate-700 truncate">{app.assessmentResult?.domain || 'N/A'}</div>
-                        <div>Exp: {app.aiExperienceMatch || 0}%</div>
-                      </div>
                     </div>
                   </td>
                   <td className="px-2 py-2.5">
@@ -539,6 +535,9 @@ export default function PlacementTracking() {
                         const stage = e.target.value;
                         if (stage === 'Interview Scheduled') {
                           router.push('/company/interviews?scheduleAppId=' + app._id);
+                        } else if (stage === 'Shortlisted for next round') {
+                          updateStage(app._id, stage);
+                          router.push('/company/technical-rounds');
                         } else if (stage === 'Offer Released') {
                           setSelectedApp(app);
                           setOfferData({ salaryPackage: '', location: '', joiningDate: '', expiryDate: '', notes: '', offerLetter: null });
