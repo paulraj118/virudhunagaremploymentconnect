@@ -22,7 +22,7 @@ const JobApplicationSchema = new mongoose.Schema(
       enum: [
         'Applied',            // Initial state (Enrolled/Applied)
         'Assessment Completed',
-        'Shortlisted',
+        'Shortlisted for next round',
         'Interview Scheduled',
         'Interview Cleared',
         'Offer Released',

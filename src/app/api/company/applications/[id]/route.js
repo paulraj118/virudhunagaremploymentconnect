@@ -25,7 +25,7 @@ export async function PUT(request, { params }) {
     const validStages = [
       'Applied',
       'Assessment Completed',
-      'Shortlisted',
+      'Shortlisted for next round',
       'Interview Scheduled',
       'Interview Cleared',
       'Offer Released',

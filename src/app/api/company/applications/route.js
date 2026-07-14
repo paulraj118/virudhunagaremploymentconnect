@@ -27,7 +27,7 @@ export async function GET(request) {
         path: 'studentId',
         populate: {
           path: 'userId',
-          select: 'name email mobile'
+          select: 'name email mobile gender'
         }
       })
       .populate('jobId', 'title department')

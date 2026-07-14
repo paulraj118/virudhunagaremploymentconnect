@@ -27,6 +27,8 @@ export default function PlacementTracking() {
   const [selectedRole, setSelectedRole] = useState('All Jobs');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
+  const [collegeFilter, setCollegeFilter] = useState('All Colleges');
+  const [genderFilter, setGenderFilter] = useState('All Genders');
   
   // Interview Modal state
   const [showInterviewModal, setShowInterviewModal] = useState(false);
@@ -228,8 +230,13 @@ export default function PlacementTracking() {
     const matchesSearch = app.studentId?.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           app.jobId?.title?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'All Status' || app.stage === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesCollege = collegeFilter === 'All Colleges' || app.studentId?.collegeName === collegeFilter;
+    const matchesGender = genderFilter === 'All Genders' || (app.studentId?.userId?.gender && app.studentId.userId.gender.toLowerCase() === genderFilter.toLowerCase());
+    
+    return matchesSearch && matchesStatus && matchesCollege && matchesGender;
   });
+
+  const uniqueColleges = [...new Set(applications.map(app => app.studentId?.collegeName).filter(Boolean))];
 
   const handleBack = () => {
     setSelectedJob(null);
@@ -416,11 +423,41 @@ export default function PlacementTracking() {
           </select>
         </div>
 
+        <div className="w-full md:w-56">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">College</label>
+          <select 
+            value={collegeFilter}
+            onChange={(e) => setCollegeFilter(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
+          >
+            <option value="All Colleges">All Colleges</option>
+            {uniqueColleges.map((college, idx) => (
+              <option key={idx} value={college}>{college}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="w-full md:w-40">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Gender</label>
+          <select 
+            value={genderFilter}
+            onChange={(e) => setGenderFilter(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-slate-400 outline-none text-sm font-medium"
+          >
+            <option value="All Genders">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="transgender">Transgender</option>
+          </select>
+        </div>
+
         <div>
           <button 
             onClick={() => {
               setSearchQuery('');
               setStatusFilter('All Status');
+              setCollegeFilter('All Colleges');
+              setGenderFilter('All Genders');
             }}
             className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
           >
