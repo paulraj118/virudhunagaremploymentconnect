@@ -79,7 +79,7 @@ export async function GET(request) {
 
     return NextResponse.json({ success: true, interviews: formattedInterviews });
   } catch (error) {
-    console.error('Fetch Admin Interviews Error:', error);
+    console.error("Admin Interviews API Error:", error);
     return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
   }
 }

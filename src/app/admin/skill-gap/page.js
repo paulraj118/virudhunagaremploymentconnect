@@ -260,7 +260,7 @@ export default function AdminSkillGapAnalysis() {
           </div>
         </div>
 
-        <div className="overflow-hidden w-full max-h-[500px]">
+        <div className="overflow-y-auto overflow-x-hidden w-full max-h-[500px]">
           <table className="w-full text-left border-collapse text-sm">
             <thead className="sticky top-0 bg-white shadow-xs">
               <tr className="bg-slate-50 text-slate-500 border-b border-slate-200">

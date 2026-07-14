@@ -15,6 +15,8 @@ const InterviewSchema = new mongoose.Schema(
     jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
     assessmentResultId: { type: mongoose.Schema.Types.ObjectId, ref: 'AssessmentResult' },
     technicalAttemptId: { type: mongoose.Schema.Types.ObjectId, ref: 'TechnicalAttempt' },
+    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' }, // Legacy Student reference
+    driveId: { type: mongoose.Schema.Types.ObjectId, ref: 'RecruitmentDrive' }, // Legacy RecruitmentDrive reference
 
     // Interview Details
     interviewType: { type: String, required: true }, // e.g., "Technical", "HR", "Managerial"
