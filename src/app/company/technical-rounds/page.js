@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import InterviewEmailModal from '@/components/company/InterviewEmailModal';
 
 export default function TechnicalRoundsPage() {
   const router = useRouter();
@@ -10,11 +11,18 @@ export default function TechnicalRoundsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
-  const [sendingEmailId, setSendingEmailId] = useState(null);
 
-  useEffect(() => {
-    fetchTests();
-  }, [filterStatus]);
+  // Toast State
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailModalTest, setEmailModalTest] = useState(null);
+  const [candidates, setCandidates] = useState([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
 
   const fetchTests = async () => {
     try {
@@ -34,6 +42,13 @@ export default function TechnicalRoundsPage() {
     }
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterStatus]);
+
+
   const handleDelete = async (testId) => {
     if (!confirm('Are you sure you want to delete this test? This action cannot be undone.')) return;
     try {
@@ -42,10 +57,10 @@ export default function TechnicalRoundsPage() {
       if (data.success) {
         setTests(prev => prev.filter(t => t._id !== testId));
       } else {
-        alert(data.message || 'Failed to delete');
+        showToast(data.message || 'Failed to delete', 'error');
       }
     } catch (err) {
-      alert('Server error while deleting');
+      showToast('Server error while deleting', 'error');
     }
   };
 
@@ -57,21 +72,41 @@ export default function TechnicalRoundsPage() {
       if (data.success) {
         fetchTests();
       } else {
-        alert(data.errors ? data.errors.join('\n') : data.message);
+        showToast(data.errors ? data.errors.join('\n') : data.message, 'error');
       }
     } catch (err) {
-      alert('Server error while publishing');
+      showToast('Server error while publishing', 'error');
     }
   };
 
-  const handleSendEmail = (testId) => {
-    setSendingEmailId(testId);
-    // Simulate API call for sending emails
-    setTimeout(() => {
-      setSendingEmailId(null);
-      alert('Email sent successfully!');
-    }, 1500);
+  // Open Email Modal
+  const openEmailModal = async (test) => {
+    setEmailModalTest(test);
+    setIsEmailModalOpen(true);
+
+    // Fetch candidates for this test's job
+    const jobId = test.jobId?._id || test.jobId;
+    if (jobId) {
+      setLoadingCandidates(true);
+      try {
+        const res = await fetch(`/api/company/applications?jobId=${jobId}`);
+        const data = await res.json();
+        if (data.success) {
+          setCandidates(data.applications || []);
+        } else {
+          setCandidates([]);
+        }
+      } catch {
+        setCandidates([]);
+      } finally {
+        setLoadingCandidates(false);
+      }
+    } else {
+      setCandidates([]);
+    }
   };
+
+
 
   const statusBadge = (status) => {
     const styles = {
@@ -93,8 +128,19 @@ export default function TechnicalRoundsPage() {
   const totalAssigned = tests.reduce((sum, t) => sum + (t.assignedCandidateCount || 0), 0);
   const totalCompleted = tests.reduce((sum, t) => sum + (t.completedCandidateCount || 0), 0);
 
+  // Input style helper
+  const inputCls = "w-full text-sm border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 font-medium bg-white transition-colors";
+  const labelCls = "text-[11px] uppercase font-bold text-slate-400 tracking-wider mb-1.5 block";
+
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[100] px-6 py-3.5 rounded-xl font-bold shadow-2xl text-white text-sm transition-all ${toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'}`}>
+          {toast.type === 'error' ? '✕ ' : '✓ '}{toast.message}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
@@ -242,11 +288,10 @@ export default function TechnicalRoundsPage() {
                     </>
                   )}
                   <button
-                    onClick={() => handleSendEmail(test._id)}
-                    disabled={sendingEmailId === test._id}
-                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                    onClick={() => openEmailModal(test)}
+                    className="px-3.5 py-2 bg-[#0B1E40] hover:bg-[#152d54] text-white text-xs font-bold rounded-xl transition-colors"
                   >
-                    {sendingEmailId === test._id ? 'Sending...' : 'Send Email'}
+                    Send Email
                   </button>
                 </div>
               </div>
@@ -254,6 +299,17 @@ export default function TechnicalRoundsPage() {
           ))}
         </div>
       )}
+
+      <InterviewEmailModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        mode="create"
+        jobRole={emailModalTest?.jobRole || emailModalTest?.jobId?.title || ''}
+        jobId={emailModalTest?.jobId}
+        candidates={candidates}
+        loadingCandidates={loadingCandidates}
+        onSuccess={fetchTests}
+      />
     </div>
   );
 }

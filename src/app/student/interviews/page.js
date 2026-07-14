@@ -24,6 +24,65 @@ export default function StudentInterviews() {
     }
   };
 
+  const handleConfirm = async (id, status) => {
+    if (!confirm(`Are you sure you want to ${status.toLowerCase()} this interview?`)) return;
+    try {
+      const res = await fetch(`/api/student/interviews/${id}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Status updated successfully');
+        fetchInterviews();
+      } else {
+        alert(data.message || 'Failed to update status');
+      }
+    } catch (err) {
+      alert('Error connecting to server');
+    }
+  };
+
+  const downloadICS = (inv) => {
+    const formatICSDate = (dateStr, timeStr) => {
+      const d = new Date(dateStr);
+      let [hours, minutes] = timeStr.split(':');
+      if (timeStr.toLowerCase().includes('pm') && hours !== '12') hours = parseInt(hours) + 12;
+      if (timeStr.toLowerCase().includes('am') && hours === '12') hours = '00';
+      d.setHours(parseInt(hours), parseInt(minutes), 0);
+      return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+
+    const start = formatICSDate(inv.date || inv.interviewDate, inv.startTime || inv.interviewTime);
+    // Rough estimate 1 hour later for end time
+    const end = formatICSDate(new Date(new Date(inv.date || inv.interviewDate).getTime() + 60*60*1000), inv.startTime || inv.interviewTime);
+    
+    const event = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Employment Connect//Job Portal//EN',
+      'BEGIN:VEVENT',
+      `UID:${inv._id}@employmentconnect.com`,
+      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTSTART:${start}`,
+      `DTEND:${end}`,
+      `SUMMARY:Interview with ${inv.companyId?.companyName || 'Company'}`,
+      `DESCRIPTION:Interview round: ${inv.type || inv.interviewType}\\nInterviewer: ${inv.interviewerName || 'TBD'}\\nMode: ${inv.mode || inv.interviewMode}`,
+      `LOCATION:${inv.mode === 'Online' ? inv.meetingLink : (inv.venue || 'TBD')}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\\r\\n');
+
+    const blob = new Blob([event], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `Interview_${inv.companyId?.companyName || 'Company'}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -94,17 +153,48 @@ export default function StudentInterviews() {
               </div>
 
               {inv.status === 'Scheduled' && (
-                <div className="w-full md:w-auto self-stretch md:self-auto flex items-center justify-end shrink-0">
-                  {inv.mode === 'Online' ? (
+                <div className="w-full md:w-auto self-stretch md:self-auto flex flex-col items-center justify-end shrink-0 gap-2">
+                  {inv.mode === 'Online' && (
                     <a href={inv.meetingLink} target="_blank" rel="noopener noreferrer" className="w-full md:w-auto text-center inline-flex items-center justify-center gap-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3 rounded-xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-200 text-sm">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       Join Meeting
                     </a>
-                  ) : (
-                    <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 w-full md:w-auto text-center">
-                      📍 In-Person: {inv.venue}
+                  )}
+
+                  <button 
+                    onClick={() => downloadICS(inv)}
+                    className="w-full md:w-auto text-center inline-flex items-center justify-center gap-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-2 rounded-xl transition-all duration-200 text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Download .ics
+                  </button>
+
+                  {/* Unified Interview Confirmation Logic */}
+                  {inv.confirmationStatus === 'Pending' && (
+                    <div className="flex gap-2 w-full mt-2">
+                      <button 
+                        onClick={() => handleConfirm(inv._id, 'Accepted')}
+                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2 rounded-lg"
+                      >
+                        Accept
+                      </button>
+                      <button 
+                        onClick={() => handleConfirm(inv._id, 'Declined')}
+                        className="flex-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-2 rounded-lg"
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  )}
+                  {inv.confirmationStatus && inv.confirmationStatus !== 'Pending' && (
+                    <div className={`mt-2 text-xs font-bold px-3 py-1 rounded-full ${
+                      inv.confirmationStatus === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                    }`}>
+                      {inv.confirmationStatus}
                     </div>
                   )}
                 </div>

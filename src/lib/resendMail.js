@@ -54,3 +54,32 @@ export async function sendOTPEmail(toEmail, otp) {
     return { success: false, error: error.message };
   }
 }
+
+// Generic email sender – reuses the existing singleton transporter above
+// Supports HTML, plain text, CC, attachments, and priority
+export async function sendEmail({ to, subject, html, text, cc, replyTo, attachments, priority }) {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || '"Employment Connect" <tnemploymentconnect@gmail.com>',
+      to,
+      subject,
+    };
+
+    if (html) mailOptions.html = html;
+    if (text) mailOptions.text = text;
+    if (cc) mailOptions.cc = cc;
+    if (replyTo) mailOptions.replyTo = replyTo;
+    if (attachments && attachments.length > 0) mailOptions.attachments = attachments;
+    if (priority === 'high') {
+      mailOptions.priority = 'high';
+      mailOptions.headers = { 'X-Priority': '1', 'X-MSMail-Priority': 'High', 'Importance': 'High' };
+    }
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[sendEmail] Email sent to ${to}. Message ID: ${info.messageId}`);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('[sendEmail] Error:', error);
+    return { success: false, error: error.message };
+  }
+}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import InterviewEmailModal from '@/components/company/InterviewEmailModal';
 
 export default function CompanyInterviewsDashboard() {
   const router = useRouter();
@@ -42,6 +43,9 @@ export default function CompanyInterviewsDashboard() {
   const [selectedInterview, setSelectedInterview] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [sendingEmailId, setSendingEmailId] = useState(null);
+  
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailModalInterview, setEmailModalInterview] = useState(null);
   
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -103,9 +107,10 @@ export default function CompanyInterviewsDashboard() {
   // Load data
   useEffect(() => {
     fetchInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
-  const fetchInitialData = async () => {
+  async function fetchInitialData() {
     setLoading(true);
     setError(null);
     try {
@@ -174,28 +179,9 @@ export default function CompanyInterviewsDashboard() {
   
   // Handler Actions
 
-  const handleSendEmail = async (applicationId) => {
-    if (!applicationId) {
-      alert('No application linked to this interview.');
-      return;
-    }
-    const id = typeof applicationId === 'object' ? applicationId._id : applicationId;
-    setSendingEmailId(id);
-    try {
-      const res = await fetch(`/api/company/applications/${id}/send-email`, {
-        method: 'POST',
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Email sent successfully.');
-      } else {
-        alert(data.message || 'Unable to send email. Please try again.');
-      }
-    } catch (error) {
-      alert('Unable to send email. Please try again.');
-    } finally {
-      setSendingEmailId(null);
-    }
+  const openEmailModal = (inv) => {
+    setEmailModalInterview(inv);
+    setIsEmailModalOpen(true);
   };
 
   const handleScheduleSubmit = async (e) => {
@@ -839,6 +825,12 @@ export default function CompanyInterviewsDashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full text-sm border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 font-medium placeholder-slate-400"
             />
+            <textarea 
+              value={cancelRemarks}
+              onChange={(e) => setCancelRemarks(e.target.value)}
+              className="w-full text-sm border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/10 min-h-[120px] resize-y"
+              placeholder="e.g., &quot;The position has been put on hold...&quot;"
+            />
           </div>
           {/* Date range inputs */}
           <div className="flex gap-2 items-center col-span-1 md:col-span-2">
@@ -1047,11 +1039,10 @@ export default function CompanyInterviewsDashboard() {
                     </td>
                     <td className="px-2 py-3">
                       <button 
-                        onClick={() => handleSendEmail(inv.applicationId)}
-                        disabled={sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId)}
-                        className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+                        onClick={() => openEmailModal(inv)}
+                        className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
                       >
-                        {sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId) ? 'Sending...' : 'Send Email'}
+                        Send Email
                       </button>
                     </td>
                     <td className="px-2 py-3 flex gap-1.5 flex-wrap w-44">
@@ -2056,6 +2047,13 @@ export default function CompanyInterviewsDashboard() {
           </div>
         </div>
       )}
+      <InterviewEmailModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        mode="resend"
+        existingInterview={emailModalInterview}
+        onSuccess={refreshInterviews}
+      />
     </div>
   );
 }

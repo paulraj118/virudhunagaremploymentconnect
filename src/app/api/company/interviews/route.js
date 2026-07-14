@@ -11,15 +11,7 @@ import Company from '@/models/Company';
 import JobApplication from '@/models/JobApplication';
 import Job from '@/models/Job';
 
-function generateInterviewId() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = 'INT-';
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
+// Note: generateInterviewId moved to src/lib/interviewService.js
 // GET - HR Interview List
 export async function GET(request) {
   try {
@@ -166,138 +158,22 @@ export async function POST(request) {
         );
       }
 
-      const {
-        candidateId,
-        jobId,
-        applicationId,
-        assessmentResultId,
-        technicalAttemptId,
-        interviewType,
-        interviewRound,
-        interviewDate,
-        interviewTime,
-        duration,
-        timezone,
-        interviewMode,
-        meetingLink,
-        meetingPlatform,
-        venue,
-        venueAddress,
-        interviewerName,
-        interviewerEmail,
-        interviewerDesignation,
-        interviewInstructions,
-        status, // Draft or Scheduled
-        attachments
-      } = data;
-
-      // Validate required fields
-      if (
-        !candidateId ||
-        !jobId ||
-        !applicationId ||
-        !interviewType ||
-        !interviewRound ||
-        !interviewDate ||
-        !interviewTime ||
-        !duration ||
-        !interviewMode ||
-        !interviewerName ||
-        !interviewerEmail
-      ) {
+      // Delegate to the shared service for Database writes & idempotency checks
+      try {
+        const { createUnifiedInterview } = await import('@/lib/interviewService');
+        const interview = await createUnifiedInterview(data, company, decoded.id, decoded.role);
+        
+        return NextResponse.json({
+          success: true,
+          message: data.status === 'Draft' ? 'Interview saved as draft successfully' : 'Interview scheduled successfully',
+          data: interview
+        });
+      } catch (svcError) {
         return NextResponse.json(
-          { success: false, message: 'Missing required fields.', errors: ['Check all required interview details'] },
-          { status: 400 }
+          { success: false, message: svcError.message },
+          { status: svcError.status || 400 }
         );
       }
-
-      // Verify company ownership of the JobApplication
-      const jobApp = await JobApplication.findOne({ _id: applicationId, companyId: company._id });
-      if (!jobApp) {
-        return NextResponse.json(
-          { success: false, message: 'Job Application not found or unauthorized.', errors: ['Ownership validation failed'] },
-          { status: 403 }
-        );
-      }
-
-      const interviewId = generateInterviewId();
-      const finalStatus = status || 'Scheduled'; // Defaults to Scheduled
-
-      const interview = await Interview.create({
-        interviewId,
-        companyId: company._id,
-        hrId: decoded.id,
-        candidateId,
-        jobId,
-        applicationId,
-        assessmentResultId: assessmentResultId || undefined,
-        technicalAttemptId: technicalAttemptId || undefined,
-        interviewType,
-        interviewRound,
-        interviewDate: new Date(interviewDate),
-        interviewTime,
-        duration: Number(duration),
-        timezone: timezone || 'UTC',
-        interviewMode,
-        meetingLink: interviewMode === 'Online' ? meetingLink : undefined,
-        meetingPlatform: interviewMode === 'Online' ? meetingPlatform : undefined,
-        venue: interviewMode === 'Offline' ? venue : undefined,
-        venueAddress: interviewMode === 'Offline' ? venueAddress : undefined,
-        interviewerName,
-        interviewerEmail,
-        interviewerDesignation,
-        interviewInstructions,
-        status: finalStatus,
-        confirmationStatus: 'Pending',
-        attachments: attachments || [],
-        createdBy: decoded.id,
-        timeline: [
-          {
-            status: finalStatus,
-            timestamp: new Date(),
-            actorId: decoded.id,
-            actorRole: decoded.role,
-            remarks: `Interview created as status: ${finalStatus}`
-          }
-        ]
-      });
-
-      // Update JobApplication stage and details if Scheduled
-      if (finalStatus === 'Scheduled') {
-        jobApp.stage = 'Interview Scheduled';
-        jobApp.interviewDate = new Date(interviewDate);
-        if (meetingLink) jobApp.meetingLink = meetingLink;
-        await jobApp.save();
-
-        // Create Notification for candidate
-        try {
-          await Notification.create({
-            recipientId: candidateId,
-            recipientRole: 'student',
-            message: `An interview round (${interviewRound}) has been scheduled for ${company.companyName} on ${new Date(interviewDate).toLocaleDateString()} at ${interviewTime}.`,
-            type: 'interview_scheduled',
-            link: `/student/interviews`
-          });
-        } catch (notifErr) {
-          console.error('[NOTIFICATION] Failed to notify candidate:', notifErr.message);
-        }
-      }
-
-      // Record Audit Trail
-      await AuditTrail.create({
-        applicationId,
-        actorId: decoded.id,
-        actorRole: decoded.role,
-        previousStatus: 'None',
-        newStatus: finalStatus === 'Draft' ? 'Draft Created' : 'Schedule Interview',
-        remarks: `Interview round ${interviewRound} ${finalStatus === 'Draft' ? 'saved as Draft' : 'scheduled'} for ${interviewDate}.`
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: finalStatus === 'Draft' ? 'Interview saved as draft successfully' : 'Interview scheduled successfully',
-        data: interview
-      });
     }
 
     return NextResponse.json(
