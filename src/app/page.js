@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 const heroImages = [
-  '/images/temple.jpg',
-  '/images/dam.jpg',
+  '/images/hero1.png',
+  '/images/hero2.png',
   '/images/hills.jpg',
-  '/images/fireworks.jpg'
+  '/images/hero4.png'
 ];
 
 // Animated Counter Hook
