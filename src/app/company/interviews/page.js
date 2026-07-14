@@ -1413,33 +1413,7 @@ export default function CompanyInterviewsDashboard() {
                     ))}
                 </select>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Interview Type</label>
-                  <select 
-                    value={scheduleForm.interviewType}
-                    onChange={(e) => setScheduleForm({...scheduleForm, interviewType: e.target.value})}
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500 font-semibold mt-1 bg-slate-50"
-                  >
-                    <option value="Technical">Technical</option>
-                    <option value="HR">HR</option>
-                    <option value="Managerial">Managerial</option>
-                    <option value="Panel">Panel</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Interview Round Name</label>
-                  <input 
-                    type="text"
-                    required
-                    value={scheduleForm.interviewRound}
-                    onChange={(e) => setScheduleForm({...scheduleForm, interviewRound: e.target.value})}
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500 mt-1"
-                  />
-                </div>
-              </div>
-              
+
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Date</label>
