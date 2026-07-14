@@ -511,7 +511,6 @@ export default function PlacementTracking() {
                     <th className="px-2 py-2.5 w-[16%]">Skill Match</th>
                     <th className="px-2 py-2.5 w-[12%]">Assessment</th>
                     <th className="px-2 py-2.5 w-[15%]">Current Stage</th>
-                    <th className="px-2 py-2.5 text-right w-[11%]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -592,21 +591,12 @@ export default function PlacementTracking() {
                       {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </td>
-                  <td className="px-2 py-2.5 text-right">
-                    <button 
-                      onClick={() => handleSendEmail(app._id)}
-                      disabled={sendingEmailId === app._id}
-                      className="text-[10px] font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] px-3 py-1.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                      {sendingEmailId === app._id ? 'Sending...' : 'Send Email'}
-                    </button>
-                  </td>
                 </tr>
               ))}
               
               {filteredApps.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-2 py-12 text-center text-slate-500">
+                  <td colSpan="7" className="px-2 py-12 text-center text-slate-500">
                     No applications match your filters.
                   </td>
                 </tr>
