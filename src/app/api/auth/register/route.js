@@ -15,9 +15,9 @@ export async function POST(request) {
     }
     await dbConnect();
     const body = await request.json();
-    let { name, email, password, mobile, role } = body;
+    let { name, email, password, mobile, role, gender } = body;
 
-    if (!name || !email || !password || !mobile || !role) {
+    if (!name || !email || !password || !mobile || !role || !gender) {
       return NextResponse.json({ success: false, message: 'Please provide all required fields' }, { status: 400 });
     }
 
@@ -70,6 +70,12 @@ export async function POST(request) {
       return NextResponse.json({ success: false, message: 'Invalid role selected' }, { status: 400 });
     }
 
+    // --- Validate Gender ---
+    gender = sanitize(gender).toLowerCase();
+    if (!['male', 'female', 'transgender'].includes(gender)) {
+      return NextResponse.json({ success: false, message: 'Invalid gender selected' }, { status: 400 });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return NextResponse.json({ success: false, message: 'Email already exists' }, { status: 400 });
@@ -80,7 +86,8 @@ export async function POST(request) {
       email,
       password,
       mobile,
-      role
+      role,
+      gender
     });
 
     return NextResponse.json({

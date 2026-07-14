@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide a mobile number'],
     },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'transgender'],
+      required: [true, 'Please provide your gender'],
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,
