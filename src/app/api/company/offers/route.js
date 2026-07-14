@@ -8,6 +8,8 @@ import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
 import User from '@/models/User';
 import Company from '@/models/Company';
+import College from '@/models/College';
+import Student from '@/models/Student';
 
 export async function GET(request) {
   try {
