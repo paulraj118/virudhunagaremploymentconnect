@@ -30,7 +30,19 @@ export async function GET(request) {
     }
 
     const offers = await Offer.find({ companyId })
-      .populate({ path: 'studentId', select: 'userId', populate: { path: 'userId', model: User, select: 'name email' } })
+      .populate({ 
+        path: 'studentId', 
+        select: 'userId gender', 
+        populate: { 
+          path: 'userId', 
+          model: User, 
+          select: 'name email collegeId',
+          populate: {
+            path: 'collegeId',
+            select: 'collegeName'
+          }
+        } 
+      })
       .populate('driveId', 'jobRole')
       .sort({ createdAt: -1 })
       .lean();
