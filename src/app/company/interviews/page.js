@@ -124,7 +124,30 @@ export default function CompanyInterviewsDashboard() {
       const appRes = await fetch('/api/company/applications');
       const appData = await appRes.json();
       if (appData.success) {
-        setApplications(appData.applications || []);
+        const appsList = appData.applications || [];
+        setApplications(appsList);
+        
+        // Auto-open schedule modal if navigated from Candidate Tracker
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          const scheduleAppId = params.get('scheduleAppId');
+          if (scheduleAppId) {
+            const matchedApp = appsList.find(a => a._id === scheduleAppId);
+            if (matchedApp) {
+              setScheduleForm(prev => ({
+                ...prev,
+                applicationId: matchedApp._id,
+                candidateId: matchedApp.studentId?.userId?._id || matchedApp.studentId?._id || '',
+                jobId: matchedApp.jobId?._id || '',
+                assessmentResultId: matchedApp.assessmentResult?._id || '',
+                technicalAttemptId: matchedApp.technicalTestId || ''
+              }));
+              setIsScheduleModalOpen(true);
+              // Clean up URL
+              window.history.replaceState({}, '', '/company/interviews');
+            }
+          }
+        }
       }
     } catch (err) {
       console.error(err);
@@ -1399,6 +1422,7 @@ export default function CompanyInterviewsDashboard() {
               <div>
                 <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Select Shortlisted Candidate Application</label>
                 <select 
+                  value={scheduleForm.applicationId || ""}
                   onChange={(e) => handleAppSelectForSchedule(e.target.value)}
                   required
                   className="w-full border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500 font-semibold mt-1 bg-slate-50"
