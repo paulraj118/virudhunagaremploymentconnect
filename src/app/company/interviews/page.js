@@ -41,6 +41,7 @@ export default function CompanyInterviewsDashboard() {
   // Modals / Drawer states
   const [selectedInterview, setSelectedInterview] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
   
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -172,6 +173,31 @@ export default function CompanyInterviewsDashboard() {
   };
   
   // Handler Actions
+
+  const handleSendEmail = async (applicationId) => {
+    if (!applicationId) {
+      alert('No application linked to this interview.');
+      return;
+    }
+    const id = typeof applicationId === 'object' ? applicationId._id : applicationId;
+    setSendingEmailId(id);
+    try {
+      const res = await fetch(`/api/company/applications/${id}/send-email`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Email sent successfully.');
+      } else {
+        alert(data.message || 'Unable to send email. Please try again.');
+      }
+    } catch (error) {
+      alert('Unable to send email. Please try again.');
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
+
   const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -1029,6 +1055,15 @@ export default function CompanyInterviewsDashboard() {
                         title="Details"
                       >
                         🔍
+                      </button>
+                      
+                      <button 
+                        onClick={() => handleSendEmail(inv.applicationId)}
+                        disabled={sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId)}
+                        className="text-[9px] font-bold uppercase bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1.5 rounded border border-blue-200 disabled:opacity-50"
+                        title="Send Email"
+                      >
+                        {sendingEmailId === (typeof inv.applicationId === 'object' ? inv.applicationId?._id : inv.applicationId) ? '⏳' : '📧'}
                       </button>
                       
                       {/* Sub-actions based on HR Authorization checks */}
