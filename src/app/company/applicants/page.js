@@ -332,17 +332,17 @@ export default function PlacementTracking() {
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4 mt-4 flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-black text-[#0B1E40]">{totalCount}</span>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Applicants</p>
+                  <div className="border-t border-slate-100 pt-4 mt-auto flex items-center justify-between">
+                    <div className="flex flex-col items-start">
+                      <span className="text-2xl font-black text-slate-800 leading-none">{totalCount}</span>
+                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Applicants</span>
                     </div>
 
                     <button
                       onClick={() => {
                         router.push(`${pathname}?jobId=${job._id}`);
                       }}
-                      className="px-4 py-2 text-xs font-bold text-white bg-[#0B1E40] hover:bg-[#152d54] rounded-xl transition-all shadow-xs hover:shadow-md cursor-pointer"
+                      className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm cursor-pointer"
                     >
                       View Candidates
                     </button>
