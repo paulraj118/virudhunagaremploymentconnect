@@ -40,9 +40,9 @@ export async function POST(request, { params }) {
     if (!sectionA_MCQ || sectionA_MCQ.length !== 5) errors.push('Section A must have exactly 5 MCQ questions');
     if (!sectionB_FillBlanks || sectionB_FillBlanks.length !== 5) errors.push('Section B must have exactly 5 Fill-in-the-Blank questions');
     if (!sectionC_Programming1 || !sectionC_Programming1.title) errors.push('Section C programming question title is required');
-    if (!sectionC_Programming1?.hiddenTestCases || sectionC_Programming1.hiddenTestCases.length < 5) errors.push('Section C must have at least 5 hidden test cases');
+    if (!sectionC_Programming1?.hiddenTestCases || sectionC_Programming1.hiddenTestCases.length < 1) errors.push('Section C must have at least 1 hidden test case');
     if (!sectionD_Programming2 || !sectionD_Programming2.title) errors.push('Section D programming question title is required');
-    if (!sectionD_Programming2?.hiddenTestCases || sectionD_Programming2.hiddenTestCases.length < 5) errors.push('Section D must have at least 5 hidden test cases');
+    if (!sectionD_Programming2?.hiddenTestCases || sectionD_Programming2.hiddenTestCases.length < 1) errors.push('Section D must have at least 1 hidden test case');
 
     if (errors.length > 0) {
       return NextResponse.json({ success: false, message: 'Test is incomplete and cannot be published', errors }, { status: 400 });
