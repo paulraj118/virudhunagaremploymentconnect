@@ -5,6 +5,8 @@ import LoginOTP from '@/models/LoginOTP';
 import { sendOTPEmail } from '@/lib/resendMail';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { signToken } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export async function POST(request) {
   try {
@@ -43,42 +45,27 @@ export async function POST(request) {
       );
     }
 
-    // --- OTP flow for college ---
-    // Delete any existing OTP for this email
-    await LoginOTP.deleteMany({ email });
+    // --- Direct login for college (Bypass OTP) ---
+    const token = signToken(college._id, 'college');
 
-    // Generate 6-digit OTP
-    const otpPlain = crypto.randomInt(100000, 999999).toString();
-
-    // Hash the OTP before storing
-    const salt = await bcrypt.genSalt(10);
-    const otpHashed = await bcrypt.hash(otpPlain, salt);
-
-    // Store OTP in MongoDB
-    await LoginOTP.create({
-      email,
-      role: 'college',
-      otp: otpHashed,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      verified: false,
-      attemptCount: 0,
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
     });
-
-    // Send OTP via Resend
-    const emailResult = await sendOTPEmail(email, otpPlain);
-    if (!emailResult.success) {
-      return NextResponse.json(
-        { success: false, message: 'Failed to send OTP email. Please try again.' },
-        { status: 500 }
-      );
-    }
 
     return NextResponse.json({
       success: true,
-      otpRequired: true,
-      message: 'OTP sent to your registered email',
-      email,
-      role: 'college',
+      directLogin: true,
+      token,
+      user: {
+        id: college._id,
+        name: college.institutionName,
+        email: college.email,
+        role: 'college',
+      },
     });
   } catch (error) {
     console.error('College OTP Send Error:', error);

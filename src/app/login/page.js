@@ -35,7 +35,13 @@ export default function Login() {
         }
         sessionStorage.setItem('jf_user', JSON.stringify(data.user));
         sessionStorage.setItem('jf_expected_role', data.user.role);
-        window.location.href = '/admin';
+        
+        const role = data.user.role;
+        if (role === 'super_admin') window.location.href = '/admin';
+        else if (role === 'hr_company') window.location.href = '/company';
+        else if (role === 'student') window.location.href = '/student';
+        else if (role === 'college') window.location.href = '/college/dashboard';
+        else window.location.href = '/';
       } else if (data.otpRequired) {
         // Student/HR: redirect to OTP page
         router.push(`/verify-otp?email=${encodeURIComponent(data.email)}&role=${encodeURIComponent(data.role)}&loginType=general`);

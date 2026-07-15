@@ -63,7 +63,14 @@ export default function CollegeLogin() {
       if (data.otpRequired) {
         // Redirect to OTP verification page
         window.location.href = `/verify-otp?email=${encodeURIComponent(data.email)}&role=college&loginType=college`;
-      } else if (data.success) {
+      } else if (data.directLogin || data.success) {
+        if (data.token) {
+          sessionStorage.setItem('jf_token', data.token);
+        }
+        if (data.user) {
+          sessionStorage.setItem('jf_user', JSON.stringify(data.user));
+          sessionStorage.setItem('jf_expected_role', data.user.role);
+        }
         window.location.href = '/college/dashboard';
       } else {
         setError(data.message);
