@@ -171,7 +171,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    const expectedRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+    const expectedRole = user?.role || sessionStorage.getItem(SESSION_ROLE_KEY);
     await fetch('/api/auth/logout', { 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -181,7 +181,16 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem('jf_user');
     sessionStorage.removeItem(SESSION_ROLE_KEY);
     setUser(null);
-    router.push('/login');
+    
+    if (expectedRole === 'super_admin') {
+      router.push('/admin/login');
+    } else if (expectedRole === 'college') {
+      router.push('/college/login');
+    } else if (expectedRole === 'company' || expectedRole === 'hr_company') {
+      router.push('/company/login');
+    } else {
+      router.push('/login');
+    }
   };
 
   return (
