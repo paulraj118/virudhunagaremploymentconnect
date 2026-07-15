@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { useAuth } from '@/context/AuthContext';
+
 export default function CompanyDashboard() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [drives, setDrives] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,11 +16,6 @@ export default function CompanyDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
   const [interviewData, setInterviewData] = useState({
-    type: 'HR Interview',
-    mode: 'Online',
-    date: '',
-    startTime: '',
-    endTime: '',
     type: 'HR Interview',
     mode: 'Online',
     date: '',
@@ -129,9 +127,8 @@ export default function CompanyDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    document.cookie = 'token=; Max-Age=0; path=/';
-    router.push('/company/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   if (loading) return <div className="p-8">Loading dashboard...</div>;

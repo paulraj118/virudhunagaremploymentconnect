@@ -32,12 +32,7 @@ export default function CollegeDashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' }); // Wait, college auth might just use standard logout or clear cookie
-    // Since we use the same `token` cookie, standard logout API should work, or we can just delete it client side.
-    document.cookie = 'token=; Max-Age=0; path=/';
-    router.push('/college/login');
-  };
+
 
   if (loading) {
     return (

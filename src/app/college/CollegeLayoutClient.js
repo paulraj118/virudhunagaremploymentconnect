@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CollegeLayoutClient({ children, collegeName }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Do not show sidebar on login and register pages
@@ -24,14 +26,7 @@ export default function CollegeLayoutClient({ children, collegeName }) {
   ];
 
   const handleLogout = async () => {
-    // Standard college logout procedure
-    document.cookie = 'token=; Max-Age=0; path=/';
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {
-      // ignore
-    }
-    router.push('/college/login');
+    await logout();
   };
 
   const getInitials = (name) => {

@@ -36,8 +36,6 @@ export default function AdminLayout({ children }) {
 
   const handleLogout = async () => {
     await logout();
-    // Force redirect to admin login after the context logout
-    window.location.href = '/admin/login';
   };
 
   if (loading) {

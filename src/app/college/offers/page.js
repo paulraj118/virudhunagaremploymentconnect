@@ -31,10 +31,7 @@ export default function CollegeOffers() {
     }
   };
 
-  const handleLogout = () => {
-    document.cookie = 'token=; Max-Age=0; path=/';
-    router.push('/college/login');
-  };
+
 
   // Calculate metrics
   const totalOffers = offers.length;

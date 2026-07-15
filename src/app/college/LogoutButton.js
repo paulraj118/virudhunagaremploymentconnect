@@ -1,19 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LogoutButton() {
-  const router = useRouter();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
-    // Delete the token cookie explicitly
-    document.cookie = 'token=; Max-Age=0; path=/';
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch (e) {
-      // ignore
-    }
-    router.push('/college/login');
+    await logout();
   };
 
   return (
