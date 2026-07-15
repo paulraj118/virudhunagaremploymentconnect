@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -22,12 +22,22 @@ export const verifyToken = (token) => {
 
 export const getCurrentUser = async (expectedRole = null) => {
   const cookieStore = await cookies();
+  const headersList = await headers();
+  const referer = headersList.get('referer') || '';
   
   let token;
   if (expectedRole) {
     token = cookieStore.get(`token_${expectedRole}`)?.value;
+  } else if (referer.includes('/admin')) {
+    token = cookieStore.get('token_super_admin')?.value;
+  } else if (referer.includes('/student')) {
+    token = cookieStore.get('token_student')?.value;
+  } else if (referer.includes('/company')) {
+    token = cookieStore.get('token_hr_company')?.value || cookieStore.get('token_company')?.value;
+  } else if (referer.includes('/college')) {
+    token = cookieStore.get('token_college')?.value;
   } else {
-    // Fallback: check them in order of priority if no specific role is asked for
+    // Fallback: check them in order of priority if no specific role is asked for and no referer context
     token = cookieStore.get('token_super_admin')?.value || 
             cookieStore.get('token_student')?.value || 
             cookieStore.get('token_hr_company')?.value || 
