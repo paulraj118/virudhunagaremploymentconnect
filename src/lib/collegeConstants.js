@@ -9,7 +9,7 @@ export const COLLEGES = [
   "The Standard Fireworks Rajaratnam College for Women",
   "SFR College for Women",
   "Raju's College",
-  "Sri S. Ramasamy Naidu Memorial College",
+  "Sri. Ramasamy Naidu Memorial College, Sattur",
   "A.K.D. Dharmaraja Women's College",
   "Devanga Arts College",
   "Saiva Bhanu Kshatriya College (SBK College)",
