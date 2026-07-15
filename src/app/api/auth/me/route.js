@@ -6,7 +6,8 @@ import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request) {
   try {
-    const decoded = await getCurrentUser();
+    const expectedRole = request.headers.get('x-expected-role');
+    const decoded = await getCurrentUser(expectedRole || null);
     if (!decoded) {
       return NextResponse.json({ success: false, message: 'Not authorized' }, { status: 401 });
     }

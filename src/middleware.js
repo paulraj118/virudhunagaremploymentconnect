@@ -65,7 +65,20 @@ async function verifyJWT(token, secret) {
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('token')?.value;
+  
+  let token = null;
+  if (pathname.startsWith('/admin')) token = request.cookies.get('token_super_admin')?.value;
+  else if (pathname.startsWith('/student')) token = request.cookies.get('token_student')?.value;
+  else if (pathname.startsWith('/company')) token = request.cookies.get('token_hr_company')?.value || request.cookies.get('token_company')?.value;
+  else if (pathname.startsWith('/college')) token = request.cookies.get('token_college')?.value;
+  else {
+    token = request.cookies.get('token_super_admin')?.value || 
+            request.cookies.get('token_student')?.value || 
+            request.cookies.get('token_hr_company')?.value || 
+            request.cookies.get('token_company')?.value || 
+            request.cookies.get('token_college')?.value || 
+            request.cookies.get('token')?.value;
+  }
   const JWT_SECRET = process.env.JWT_SECRET;
   
   let decodedPayload = null;

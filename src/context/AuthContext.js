@@ -84,7 +84,13 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      const res = await fetch('/api/auth/me');
+      const expectedRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+      
+      const res = await fetch('/api/auth/me', {
+        headers: {
+          'x-expected-role': expectedRole || ''
+        }
+      });
       const data = await res.json();
       
       if (data.success) {
@@ -165,7 +171,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    const expectedRole = sessionStorage.getItem(SESSION_ROLE_KEY);
+    await fetch('/api/auth/logout', { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: expectedRole })
+    });
     sessionStorage.removeItem('jf_token');
     sessionStorage.removeItem('jf_user');
     sessionStorage.removeItem(SESSION_ROLE_KEY);

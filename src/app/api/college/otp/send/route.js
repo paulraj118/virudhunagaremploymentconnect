@@ -49,10 +49,11 @@ export async function POST(request) {
     const token = signToken(college._id, 'college');
 
     const cookieStore = await cookies();
-    cookieStore.set('token', token, {
+    cookieStore.set('token_college', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
     });
 

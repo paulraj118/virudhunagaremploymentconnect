@@ -20,9 +20,21 @@ export const verifyToken = (token) => {
   }
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (expectedRole = null) => {
   const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  
+  let token;
+  if (expectedRole) {
+    token = cookieStore.get(`token_${expectedRole}`)?.value;
+  } else {
+    // Fallback: check them in order of priority if no specific role is asked for
+    token = cookieStore.get('token_super_admin')?.value || 
+            cookieStore.get('token_student')?.value || 
+            cookieStore.get('token_hr_company')?.value || 
+            cookieStore.get('token_company')?.value || 
+            cookieStore.get('token_college')?.value || 
+            cookieStore.get('token')?.value;
+  }
 
   if (!token) return null;
 

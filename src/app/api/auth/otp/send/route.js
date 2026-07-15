@@ -50,7 +50,7 @@ export async function POST(request) {
 
     const cookieStore = await cookies();
     cookieStore.set({
-      name: 'token',
+      name: `token_${user.role}`,
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
