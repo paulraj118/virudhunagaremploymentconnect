@@ -114,8 +114,7 @@ async function executeTestCase(code, languageId, input, expectedOutput) {
   };
 }
 
-// Evaluate a programming question against its 5 hidden test cases
-async function evaluateProgramming(code, languageStr, hiddenTestCases, sectionLabel) {
+async function evaluateProgramming(code, languageStr, hiddenTestCases = [], sectionLabel) {
   if (!code || code.trim() === '') {
     // Log removed
     return {
@@ -240,21 +239,23 @@ export async function POST(request) {
 
     // --- Save final answers ---
     if (answers) {
-      if (answers.mcq) {
+      if (answers.mcq && attempt.answers && attempt.answers.mcq) {
         for (const [key, value] of Object.entries(answers.mcq)) {
-          attempt.answers.mcq.set(key, value);
+          if (typeof attempt.answers.mcq.set === 'function') attempt.answers.mcq.set(key, value);
+          else attempt.answers.mcq[key] = value;
         }
       }
-      if (answers.fillBlanks) {
+      if (answers.fillBlanks && attempt.answers && attempt.answers.fillBlanks) {
         for (const [key, value] of Object.entries(answers.fillBlanks)) {
-          attempt.answers.fillBlanks.set(key, value);
+          if (typeof attempt.answers.fillBlanks.set === 'function') attempt.answers.fillBlanks.set(key, value);
+          else attempt.answers.fillBlanks[key] = value;
         }
       }
-      if (answers.programming1) {
+      if (answers.programming1 && attempt.answers && attempt.answers.programming1) {
         if (answers.programming1.code !== undefined) attempt.answers.programming1.code = answers.programming1.code;
         if (answers.programming1.languageId) attempt.answers.programming1.languageId = answers.programming1.languageId;
       }
-      if (answers.programming2) {
+      if (answers.programming2 && attempt.answers && attempt.answers.programming2) {
         if (answers.programming2.code !== undefined) attempt.answers.programming2.code = answers.programming2.code;
         if (answers.programming2.languageId) attempt.answers.programming2.languageId = answers.programming2.languageId;
       }
@@ -262,9 +263,12 @@ export async function POST(request) {
 
     // --- SECTION A: Grade MCQs (5 marks) ---
     let mcqScore = 0;
-    const mcqQuestions = test.sections.sectionA_MCQ;
+    const mcqQuestions = test.sections?.sectionA_MCQ || [];
     for (let i = 0; i < mcqQuestions.length; i++) {
-      const selectedOptionIndex = attempt.answers.mcq.get(String(i));
+      let selectedOptionIndex;
+      if (attempt.answers?.mcq) {
+        selectedOptionIndex = typeof attempt.answers.mcq.get === 'function' ? attempt.answers.mcq.get(String(i)) : attempt.answers.mcq[String(i)];
+      }
       if (selectedOptionIndex !== undefined && selectedOptionIndex !== null) {
         const correctIndex = ['A', 'B', 'C', 'D'].indexOf(mcqQuestions[i].correctOption.toUpperCase());
         if (selectedOptionIndex === correctIndex) {
@@ -276,9 +280,12 @@ export async function POST(request) {
 
     // --- SECTION B: Grade Fill-in-the-Blanks (5 marks) ---
     let fillBlanksScore = 0;
-    const fillQuestions = test.sections.sectionB_FillBlanks;
+    const fillQuestions = test.sections?.sectionB_FillBlanks || [];
     for (let i = 0; i < fillQuestions.length; i++) {
-      const candidateAnswer = attempt.answers.fillBlanks.get(String(i));
+      let candidateAnswer;
+      if (attempt.answers?.fillBlanks) {
+        candidateAnswer = typeof attempt.answers.fillBlanks.get === 'function' ? attempt.answers.fillBlanks.get(String(i)) : attempt.answers.fillBlanks[String(i)];
+      }
       if (candidateAnswer) {
         if (candidateAnswer.trim().toLowerCase() === fillQuestions[i].correctAnswer.trim().toLowerCase()) {
           fillBlanksScore += 1;
@@ -295,9 +302,9 @@ export async function POST(request) {
 
     try {
       const prog1Result = await evaluateProgramming(
-        attempt.answers.programming1.code,
-        attempt.answers.programming1.languageId,
-        test.sections.sectionC_Programming1.hiddenTestCases,
+        attempt.answers?.programming1?.code,
+        attempt.answers?.programming1?.languageId,
+        test.sections?.sectionC_Programming1?.hiddenTestCases || [],
         'Section C'
       );
       programming1Score = prog1Result.score;
@@ -308,9 +315,9 @@ export async function POST(request) {
 
     try {
       const prog2Result = await evaluateProgramming(
-        attempt.answers.programming2.code,
-        attempt.answers.programming2.languageId,
-        test.sections.sectionD_Programming2.hiddenTestCases,
+        attempt.answers?.programming2?.code,
+        attempt.answers?.programming2?.languageId,
+        test.sections?.sectionD_Programming2?.hiddenTestCases || [],
         'Section D'
       );
       programming2Score = prog2Result.score;
