@@ -43,13 +43,13 @@ export default function TechnicalTestEnginePage() {
   const fetchTestState = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/student/technical-test/pending');
+      const res = await fetch('/api/student/technical-test/pending', { cache: 'no-store' });
       const json = await res.json();
       
       if (json.success) {
         const testItem = json.data.tests.find(t => t.applicationId === applicationId);
         if (testItem) {
-          if (['Completed', 'Pass', 'Fail'].includes(testItem.technicalTestStatus)) {
+          if (['Completed', 'Pass', 'Fail'].includes(testItem.technicalTestStatus) || ['Completed', 'Terminated'].includes(testItem.attempt?.status)) {
             router.replace(`/student/technical-test/${applicationId}/result`);
             return;
           }

@@ -114,7 +114,8 @@ async function executeTestCase(code, languageId, input, expectedOutput) {
   };
 }
 
-async function evaluateProgramming(code, languageStr, hiddenTestCases = [], sectionLabel) {
+// Evaluate a programming question against its 5 hidden test cases
+async function evaluateProgramming(code, languageStr, hiddenTestCases, sectionLabel) {
   if (!code || code.trim() === '') {
     // Log removed
     return {
@@ -238,24 +239,22 @@ export async function POST(request) {
     // Log removed
 
     // --- Save final answers ---
-    if (answers) {
-      if (answers.mcq && attempt.answers && attempt.answers.mcq) {
+    if (answers && attempt.answers) {
+      if (answers.mcq && attempt.answers.mcq && typeof attempt.answers.mcq.set === 'function') {
         for (const [key, value] of Object.entries(answers.mcq)) {
-          if (typeof attempt.answers.mcq.set === 'function') attempt.answers.mcq.set(key, value);
-          else attempt.answers.mcq[key] = value;
+          attempt.answers.mcq.set(key, value);
         }
       }
-      if (answers.fillBlanks && attempt.answers && attempt.answers.fillBlanks) {
+      if (answers.fillBlanks && attempt.answers.fillBlanks && typeof attempt.answers.fillBlanks.set === 'function') {
         for (const [key, value] of Object.entries(answers.fillBlanks)) {
-          if (typeof attempt.answers.fillBlanks.set === 'function') attempt.answers.fillBlanks.set(key, value);
-          else attempt.answers.fillBlanks[key] = value;
+          attempt.answers.fillBlanks.set(key, value);
         }
       }
-      if (answers.programming1 && attempt.answers && attempt.answers.programming1) {
+      if (answers.programming1 && attempt.answers.programming1) {
         if (answers.programming1.code !== undefined) attempt.answers.programming1.code = answers.programming1.code;
         if (answers.programming1.languageId) attempt.answers.programming1.languageId = answers.programming1.languageId;
       }
-      if (answers.programming2 && attempt.answers && attempt.answers.programming2) {
+      if (answers.programming2 && attempt.answers.programming2) {
         if (answers.programming2.code !== undefined) attempt.answers.programming2.code = answers.programming2.code;
         if (answers.programming2.languageId) attempt.answers.programming2.languageId = answers.programming2.languageId;
       }
@@ -265,13 +264,29 @@ export async function POST(request) {
     let mcqScore = 0;
     const mcqQuestions = test.sections?.sectionA_MCQ || [];
     for (let i = 0; i < mcqQuestions.length; i++) {
-      let selectedOptionIndex;
-      if (attempt.answers?.mcq) {
-        selectedOptionIndex = typeof attempt.answers.mcq.get === 'function' ? attempt.answers.mcq.get(String(i)) : attempt.answers.mcq[String(i)];
-      }
-      if (selectedOptionIndex !== undefined && selectedOptionIndex !== null) {
-        const correctIndex = ['A', 'B', 'C', 'D'].indexOf(mcqQuestions[i].correctOption.toUpperCase());
-        if (selectedOptionIndex === correctIndex) {
+      const selectedOption = attempt.answers?.mcq?.get(String(i));
+      if (selectedOption !== undefined && selectedOption !== null) {
+        const correctOption = mcqQuestions[i]?.correctOption || '';
+        
+        // Find correct index
+        let correctIndex = ['A', 'B', 'C', 'D'].indexOf(String(correctOption).toUpperCase());
+        if (correctIndex === -1 && correctOption) {
+          correctIndex = (mcqQuestions[i]?.options || []).findIndex(
+            o => o.trim().toLowerCase() === String(correctOption).trim().toLowerCase()
+          );
+        }
+        
+        // Find selected index
+        let selectedIndex = ['A', 'B', 'C', 'D'].indexOf(String(selectedOption).toUpperCase());
+        if (selectedIndex === -1 && selectedOption) {
+          selectedIndex = (mcqQuestions[i]?.options || []).findIndex(
+            o => o.trim().toLowerCase() === String(selectedOption).trim().toLowerCase()
+          );
+        }
+
+        // Compare by index, or fallback to exact string match
+        if ((correctIndex !== -1 && correctIndex === selectedIndex) || 
+            (String(selectedOption).trim().toUpperCase() === String(correctOption).trim().toUpperCase())) {
           mcqScore += 1;
         }
       }
@@ -282,12 +297,10 @@ export async function POST(request) {
     let fillBlanksScore = 0;
     const fillQuestions = test.sections?.sectionB_FillBlanks || [];
     for (let i = 0; i < fillQuestions.length; i++) {
-      let candidateAnswer;
-      if (attempt.answers?.fillBlanks) {
-        candidateAnswer = typeof attempt.answers.fillBlanks.get === 'function' ? attempt.answers.fillBlanks.get(String(i)) : attempt.answers.fillBlanks[String(i)];
-      }
+      const candidateAnswer = attempt.answers?.fillBlanks?.get(String(i));
       if (candidateAnswer) {
-        if (candidateAnswer.trim().toLowerCase() === fillQuestions[i].correctAnswer.trim().toLowerCase()) {
+        const correctAnswer = fillQuestions[i]?.correctAnswer || '';
+        if (String(candidateAnswer).trim().toLowerCase() === String(correctAnswer).trim().toLowerCase()) {
           fillBlanksScore += 1;
         }
       }
@@ -339,7 +352,7 @@ export async function POST(request) {
     attempt.submittedAt = now;
     attempt.autoSubmitted = finalAutoSubmitted;
     attempt.submissionReason = finalSubmissionReason;
-    attempt.timeTaken = Math.round((now - attempt.browserStartedAt) / 1000);
+    attempt.timeTaken = attempt.browserStartedAt ? Math.round((now - attempt.browserStartedAt) / 1000) : 0;
     attempt.updatedBy = decoded.id;
     await attempt.save();
     // Log removed

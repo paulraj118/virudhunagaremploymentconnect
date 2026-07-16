@@ -35,7 +35,7 @@ const TechnicalAttemptSchema = new mongoose.Schema({
 
   // Candidate Answers
   answers: {
-    mcq: { type: Map, of: Number, default: {} },           // { "0": 2, "1": 0, ... } question index → selected option index
+    mcq: { type: Map, of: String, default: {} },           // { "0": "A", "1": "C", ... } question index → selected option letter
     fillBlanks: { type: Map, of: String, default: {} },     // { "0": "print()", "1": "int", ... }
     programming1: {
       code: { type: String, default: '' },
