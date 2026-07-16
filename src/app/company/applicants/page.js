@@ -254,7 +254,7 @@ export default function PlacementTracking() {
             No Job Posts Found
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {jobs.map(job => {
               const jobApps = allApplications.filter(app => app.jobId?._id === job._id || app.jobId === job._id);
               const test = techTests.find(t => t.jobId?._id === job._id || t.jobId === job._id);
@@ -349,7 +349,7 @@ export default function PlacementTracking() {
                       onClick={() => {
                         router.push(`${pathname}?jobId=${job._id}`);
                       }}
-                      className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap"
+                      className="px-4 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap"
                     >
                       View Candidates
                     </button>
