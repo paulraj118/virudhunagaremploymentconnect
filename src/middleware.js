@@ -71,6 +71,12 @@ export async function middleware(request) {
   else if (pathname.startsWith('/student')) token = request.cookies.get('token_student')?.value;
   else if (pathname.startsWith('/company')) token = request.cookies.get('token_hr_company')?.value || request.cookies.get('token_company')?.value;
   else if (pathname.startsWith('/college')) token = request.cookies.get('token_college')?.value;
+  else if (pathname === '/login') {
+    token = request.cookies.get('token_student')?.value || 
+            request.cookies.get('token_hr_company')?.value || 
+            request.cookies.get('token_company')?.value || 
+            request.cookies.get('token')?.value;
+  }
   else {
     token = request.cookies.get('token_super_admin')?.value || 
             request.cookies.get('token_student')?.value || 
