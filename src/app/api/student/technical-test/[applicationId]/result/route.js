@@ -5,6 +5,8 @@ import JobApplication from '@/models/JobApplication';
 import TechnicalTest from '@/models/TechnicalTest';
 import TechnicalAttempt from '@/models/TechnicalAttempt';
 import Student from '@/models/Student';
+import Job from '@/models/Job';
+import Company from '@/models/Company';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request, { params }) {
