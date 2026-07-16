@@ -71,7 +71,7 @@ export async function middleware(request) {
   else if (pathname.startsWith('/student')) token = request.cookies.get('token_student')?.value;
   else if (pathname.startsWith('/company')) token = request.cookies.get('token_hr_company')?.value || request.cookies.get('token_company')?.value;
   else if (pathname.startsWith('/college')) token = request.cookies.get('token_college')?.value;
-  else if (pathname === '/login') {
+  else if (pathname.startsWith('/login')) {
     token = request.cookies.get('token_student')?.value || 
             request.cookies.get('token_hr_company')?.value || 
             request.cookies.get('token_company')?.value || 
@@ -125,7 +125,7 @@ export async function middleware(request) {
   }
 
   // Redirect authenticated users away from generic login page OR their own specific login page
-  const isGenericLogin = pathname === '/login';
+  const isGenericLogin = pathname.startsWith('/login');
   
   let isOwnRoleLoginPage = false;
   if (decodedPayload) {
